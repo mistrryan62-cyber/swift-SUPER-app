@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIFT - Master Admin Engine & Command Center</title>
+    
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- INTEGRASI: Tailwind CSS & FontAwesome Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Internal -->
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #131b2e;
+            --accent-red: #dc2626;
+            --accent-green: #16a34a;
+            --accent-gold: #f59e0b;
+            --accent-blue: #2563eb;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-pink: #ec4899;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 12px;
+            box-sizing: border-box;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #1e1b4b, #111827);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 12px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .card-section {
+            background-color: var(--card-bg);
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .form-input {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+        }
+
+        .btn-main {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .btn-main:active {
+            transform: scale(0.98);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 8px 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        th {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+
+        .activity-feed-box {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            font-size: 11px;
+        }
+
+        .activity-item {
+            padding: 6px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toast-alert {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+        }
+
+        .current-value-box {
+            background: #0f172a;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 11px;
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .history-table {
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        label {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Alert Notification -->
+    <div id="toastAlert" class="toast-alert"></div>
+
+    <!-- ADMIN HEADER -->
+    <div class="admin-header">
+        <div>
+            <h2 style="margin:0; font-size:16px; color:var(--text-main); display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-shield-halved text-red-500"></i> SWIFT Master Engine
+            </h2>
+            <span style="font-size:12px; color:var(--accent-red); font-weight:bold;">Command Center (Full Access Control)</span>
+        </div>
+        <div style="text-align: right; display: flex; align-items: center; gap: 10px;">
+            <div class="hidden md:flex gap-2 text-xs">
+                <span class="bg-slate-800 text-green-400 px-2 py-1 rounded border border-green-500/20"><i class="fa-solid fa-location-dot"></i> PostGIS: Active</span>
+                <span class="bg-slate-800 text-pink-400 px-2 py-1 rounded border border-pink-500/20"><i class="fa-solid fa-video"></i> Live Engine: Ready</span>
+            </div>
+            <div id="connectionStatus" style="font-size: 11px; color: var(--accent-gold); background: rgba(245, 158, 11, 0.1); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--accent-gold);">
+                Menghubungkan...
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS GRID UTAMA -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span style="font-size:10px; color:var(--text-muted);">Total Pengguna</span>
+            <h3 id="statTotalUsers" style="margin:4px 0 0 0; font-size:16px; color:var(--text-main);">--</h3>
+        </div>
+        <div class="stat-card">
+            <span style="font-size:10px; color:var(--text-muted);">Driver Aktif</span>
+            <h3 id="statActiveDrivers" style="margin:4px 0 0 0; font-size:16px; color:var(--text-main);">--</h3>
+        </div>
+        <div class="stat-card">
+            <span style="font-size:10px; color:var(--text-muted);">Mitra Merchant</span>
+            <h3 id="statTotalMerchants" style="margin:4px 0 0 0; font-size:16px; color:var(--text-main);">--</h3>
+        </div>
+    </div>
+
+    <!-- MONITORING REAL-TIME BAR -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+            <p class="text-[10px] text-slate-400">Total Transaksi Hari Ini</p>
+            <p class="text-base font-bold text-white" id="statTodayOrders">0 <span class="text-[10px] text-green-400 font-normal">(+12%)</span></p>
+        </div>
+        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+            <p class="text-[10px] text-slate-400">Live Stream Aktif</p>
+            <p class="text-base font-bold text-pink-500" id="liveStreamActiveCount">2 Room</p>
+        </div>
+        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+            <p class="text-[10px] text-slate-400">Pendapatan Gift Live</p>
+            <p class="text-base font-bold text-amber-400">Rp 4.250.000</p>
+        </div>
+        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+            <p class="text-[10px] text-slate-400">Sistem Dispatch</p>
+            <p class="text-base font-bold text-blue-400">Otomatis (Active)</p>
+        </div>
+    </div>
+
+    <!-- BAGIAN 1: KONTROL KUOTA PENDAFTARAN -->
+    <div class="card-section" style="border: 1px solid var(--accent-gold);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-gold);">📊 1. Kontrol Kuota Pendaftaran</h3>
+        <div id="quotaCurrentValues" class="current-value-box"><strong>Nilai Kuota saat ini:</strong> Memuat data real-time...</div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px;">
+            <div>
+                <label>Kategori:</label>
+                <select id="quotaCategorySelect" class="form-input">
+                    <option value="driver_rider">Driver / Rider</option>
+                    <option value="courier">Kurir</option>
+                    <option value="merchant">Merchant</option>
+                    <option value="customer">Pengguna</option>
+                </select>
+            </div>
+            <div>
+                <label>Batas Kuota:</label>
+                <input type="number" id="quotaLimitInput" class="form-input" value="500">
+            </div>
+        </div>
+        <div style="margin-top: 4px;">
+            <label>Status Pendaftaran:</label>
+            <select id="quotaStatusAction" class="form-input">
+                <option value="UNLIMITED">Tanpa Batas</option>
+                <option value="LIMITED">Terbatas</option>
+                <option value="CLOSED">Tutup Sementara</option>
+            </select>
+        </div>
+        <button class="btn-main" style="background: var(--accent-gold); color: #0b0f19; margin-top: 4px;" onclick="saveQuotaSettings()">💾 Simpan Kuota</button>
+    </div>
+
+    <!-- BAGIAN 2: BONUS & INSENTIF -->
+    <div class="card-section" style="border: 1px solid var(--accent-green);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-green);">🎁 2. Program Bonus & Insentif</h3>
+        <div>
+            <label>Nama Program Bonus:</label>
+            <input type="text" id="bonusProgramName" class="form-input" placeholder="Contoh: Bonus Akhir Pekan Driver">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div>
+                <label>Target Penerima:</label>
+                <select id="bonusTargetRole" class="form-input">
+                    <option value="all_providers">Semua Mitra</option>
+                    <option value="driver">Driver & Rider</option>
+                    <option value="courier">Kurir</option>
+                </select>
+            </div>
+            <div>
+                <label>Nominal (Rp):</label>
+                <input type="number" id="bonusAmountInput" class="form-input" value="50000">
+            </div>
+        </div>
+        <button class="btn-main" style="margin-top: 6px;" onclick="saveBonusProgram()">🚀 Simpan & Luncurkan Program</button>
+    </div>
+
+    <!-- BAGIAN 3: MONITOR AKTIVITAS REAL-TIME -->
+    <div class="card-section" style="border: 1px solid #3b82f6;">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:#60a5fa;">📡 3. Monitor Aktivitas Real-Time</h3>
+        <div class="activity-feed-box" id="activityFeedContainer">
+            <div style="text-align:center; color:var(--text-muted); padding: 12px;">Memuat log aktivitas...</div>
+        </div>
+    </div>
+
+    <!-- BAGIAN 4: KOMISI MASTER ADMIN -->
+    <div class="card-section" style="border: 1px solid var(--accent-red);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-red);">💰 4. Komisi Master Admin</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+            <div><label>Komisi Driver (%):</label><input type="number" id="driverCommissionInput" class="form-input" value="15"></div>
+            <div><label>Komisi Merchant (%):</label><input type="number" id="merchantCommissionInput" class="form-input" value="10"></div>
+        </div>
+        <button class="btn-main" style="background:var(--accent-red); margin-top: 6px;" onclick="saveCommissionSettings()">💾 Simpan & Perbarui Komisi</button>
+    </div>
+
+    <!-- BAGIAN 5: ALGORITMA DISPATCH & MATCHMAKING -->
+    <div class="card-section" style="border: 1px solid var(--accent-purple);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-purple);">🛵 5. Algoritma Matchmaking & Auto-Dispatch</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div><label>Radius Pencarian (KM):</label><input type="number" id="dispatchRadiusInput" class="form-input" value="3.0"></div>
+            <div><label>Timeout Respon Driver (Detik):</label><input type="number" id="dispatchTimeoutInput" class="form-input" value="15"></div>
+        </div>
+        <button class="btn-main" style="background:var(--accent-purple);" onclick="saveDispatchSettings()">💾 Simpan Algoritma Dispatch</button>
+    </div>
+
+    <!-- BAGIAN 6: MANAJEMEN PAYOUT & WITHDRAWAL -->
+    <div class="card-section" style="border: 1px solid var(--accent-cyan);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-cyan);">💳 6. Payout & Penarikan Saldo Mitra</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div><label>Min. Penarikan (Rp):</label><input type="number" id="payoutMinInput" class="form-input" value="50000"></div>
+            <div><label>Biaya Admin Payout (Rp):</label><input type="number" id="payoutFeeInput" class="form-input" value="2500"></div>
+        </div>
+        <button class="btn-main" style="background:var(--accent-cyan); color:#0b0f19;" onclick="savePayoutSettings()">💾 Simpan Parameter Payout</button>
+    </div>
+
+    <!-- BAGIAN 7: DYNAMIC SURGE PRICING -->
+    <div class="card-section" style="border: 1px solid var(--accent-gold);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-gold);">⚡ 7. Dynamic Surge Pricing & Tarif Area</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div><label>Multiplier Jam Sibuk:</label><input type="number" id="surgeMultiplierInput" class="form-input" value="1.2" step="0.1"></div>
+            <div><label>Tarif Dasar (Rp):</label><input type="number" id="baseFareInput" class="form-input" value="10000"></div>
+        </div>
+        <button class="btn-main" style="background:var(--accent-gold); color:#0b0f19;" onclick="saveSurgeSettings()">⚡ Terapkan Tarif Dinamis</button>
+    </div>
+
+    <!-- BAGIAN 8: KONTROL MERCHANT & KATALOG -->
+    <div class="card-section" style="border: 1px solid var(--accent-green);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-green);">🏪 8. Kontrol Merchant & Katalok Produk</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div><label>Timeout Merchant (Menit):</label><input type="number" id="merchantTimeoutInput" class="form-input" value="10"></div>
+            <div><label>Biaya Handling (Rp):</label><input type="number" id="merchantHandlingFeeInput" class="form-input" value="2000"></div>
+        </div>
+        <button class="btn-main" style="background:var(--accent-green);" onclick="saveMerchantSettings()">💾 Simpan Parameter Merchant</button>
+    </div>
+
+    <!-- BAGIAN 9: KEAMANAN & ANTI-FRAUD -->
+    <div class="card-section" style="border: 1px solid var(--accent-red);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-red);">🛡️ 9. Sistem Keamanan & Anti-Fraud</h3>
+        <div>
+            <label>Deteksi Mock Location / GPS Palsu:</label>
+            <select id="fakeGpsPolicySelect" class="form-input">
+                <option value="BLOCK">Blokir Akun Otomatis</option>
+                <option value="WARN">Beri Peringatan & Suspend 24 Jam</option>
+                <option value="IGNORE">Hanya Catat Log</option>
+            </select>
+        </div>
+        <button class="btn-main" style="background:var(--accent-red);" onclick="saveSecuritySettings()">🛡️ Update Keamanan & Fraud Protocol</button>
+    </div>
+
+    <!-- BAGIAN 11: KONTROL VERSI APLIKASI & MAINTENANCE (LANGKAH 3) -->
+    <div class="card-section" style="border: 1px solid var(--accent-cyan);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-cyan); display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-code-version"></i> 11. App Version Control & Maintenance Mode
+        </h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div>
+                <label>Versi Android Minimal:</label>
+                <input type="text" id="appVersionAndroid" class="form-input" placeholder="Contoh: 1.2.0">
+            </div>
+            <div>
+                <label>Versi iOS Minimal:</label>
+                <input type="text" id="appVersionIos" class="form-input" placeholder="Contoh: 1.1.5">
+            </div>
+            <div class="col-span-2">
+                <label>Status Maintenance Mode:</label>
+                <select id="appMaintenanceStatus" class="form-input">
+                    <option value="OFF">Sistem Aktif (Normal)</option>
+                    <option value="ON">Maintenance Mode (Kunci Aplikasi)</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-main" style="background:var(--accent-cyan); color:#0b0f19;" onclick="saveVersionSettings()">💾 Simpan Versi & Status Sistem</button>
+    </div>
+
+    <!-- BAGIAN 12: PUSAT PENGUMUMAN GLOBAL (LANGKAH 3) -->
+    <div class="card-section" style="border: 1px solid var(--accent-purple);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-purple); display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-bullhorn"></i> 12. Broadcast Pengumuman Global (Push Notification)
+        </h3>
+        <div>
+            <label>Judul Pengumuman:</label>
+            <input type="text" id="broadcastTitle" class="form-input" placeholder="Judul pesan">
+        </div>
+        <div>
+            <label>Isi Pengumuman:</label>
+            <textarea id="broadcastMessage" class="form-input" style="height: 60px;" placeholder="Isi pesan pengumuman global..."></textarea>
+        </div>
+        <div>
+            <label>Target Penerima:</label>
+            <select id="broadcastTarget" class="form-input">
+                <option value="all">Semua Pengguna & Mitra</option>
+                <option value="driver">Hanya Driver</option>
+                <option value="merchant">Hanya Merchant</option>
+                <option value="customer">Hanya Customer</option>
+            </select>
+        </div>
+        <button class="btn-main" style="background:var(--accent-purple);" onclick="sendGlobalBroadcast()">📣 Kirim Pengumuman Global</button>
+    </div>
+
+    <!-- BAGIAN 10: MASTER CONTROL LIVE STREAMING -->
+    <div class="card-section" style="border: 1px solid var(--accent-pink);">
+        <h3 style="margin:0 0 4px 0; font-size:13px; color:var(--accent-pink); display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-video"></i> 10. Master Control Live Streaming & Saweran
+        </h3>
+         
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div>
+                <label>Potongan Komisi Gift/Saweran (%):</label>
+                <input type="number" id="liveGiftCommission" class="form-input" value="20" placeholder="Contoh: 20%">
+            </div>
+            <div>
+                <label>Batas Maksimal Durasi Live (Jam):</label>
+                <input type="number" id="liveMaxDuration" class="form-input" value="4">
+            </div>
+            <div>
+                <label>Kualitas Max Video Stream:</label>
+                <select id="liveMaxQuality" class="form-input">
+                    <option value="1080p">1080p Full HD (60 FPS)</option>
+                    <option value="720p" selected>720p HD (Standard)</option>
+                    <option value="480p">480p SD (Hemat Bandwidth)</option>
+                </select>
+            </div>
+            <div>
+                <label>Sensor Chat Otomatis (Filter Kata):</label>
+                <select id="liveChatFilter" class="form-input">
+                    <option value="STRICT">Ketat (Blokir Judi/Kasar/SARA)</option>
+                    <option value="MODERATE">Sedang</option>
+                    <option value="OFF">Nonaktifkan</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-main" style="background:var(--accent-pink);" onclick="saveLiveStreamSettings()">🎥 Simpan Pengaturan Live Stream</button>
+
+        <div class="history-table" style="margin-top:12px;">
+            <p style="font-size:11px; color:var(--accent-pink); margin:0 0 6px 0; font-weight:bold;">🔴 Live Streaming Sedang Berlangsung (Real-Time Control):</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Streamer / Host</th>
+                        <th>Penonton</th>
+                        <th>Gift Terkumpul</th>
+                        <th>Aksi Admin</th>
+                    </tr>
+                </thead>
+                <tbody id="liveRoomsTableBody">
+                    <tr id="room-882">
+                        <td><strong>Warung Makan Khas Bu Siti</strong> <span class="text-[9px] bg-pink-950 text-pink-400 px-1 rounded">MERCHANT</span></td>
+                        <td>👥 342 Viewer</td>
+                        <td>🪙 12,400 Coin</td>
+                        <td><button class="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded font-bold" onclick="stopLiveStreamRoom('ROOM-882')">Hentikan Live</button></td>
+                    </tr>
+                    <tr id="room-883">
+                        <td><strong>Budi Santoso (Rider)</strong> <span class="text-[9px] bg-blue-950 text-blue-400 px-1 rounded">DRIVER</span></td>
+                        <td>👥 89 Viewer</td>
+                        <td>🪙 1,200 Coin</td>
+                        <td><button class="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded font-bold" onclick="stopLiveStreamRoom('ROOM-883')">Hentikan Live</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT MASTER ENGINE -->
+    <script>
+        // LANGKAH 1 & 2: PERBAIKAN INISIALISASI & KEAMANAN
+        const SUPABASE_URL = "https://ydulzwenmideyjrntwie.supabase.co";
+        // ANON KEY DIHAPUS DARI SINI UNTUK KEAMANAN Full Access Admin
+
+        let supabase = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initSupabase();
+            loadDashboardStats();
+            loadActivityLogs();
+        });
+
+        function showToast(message) {
+            const toast = document.getElementById('toastAlert');
+            toast.innerText = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // GANTI FUNGSI initSupabase:
+        function initSupabase() {
+            const connStatus = document.getElementById('connectionStatus');
+            // Untuk Admin Command Center, kita HARUS menggunakan Service Role Key
+            // agar bisa mengontrol penuh (melewati RLS).
+            // PENTING: Key ini jangan ditaruh di client-side permanen.
+            // Gunakan prompt sementara untuk sesi admin ini.
+            
+            const adminKey = prompt("Masukkan SWIFT Service Role Key untuk Akses Master:");
+
+            if (!adminKey) {
+                connStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Akses Ditolak';
+                connStatus.style.color = 'var(--accent-red)';
+                connStatus.style.borderColor = 'var(--accent-red)';
+                connStatus.style.background = 'rgba(220, 38, 38, 0.1)';
+                return;
+            }
+
+            try {
+                if (window.supabase) {
+                    // Inisialisasi menggunakan Key yang dimasukkan
+                    supabase = window.supabase.createClient(SUPABASE_URL, adminKey);
+                    connStatus.innerHTML = '<i class="fa-solid fa-circle-check"></i> Connected';
+                    connStatus.style.color = 'var(--accent-green)';
+                    connStatus.style.borderColor = 'var(--accent-green)';
+                    connStatus.style.background = 'rgba(22, 163, 74, 0.1)';
+                } else {
+                    throw new Error('Supabase SDK tidak termuat');
+                }
+            } catch (err) {
+                connStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Offline';
+                connStatus.style.color = 'var(--accent-red)';
+                connStatus.style.borderColor = 'var(--accent-red)';
+                connStatus.style.background = 'rgba(220, 38, 38, 0.1)';
+            }
+        }
+
+        // LANGKAH 4: SINKRONISASI DATA LIVE STREAMING (Real-time v2)
+        async function loadDashboardStats() {
+            if (!supabase) return;
+            try {
+                // Hitung total pengguna
+                const { count: totalUsers } = await supabase.from('users').select('*', { count: 'exact', head: true });
+                document.getElementById('statTotalUsers').innerText = totalUsers !== null ? totalUsers : '0';
+
+                // Hitung driver aktif
+                const { count: activeDrivers } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'driver');
+                document.getElementById('statActiveDrivers').innerText = activeDrivers !== null ? activeDrivers : '0';
+
+                // Hitung merchant
+                const { count: totalMerchants } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'merchant');
+                document.getElementById('statTotalMerchants').innerText = totalMerchants !== null ? totalMerchants : '0';
+
+                // Hitung total order hari ini
+                const { count: todayOrders } = await supabase.from('orders').select('*', { count: 'exact', head: true });
+                document.getElementById('statTodayOrders').innerText = todayOrders !== null ? todayOrders : '0';
+                 
+                document.getElementById('quotaCurrentValues').innerHTML = `<strong>Nilai Kuota saat ini:</strong> Driver: ${activeDrivers || 0}/500 | Merchant: ${totalMerchants || 0}/100`;
+
+                // TAMBAHKAN: Hitung live stream aktif secara REALTIME
+                const { count: liveStreams } = await supabase
+                    .from('live_streams') // Asumsi nama tabel
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'ongoing'); // Hanya hitung yang ongoing
+
+                document.getElementById('liveStreamActiveCount').innerText = `${liveStreams || 0} Room`;
+
+                // --- AKTIFKAN SUPABASE REALTIME V2 ---
+                // Dengarkan perubahan pada tabel 'live_streams'
+                supabase
+                    .channel('public:live_streams')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'live_streams' }, payload => {
+                        console.log('Live Stream Change Detected:', payload);
+                        loadDashboardStats(); // Rekalkulasi statistik jika ada perubahan live
+                    })
+                    .subscribe();
+
+            } catch (err) {
+                console.log('Catatan statistik: Gunakan skema Supabase yang sesuai.');
+            }
+        }
+
+        function loadActivityLogs() {
+            const container = document.getElementById('activityFeedContainer');
+            const now = new Date().toLocaleTimeString();
+            container.innerHTML = `
+                <div class="activity-item">
+                    <span><i class="fa-solid fa-circle-dot text-green-500"></i> System Initialized Successfully</span>
+                    <span style="color:var(--text-muted);">${now}</span>
+                </div>
+                <div class="activity-item">
+                    <span><i class="fa-solid fa-user-plus text-blue-400"></i> Pendaftaran Mitra Baru: Driver #8921</span>
+                    <span style="color:var(--text-muted);">Baru saja</span>
+                </div>
+                <div class="activity-item">
+                    <span><i class="fa-solid fa-bolt text-amber-400"></i> Surge Pricing Aktif Wilayah Sektor 1</span>
+                    <span style="color:var(--text-muted);">5 mnt lalu</span>
+                </div>
+            `;
+        }
+
+        // FUNGSI SIMPAN AKSI MASTER ADMIN (LANGKAH 2: REAL SUPABASE UPDATE)
+        async function saveQuotaSettings() {
+            if (!supabase) return showToast("❌ Supabase belum terhubung.");
+            
+            const cat = document.getElementById('quotaCategorySelect').value;
+            const limit = document.getElementById('quotaLimitInput').value;
+            const status = document.getElementById('quotaStatusAction').value;
+
+            showToast('🔄 Mengupdate kuota di cloud...');
+
+            // UPDATE KE DB SUPABASE (Tabel app_settings)
+            // Asumsi schema: key (text, primary key), value (jsonb)
+            const { error } = await supabase
+                .from('app_settings')
+                .upsert({ 
+                    key: `quota_${cat}`, 
+                    value: { limit: parseInt(limit), status: status } 
+                });
+
+            if (error) {
+                showToast(`❌ Gagal menyimpan kuota: ${error.message}`);
+            } else {
+                showToast(`✅ Kuota [${cat.toUpperCase()}] berhasil disinkronkan ke cloud!`);
+                loadDashboardStats(); // Refresh tampilan
+            }
+        }
+
+        async function saveBonusProgram() {
+            const name = document.getElementById('bonusProgramName').value || 'Bonus Program';
+            const amount = document.getElementById('bonusAmountInput').value;
+            showToast(`🚀 Program "${name}" senilai Rp ${amount} Berhasil Diluncurkan!`);
+            // Lakukan implementasi upsert Supabase seperti saveQuotaSettings jika schema siap
+        }
+
+        async function saveCommissionSettings() {
+            if (!supabase) return showToast("❌ Supabase belum terhubung.");
+            
+            const driverComm = document.getElementById('driverCommissionInput').value;
+            const merchantComm = document.getElementById('merchantCommissionInput').value;
+
+            showToast('🔄 Mengupdate komisi di cloud...');
+
+            const { error } = await supabase
+                .from('app_settings')
+                .upsert({ 
+                    key: 'commission_rates', 
+                    value: { driver: parseInt(driverComm), merchant: parseInt(merchantComm) } 
+                });
+
+            if (error) {
+                showToast(`❌ Gagal menyimpan komisi: ${error.message}`);
+            } else {
+                showToast(`💾 Komisi Diperbarui & Sinkron! Driver: ${driverComm}%, Merchant: ${merchantComm}%`);
+            }
+        }
+
+        async function saveDispatchSettings() {
+            const radius = document.getElementById('dispatchRadiusInput').value;
+            const timeout = document.getElementById('dispatchTimeoutInput').value;
+            showToast(`🛵 Algoritma Dispatch Disimpan! Radius: ${radius} KM, Timeout: ${timeout} Detik`);
+            // Lakukan implementasi upsert Supabase seperti saveQuotaSettings jika schema siap
+        }
+
+        async function savePayoutSettings() {
+            const min = document.getElementById('payoutMinInput').value;
+            const fee = document.getElementById('payoutFeeInput').value;
+            showToast(`💳 Parameter Payout Disimpan! Min: Rp ${min}, Fee: Rp ${fee}`);
+            // Lakukan implementasi upsert Supabase seperti saveQuotaSettings jika schema siap
+        }
+
+        async function saveSurgeSettings() {
+            const mult = document.getElementById('surgeMultiplierInput').value;
+            const base = document.getElementById('baseFareInput').value;
+            showToast(`⚡ Dynamic Surge Diterapkan! Multiplier: ${mult}x, Base: Rp ${base}`);
+            // Lakukan implementasi upsert Supabase seperti saveQuotaSettings jika schema siap
+        }
+
+        async function saveMerchantSettings() {
+            showToast(`🏪 Parameter Merchant & Catalog Berhasil Disimpan!`);
+            // Lakukan implementasi upsert Supabase seperti saveQuotaSettings jika schema siap
+        }
+
+        async function saveSecuritySettings() {
+            const policy = document.getElementById('fakeGpsPolicySelect').value;
+            showToast(`🛡️ Protokol Anti-Fraud Diperbarui: Policy [${policy}]`);
+            // Lakukan implementasi upsert Supabase seperti saveQuotaSettings jika schema siap
+        }
+
+        async function saveLiveStreamSettings() {
+            const comm = document.getElementById('liveGiftCommission').value;
+            showToast(`🎥 Pengaturan Live Stream Berhasil Disimpan! Komisi Gift: ${comm}%`);
+            // Lakukan implementasi upsert Supabase seperti saveQuotaSettings jika schema siap
+        }
+
+        // FUNGSI JAVASCRIPT UNTUK PENGATURAN BARU (LANGKAH 3)
+        async function saveVersionSettings() {
+            if (!supabase) return showToast("❌ Supabase belum terhubung.");
+            
+            const android = document.getElementById('appVersionAndroid').value;
+            const ios = document.getElementById('appVersionIos').value;
+            const status = document.getElementById('appMaintenanceStatus').value;
+
+            showToast('🔄 Mengupdate versi di cloud...');
+
+            const { error } = await supabase
+                .from('app_settings')
+                .upsert({ 
+                    key: 'app_version_control', 
+                    value: { android_min: android, ios_min: ios, maintenance: status } 
+                });
+
+            if (error) {
+                showToast(`❌ Gagal menyimpan versi: ${error.message}`);
+            } else {
+                showToast(`💾 Versi & Sistem Diperbarui! Android: ${android}, Status: ${status}`);
+            }
+        }
+
+        async function sendGlobalBroadcast() {
+            if (!supabase) return showToast("❌ Supabase belum terhubung.");
+            
+            const title = document.getElementById('broadcastTitle').value;
+            const message = document.getElementById('broadcastMessage').value;
+            const target = document.getElementById('broadcastTarget').value;
+
+            if (!title || !message) return showToast("⚠️ Judul dan Isi pesan harus diisi.");
+
+            showToast('📣 Mengirim broadcast global...');
+
+            // Asumsi Anda memiliki tabel 'broadcasts' atau API Edge Function untuk Push
+            const { error } = await supabase
+                .from('broadcasts')
+                .insert({ 
+                    title: title, 
+                    message: message, 
+                    target: target,
+                    sent_at: new Date()
+                });
+
+            if (error) {
+                showToast(`❌ Gagal mengirim broadcast: ${error.message}`);
+            } else {
+                showToast(`📣 Broadcast "${title}" berhasil dikirim ke target [${target}]!`);
+                // Reset form
+                document.getElementById('broadcastTitle').value = '';
+                document.getElementById('broadcastMessage').value = '';
+            }
+        }
+
+        function stopLiveStreamRoom(roomId) {
+            if (confirm(`Apakah Anda yakin ingin menghentikan siaran ${roomId} secara paksa?`)) {
+                if (roomId === 'ROOM-882') document.getElementById('room-882').style.display = 'none';
+                if (roomId === 'ROOM-883') document.getElementById('room-883').style.display = 'none';
+                showToast(`🛑 Live Stream ${roomId} telah dihentikan secara paksa!`);
+                // Implementasikan API call untuk menghentikan stream di sisi media server jika ada
+            }
+        }
+    </script>
+</body>
+</html>

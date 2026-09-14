@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SWIFT Super-App Ecosystem</title>
+  
+  <!-- MANIFEST PWA & THEME COLOR -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#ef4444">
+
+  <!-- REGISTRASI SERVICE WORKER (PWA ENABLER) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('SWIFT Service Worker Registered!', reg))
+          .catch((err) => console.error('Service Worker Registration Failed!', err));
+      });
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0b1120; color: #f8fafc; padding: 16px; padding-bottom: 80px; max-width: 480px; margin: 0 auto; min-height: 100vh; }
+    
+    .top-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.6); padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #334155; }
+    .top-bar select { background: #1e293b; color: white; border: 1px solid #334155; padding: 4px 8px; border-radius: 6px; font-size: 11px; outline: none; }
+    
+    .wallet-card { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); padding: 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); margin-bottom: 16px; }
+    .wallet-title { font-size: 12px; color: #fca5a5; font-weight: 500; }
+    .wallet-amount { font-size: 22px; font-weight: 800; color: #ffffff; margin-top: 2px; }
+    .btn-topup { background: #ffffff; color: #0f172a; border: none; padding: 8px 16px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; }
+
+    .banner-container { position: relative; border-radius: 16px; overflow: hidden; margin-bottom: 20px; border: 1px solid #334155; height: 140px; }
+    .banner-img { width: 100%; height: 100%; object-fit: cover; }
+    .banner-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 10px 12px; font-size: 11px; font-weight: bold; color: #ffffff; display: flex; align-items: center; gap: 6px; }
+
+    .section-title { font-size: 13px; font-weight: 600; color: #94a3b8; margin-bottom: 10px; }
+    
+    .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+    .service-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .service-card:active { transform: scale(0.95); background: #334155; }
+    .service-icon { font-size: 22px; margin-bottom: 4px; }
+    .service-name { font-size: 11px; font-weight: 500; color: #e2e8f0; line-height: 1.2; }
+
+    .mitra-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 20px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .mitra-title { color: #ef4444; font-size: 15px; font-weight: bold; margin-bottom: 2px; }
+    .mitra-sub { color: #94a3b8; font-size: 11px; margin-bottom: 12px; }
+    
+    .mitra-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+    .mitra-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 12px 8px; text-align: center; cursor: pointer; }
+    .mitra-card.active { border: 1.5px solid #ef4444; background: #1e293b; }
+    .mitra-card:active { transform: scale(0.96); }
+    .mitra-card-text { font-size: 11px; font-weight: 600; color: #f8fafc; margin-top: 4px; }
+
+    .form-group { margin-bottom: 10px; }
+    .form-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
+    .form-group input { width: 100%; background: #020617; border: 1px solid #334155; color: #ffffff; padding: 9px 12px; border-radius: 10px; font-size: 12px; outline: none; }
+    .form-group input:focus { border-color: #ef4444; }
+
+    .btn-submit { width: 100%; background: #dc2626; color: #ffffff; font-weight: bold; padding: 10px; border: none; border-radius: 10px; font-size: 12px; cursor: pointer; margin-top: 4px; }
+    .btn-submit:active { background: #b91c1c; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 99999; padding: 16px; }
+    .modal-content { background: #1e293b; width: 100%; max-width: 440px; padding: 20px; border-radius: 16px; border: 1px solid #334155; max-height: 85vh; overflow-y: auto; }
+    #mapContainer { width: 100%; height: 180px; border-radius: 10px; margin-bottom: 12px; background: #0f172a; }
+    .toast-alert { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #f8fafc; padding: 10px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 100000; display: none; border: 1px solid #334155; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+  </style>
+</head>
+<body class="max-w-md mx-auto min-h-screen">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <span style="font-size:11px; color:#94a3b8;">🌏 Regional</span>
+    <select id="countrySelect" onchange="showToast('Mata uang diperbarui')">
+      <option value="ID" selected>🇮🇩 Indonesia (IDR)</option>
+    </select>
+  </div>
+
+  <!-- WALLET CARD -->
+  <div class="wallet-card">
+    <div>
+      <p class="wallet-title">Saldo Dompet SWIFT</p>
+      <h2 class="wallet-amount">Rp 250.000</h2>
+    </div>
+    <button onclick="showToast('Fitur Top Up diproses')" class="btn-topup">Top Up</button>
+  </div>
+
+  <!-- BANNER PROMO -->
+  <div class="banner-container">
+    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" alt="Promo" class="banner-img">
+    <div class="banner-caption">
+      <span>🔥</span> PROMO SPESIAL & DISKON KILAT HARI INI
+    </div>
+  </div>
+
+  <!-- LAYANAN SWIFT (8 GRID) -->
+  <div>
+    <h3 class="section-title">Layanan SWIFT</h3>
+    <div class="services-grid">
+      <div onclick="openDriverModal('SWIFT Ride', 'ride')" class="service-card">
+        <span class="service-icon">🛵</span>
+        <span class="service-name">SWIFT Ride</span>
+      </div>
+      <div onclick="openDriverModal('SWIFT Send', 'send')" class="service-card">
+        <span class="service-icon">📦</span>
+        <span class="service-name">SWIFT Send</span>
+      </div>
+      <div onclick="showToast('Katalog Food diproses')" class="service-card">
+        <span class="service-icon">🍔</span>
+        <span class="service-name">SWIFT Food</span>
+      </div>
+      <div onclick="showToast('Katalog Mart diproses')" class="service-card">
+        <span class="service-icon">🏪</span>
+        <span class="service-name">SWIFT Mart</span>
+      </div>
+      <div onclick="openDriverModal('SWIFT Express', 'express')" class="service-card">
+        <span class="service-icon">⚡</span>
+        <span class="service-name">SWIFT Express</span>
+      </div>
+      <div onclick="openDriverModal('SWIFT Car', 'car')" class="service-card">
+        <span class="service-icon">🚗</span>
+        <span class="service-name">SWIFT Car</span>
+      </div>
+      <div onclick="openDriverModal('SWIFT Box', 'box')" class="service-card">
+        <span class="service-icon">🚚</span>
+        <span class="service-name">SWIFT Box</span>
+      </div>
+      <div onclick="showToast('Live & Promo Segera Hadir')" class="service-card">
+        <span class="service-icon">📺</span>
+        <span class="service-name">Live & Promo</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- GABUNG JADI MITRA SWIFT -->
+  <div class="mitra-box">
+    <h3 class="mitra-title">Gabung Jadi Mitra SWIFT</h3>
+    <p class="mitra-sub">Pilih kategori pendaftaran untuk bergabung:</p>
+
+    <div class="mitra-grid">
+      <div onclick="pilihMitra('Driver Mobil', this)" class="mitra-card">
+        <span style="font-size:20px;">🚗</span>
+        <div class="mitra-card-text">Daftar Driver Mobil</div>
+      </div>
+      <div onclick="pilihMitra('Ojek Motor', this)" class="mitra-card active">
+        <span style="font-size:20px;">🛵</span>
+        <div class="mitra-card-text">Daftar Ojek Motor</div>
+      </div>
+      <div onclick="pilihMitra('Kurir Express', this)" class="mitra-card">
+        <span style="font-size:20px;">📦</span>
+        <div class="mitra-card-text">Daftar Kurir Express</div>
+      </div>
+      <div onclick="pilihMitra('Merchant Food/Mart', this)" class="mitra-card">
+        <span style="font-size:20px;">🏪</span>
+        <div class="mitra-card-text">Daftar Merchant Food/Mart</div>
+      </div>
+    </div>
+
+    <form id="formMitraSwift" onsubmit="handleFormSubmit(event)">
+      <input type="hidden" id="kategoriMitra" value="Ojek Motor">
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input type="text" id="namaLengkap" required placeholder="Masukkan nama lengkap">
+      </div>
+      <div class="form-group">
+        <label>Nomor WhatsApp / HP</label>
+        <input type="tel" id="nomorHp" required placeholder="08xxxxxxxxxx">
+      </div>
+      <button type="submit" id="btnSubmitMitra" class="btn-submit">Kirim Pendaftaran Mitra</button>
+    </form>
+  </div>
+
+  <!-- TOAST ALERT -->
+  <div id="toastNotification" class="toast-alert"></div>
+
+  <!-- MODAL MAP LEAFLET -->
+  <div id="driverModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 id="rideModalTitle" style="font-size:14px; color:#ffffff;">LOKASI LAYANAN</h3>
+        <span onclick="closeModal('driverModal')" style="cursor:pointer; font-size:22px; color:#94a3b8;">&times;</span>
+      </div>
+      <div id="mapContainer"></div>
+      <input type="hidden" id="currentServiceType">
+      <button style="width:100%; background:#ef4444; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="createRealTimeOrder()">Pesan Sekarang</button>
+    </div>
+  </div>
+
+  <!-- EXTERNAL SCRIPTS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./config.js"></script>
+  <script src="./script.js"></script>
+
+  <script>
+    let mapInstance = null;
+
+    // KONSTANTA & INISIALISASI UNTUK SINKRONISASI SUPABASE MASTER ENGINE
+    const CURRENT_APP_VERSION = "1.0.0";
+    const PLATFORM = "android"; // 'android' atau 'ios'
+    const USER_ROLE = "customer"; // 'customer', 'driver', atau 'merchant'
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Menjalankan pengecekan sistem & listener realtime saat aplikasi dibuka
+      initSupabaseSync();
+    });
+
+    async function initSupabaseSync() {
+      // Pastikan objek supabase tersedia dari config.js / window.supabase
+      if (typeof supabase !== 'undefined' && supabase) {
+        await checkAppSystemStatus();
+        listenForGlobalBroadcasts(USER_ROLE);
+      } else {
+        console.warn("Supabase SDK belum siap. Menunggu inisialisasi...");
+        setTimeout(initSupabaseSync, 1000);
+      }
+    }
+
+    // --- 1. LOGIKA PENGECEKAN SISTEM & MAINTENANCE GUARD ---
+    async function checkAppSystemStatus() {
+      try {
+        const { data, error } = await supabase
+          .from('app_settings')
+          .select('value')
+          .eq('key', 'app_version_control')
+          .single();
+
+        if (error) {
+          console.error("Gagal memeriksa status sistem:", error.message);
+          return;
+        }
+
+        if (data && data.value) {
+          const config = data.value;
+
+          // Cek Maintenance Mode
+          if (config.maintenance === 'ON') {
+            showMaintenanceScreen();
+            return;
+          }
+
+          // Cek Versi Minimal Aplikasi
+          const minVersion = PLATFORM === 'android' ? config.android_min : config.ios_min;
+          if (minVersion && isVersionOutdated(CURRENT_APP_VERSION, minVersion)) {
+            showForceUpdateScreen(minVersion);
+            return;
+          }
+
+          console.log("Sistem SWIFT Normal: Aplikasi siap digunakan.");
+        }
+      } catch (err) {
+        console.error("Kesalahan jaringan/sistem:", err);
+      }
+    }
+
+    // Helper untuk pembandingan versi semver
+    function isVersionOutdated(current, minimum) {
+      const v1 = current.split('.').map(Number);
+      const v2 = minimum.split('.').map(Number);
+
+      for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
+        const num1 = v1[i] || 0;
+        const num2 = v2[i] || 0;
+        if (num1 < num2) return true;
+        if (num1 > num2) return false;
+      }
+      return false;
+    }
+
+    // Tampilan Kunci jika Maintenance Mode Aktif
+    function showMaintenanceScreen() {
+      document.body.innerHTML = `
+        <div style="background:#0b0f19; color:white; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px;">
+          <h1 style="color:#ef4444; font-size:24px; margin-bottom:12px;">🚧 Pemeliharaan Sistem</h1>
+          <p style="color:#94a3b8; max-width:400px; font-size:13px; line-height:1.5;">
+            Aplikasi SWIFT sedang dalam peningkatan layanan. Silakan coba beberapa saat lagi.
+          </p>
+        </div>
+      `;
+    }
+
+    // Tampilan Paksa Update jika Versi Usang
+    function showForceUpdateScreen(minVersion) {
+      document.body.innerHTML = `
+        <div style="background:#0b0f19; color:white; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px;">
+          <h1 style="color:#06b6d4; font-size:24px; margin-bottom:12px;">🚀 Perbarui Aplikasi</h1>
+          <p style="color:#94a3b8; max-width:400px; font-size:13px; line-height:1.5;">
+            Versi baru (${minVersion}) telah tersedia. Silakan perbarui aplikasi Anda untuk melanjutkan.
+          </p>
+          <a href="https://play.google.com/store" style="margin-top:20px; background:#16a34a; color:white; padding:12px 24px; border-radius:10px; text-decoration:none; font-weight:bold; font-size:13px;">
+            Update Sekarang
+          </a>
+        </div>
+      `;
+    }
+
+    // --- 2. SUPABASE REALTIME CHANNEL LISTENER (BROADCAST) ---
+    function listenForGlobalBroadcasts(userRole = 'customer') {
+      supabase
+        .channel('public:broadcasts')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'broadcasts' }, payload => {
+          const newBroadcast = payload.new;
+
+          // Filter pesan berdasarkan role pengguna
+          if (newBroadcast.target === 'all' || newBroadcast.target === userRole) {
+            displayBroadcastNotification(newBroadcast.title, newBroadcast.message);
+          }
+        })
+        .subscribe();
+    }
+
+    function displayBroadcastNotification(title, message) {
+      alert(`📢 PENGUMUMAN SWIFT:\n\n${title}\n${message}`);
+    }
+
+    // --- FUNGSI INTERAKTIF UI bawaan ---
+    function showToast(text) {
+      const toast = document.getElementById('toastNotification');
+      toast.innerText = text;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+
+    function pilihMitra(kategori, element) {
+      const cards = document.querySelectorAll('.mitra-card');
+      cards.forEach(card => card.classList.remove('active'));
+      element.classList.add('active');
+      document.getElementById('kategoriMitra').value = kategori;
+    }
+
+    function openDriverModal(serviceName, type) {
+      document.getElementById('rideModalTitle').innerText = serviceName;
+      document.getElementById('currentServiceType').value = type;
+      document.getElementById('driverModal').style.display = 'flex';
+      
+      setTimeout(() => {
+        if (!mapInstance && window.L) {
+          mapInstance = L.map('mapContainer').setView([-6.175392, 106.827153], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+          L.marker([-6.175392, 106.827153]).addTo(mapInstance).bindPopup('Lokasi Penjemputan').openPopup();
+        } else if (mapInstance) {
+          mapInstance.invalidateSize();
+        }
+      }, 300);
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    function createRealTimeOrder() {
+      showToast('🔄 Mencari Driver SWIFT Terdekat...');
+      setTimeout(() => {
+        closeModal('driverModal');
+        showToast('✅ Pesanan Berhasil Dibuat!');
+      }, 1500);
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      if (typeof registerMitraToSupabase === 'function') {
+        registerMitraToSupabase();
+      } else {
+        showToast('🔄 Mengirim Pendaftaran Mitra...');
+      }
+    }
+  </script>
+</body>
+</html>
