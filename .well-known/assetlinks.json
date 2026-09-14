@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.mistrryan62_cyber.twa",
+        "sha256_cert_fingerprints": ["8F:55:39:75:C5:30:8A:25:65:C9:65:A6:56:80:91:C2:75:69:7B:68:0E:71:17:C0:C2:24:08:20:41:FF:4D:7C"]
+      }
+    }]
