@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil & Verifikasi KYC - SWIFT Super-App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .card-bg {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+        }
+        .input-dark {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            color: #f8fafc;
+        }
+        .input-dark:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-12">
+
+    <!-- Header Navigasi -->
+    <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-50">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <a href="index.html" class="text-xs font-semibold bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-700 transition">← Beranda</a>
+            <h1 class="text-sm font-bold text-white tracking-wide">👤 Profil & Verifikasi KYC</h1>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-6">
+
+        <!-- Kartu Informasi Akun -->
+        <div class="card-bg rounded-xl p-5 shadow-xl space-y-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-blue-600/20 border border-blue-500/40 rounded-full flex items-center justify-center text-blue-400 font-bold text-lg" id="user-initial">--</div>
+                <div>
+                    <h2 id="user-fullname" class="text-base font-bold text-white">Memuat Nama...</h2>
+                    <p id="user-email" class="text-xs text-slate-400">Memuat Email...</p>
+                </div>
+            </div>
+            <div class="pt-3 border-t border-slate-800 flex justify-between text-xs">
+                <span class="text-slate-400">Peran Sistem: <strong id="user-role-text" class="text-blue-400 uppercase">--</strong></span>
+                <span class="text-slate-400">Status KYC: <strong id="kyc-status-badge" class="text-yellow-400">Memeriksa...</strong></span>
+            </div>
+        </div>
+
+        <!-- Form Pengajuan Verifikasi KYC / Dokumen Mitra -->
+        <div class="card-bg rounded-xl p-5 shadow-xl space-y-4">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Unggah Dokumen Verifikasi</h3>
+            <p class="text-xs text-slate-400">Lengkapi data di bawah ini jika Anda mendaftar sebagai Mitra Driver atau Merchant untuk diverifikasi oleh Admin.</p>
+
+            <form onsubmit="handleKycSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nomor Identitas (NIK KTP)</label>
+                    <input type="text" id="kyc-nik" required class="input-dark w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Contoh: 3201XXXXXXXXXXXXXXXX">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nomor Plat Kendaraan / No. Lisensi Usaha</label>
+                    <input type="text" id="kyc-license" class="input-dark w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Contoh: B 1234 XYZ (Opsional untuk Customer)">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Catatan Tambahan / Keterangan</label>
+                    <textarea id="kyc-notes" rows="2" class="input-dark w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Keterangan kendaraan atau jenis layanan kuliner..."></textarea>
+                </div>
+                <button type="submit" id="btn-submit-kyc" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-lg text-sm transition shadow-lg shadow-blue-600/20">
+                    Kirim Dokumen Verifikasi
+                </button>
+            </form>
+        </div>
+
+        <!-- Tombol Keluar Akun -->
+        <button onclick="handleLogout()" class="w-full bg-red-950/40 hover:bg-red-900/50 text-red-400 border border-red-800/60 font-semibold py-2.5 rounded-xl text-xs transition">
+            Keluar (Logout) dari Akun
+        </button>
+
+    </main>
+
+    <!-- Script Integrasi Supabase Profile & KYC -->
+    <script>
+        const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) {
+                alert('Silakan login terlebih dahulu.');
+                window.location.href = 'auth.html';
+                return;
+            }
+            currentUser = session.user;
+            await loadUserProfile();
+        });
+
+        async function loadUserProfile() {
+            try {
+                const { data: profile } = await _supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                if (profile) {
+                    document.getElementById('user-fullname').innerText = profile.full_name || 'Pengguna SWIFT';
+                    document.getElementById('user-email').innerText = profile.email || currentUser.email;
+                    document.getElementById('user-role-text').innerText = profile.role || 'Customer';
+                    document.getElementById('user-initial').innerText = (profile.full_name || 'S').charAt(0).toUpperCase();
+                }
+
+                // Cek status KYC di tabel kyc_documents
+                const { data: kyc } = await _supabase.from('kyc_documents').select('*').eq('user_id', currentUser.id).maybeSingle();
+                const kycBadge = document.getElementById('kyc-status-badge');
+                if (kyc) {
+                    kycBadge.innerText = kyc.status.toUpperCase();
+                    if(kyc.status === 'verified' || kyc.status === 'approved') {
+                        kycBadge.className = 'text-emerald-400 font-bold';
+                    } else if(kyc.status === 'rejected') {
+                        kycBadge.className = 'text-red-400 font-bold';
+                    } else {
+                        kycBadge.className = 'text-yellow-400 font-bold';
+                    }
+                } else {
+                    kycBadge.innerText = 'BELUM DIAJUKAN';
+                    kycBadge.className = 'text-slate-400 font-semibold';
+                }
+            } catch (err) {
+                console.error('Gagal memuat profil:', err.message);
+            }
+        }
+
+        async function handleKycSubmit(e) {
+            e.preventDefault();
+            const nik = document.getElementById('kyc-nik').value;
+            const license = document.getElementById('kyc-license').value;
+            const notes = document.getElementById('kyc-notes').value;
+            const btn = document.getElementById('btn-submit-kyc');
+
+            btn.disabled = true;
+            btn.innerText = 'Mengirim Data...';
+
+            try {
+                const { error } = await _supabase.from('kyc_documents').upsert([
+                    {
+                        user_id: currentUser.id,
+                        nik_number: nik,
+                        vehicle_license: license,
+                        notes: notes,
+                        status: 'pending'
+                    }
+                ], { onConflict: 'user_id' });
+
+                if (error) throw error;
+
+                alert('Dokumen verifikasi KYC berhasil dikirim dan menunggu persetujuan admin!');
+                await loadUserProfile();
+            } catch (err) {
+                alert('Gagal mengirim verifikasi: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Kirim Dokumen Verifikasi';
+            }
+        }
+
+        async function handleLogout() {
+            if (confirm('Apakah Anda yakin ingin keluar dari aplikasi?')) {
+                await _supabase.auth.signOut();
+                window.location.href = 'auth.html';
+            }
+        }
+    </script>
+</body>
+</html>

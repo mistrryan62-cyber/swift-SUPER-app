@@ -2,15 +2,47 @@
 // SWIFT APP MASTER ENGINE & INTEGRASI FINTEK
 // ==========================================
 
+// Helper Toast Notification
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.className = 'swift-toast';
+  toast.innerText = message;
+  toast.style.cssText = `
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #1e293b; color: #fff; padding: 12px 24px; border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999; font-size: 14px;
+    border: 1px solid #334155; transition: opacity 0.3s ease;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
 // 1. Fungsi Pendaftaran Mitra SWIFT ke Supabase
 async function registerMitraToSupabase() {
   const btnSubmit = document.getElementById('btnSubmitMitra');
-  const kategori = document.getElementById('kategoriMitra').value;
-  const nama = document.getElementById('namaLengkap').value;
-  const hp = document.getElementById('nomorHp').value;
+  const kategoriElem = document.getElementById('kategoriMitra');
+  const namaElem = document.getElementById('namaLengkap');
+  const hpElem = document.getElementById('nomorHp');
+
+  if (!namaElem || !hpElem) {
+    showToast('⚠️ Form pendaftaran tidak ditemukan.');
+    return;
+  }
+
+  const kategori = kategoriElem ? kategoriElem.value : 'DRIVER_MOTOR';
+  const nama = namaElem.value.trim();
+  const hp = hpElem.value.trim();
 
   if (!nama || !hp) {
     showToast('⚠️ Harap isi nama dan nomor HP!');
+    return;
+  }
+
+  if (typeof supabase === 'undefined') {
+    showToast('❌ Koneksi Database Supabase belum siap!');
     return;
   }
 
@@ -18,7 +50,6 @@ async function registerMitraToSupabase() {
   btnSubmit.innerText = 'Mengirim Data...';
 
   try {
-    // Memasukkan data pendaftaran ke tabel mitra di Supabase
     const { data, error } = await supabase
       .from('mitra_registrations')
       .insert([
@@ -33,7 +64,8 @@ async function registerMitraToSupabase() {
     if (error) throw error;
 
     showToast('✅ Pendaftaran Berhasil Dikirim!');
-    document.getElementById('formMitraSwift').reset();
+    const form = document.getElementById('formMitraSwift');
+    if (form) form.reset();
   } catch (err) {
     console.error('Error Mitra:', err.message);
     showToast('❌ Gagal mengirim: ' + err.message);
@@ -73,8 +105,12 @@ function loadPaymentGatewaySDK(snapToken, onSuccess, onPending, onError) {
 
 // 3. Pengajuan Withdrawal / Payout Saldo Dompet Mitra
 async function requestPayout(userId, amount, bankName, accountNumber) {
+  if (typeof supabase === 'undefined') {
+    showToast('❌ Koneksi Database Supabase belum siap!');
+    return;
+  }
+
   try {
-    // Cek ketersediaan saldo
     const { data: wallet, error: walletErr } = await supabase
       .from('wallets')
       .select('balance')
@@ -87,7 +123,6 @@ async function requestPayout(userId, amount, bankName, accountNumber) {
       return;
     }
 
-    // Catat transaksi penarikan saldo
     const { data, error } = await supabase
       .from('transactions')
       .insert([{

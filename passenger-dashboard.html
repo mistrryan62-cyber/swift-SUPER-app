@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIFT Passenger Dashboard - Super-App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Leaflet CSS untuk Live Tracking Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .service-card:hover { border-color: #2563eb; transform: translateY(-2px); }
+        #map { height: 300px; width: 100%; border-radius: 0.75rem; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION -->
+    <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 sticky top-0 z-50 shadow-sm">
+        <div class="flex items-center space-x-3">
+            <span class="bg-blue-600 text-white font-black px-3 py-1.5 rounded-lg text-xs tracking-wider">SWIFT RIDER</span>
+            <span id="user-greeting" class="text-xs font-bold text-slate-700">Halo, Penumpang</span>
+        </div>
+        <div class="flex items-center space-x-3">
+            <a href="wallet.html" class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-2 rounded-lg text-xs font-bold flex items-center space-x-2">
+                <span>💳 Saldo:</span>
+                <span id="header-wallet-balance">Rp 0</span>
+            </a>
+            <button onclick="handleLogout()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-3 py-2 rounded-lg transition border border-rose-200">
+                Keluar
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 space-y-6">
+
+        <!-- LAYANAN UTAMA (RIDE, FOOD, SEND) -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <h2 class="text-sm font-black text-slate-900 uppercase tracking-wide">Pilih Layanan SWIFT</h2>
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="selectService('ride')" id="btn-service-ride" class="service-card border-2 border-blue-600 bg-blue-50/50 p-4 rounded-xl text-center transition space-y-2">
+                    <div class="text-xl">🏍️</div>
+                    <div class="text-xs font-bold text-slate-900">SWIFT Ride</div>
+                </button>
+                <button onclick="selectService('food')" id="btn-service-food" class="service-card border-2 border-slate-200 p-4 rounded-xl text-center transition space-y-2">
+                    <div class="text-xl">🍔</div>
+                    <div class="text-xs font-bold text-slate-900">SWIFT Food</div>
+                </button>
+                <button onclick="selectService('send')" id="btn-service-send" class="service-card border-2 border-slate-200 p-4 rounded-xl text-center transition space-y-2">
+                    <div class="text-xl">📦</div>
+                    <div class="text-xs font-bold text-slate-900">SWIFT Send</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- FORM PEMESANAN & TARIF DINAMIS -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <h2 class="text-sm font-black text-slate-900 uppercase tracking-wide">Detail Perjalanan & Tarif</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Lokasi Penjemputan (Pickup)</label>
+                    <input type="text" id="pickup-location" placeholder="Masukkan titik jemput..." class="w-full border border-slate-300 px-3 py-2.5 rounded-lg text-xs bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Lokasi Tujuan (Destination)</label>
+                    <input type="text" id="dropoff-location" placeholder="Masukkan tujuan..." class="w-full border border-slate-300 px-3 py-2.5 rounded-lg text-xs bg-slate-50" oninput="calculateDynamicTariff()">
+                </div>
+            </div>
+
+            <!-- ESTIMASI TARIF OTOMATIS -->
+            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex justify-between items-center">
+                <div>
+                    <div class="text-[11px] text-slate-500 font-semibold">Estimasi Jarak & Tarif Dinamis</div>
+                    <div id="estimated-fare-text" class="text-base font-black text-blue-600">Rp 0 (0 km)</div>
+                </div>
+                <button onclick="submitOrder()" id="btn-submit-order" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition shadow-sm">
+                    Pesan Sekarang
+                </button>
+            </div>
+        </div>
+
+        <!-- LIVE TRACKING MAP -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3">
+            <h2 class="text-sm font-black text-slate-900 uppercase tracking-wide">Live Tracking Armada</h2>
+            <div id="map"></div>
+        </div>
+
+    </main>
+
+    <!-- Leaflet JS untuk Peta -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let activeServiceType = 'ride';
+        let currentUser = null;
+        let map, driverMarker;
+
+        // Inisialisasi Peta Leaflet
+        function initMap() {
+            map = L.map('map').setView([-6.2088, 106.8456], 13); // Default Jakarta
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; SWIFT OpenStreetMap'
+            }).addTo(map);
+
+            // Dummy Marker posisi awal driver
+            driverMarker = L.marker([-6.2088, 106.8456]).addTo(map)
+                .bindPopup("<b>Driver SWIFT Terdekat</b><br>Menunggu pesanan Anda.").openPopup();
+        }
+
+        // Pilih Layanan
+        function selectService(type) {
+            activeServiceType = type;
+            ['ride', 'food', 'send'].forEach(t => {
+                const btn = document.getElementById(`btn-service-${t}`);
+                if (t === type) {
+                    btn.className = "service-card border-2 border-blue-600 bg-blue-50/50 p-4 rounded-xl text-center transition space-y-2";
+                } else {
+                    btn.className = "service-card border-2 border-slate-200 p-4 rounded-xl text-center transition space-y-2";
+                }
+            });
+            calculateDynamicTariff();
+        }
+
+        // Kalkulasi Tarif Dinamis Sederhana
+        function calculateDynamicTariff() {
+            const dropoff = document.getElementById('dropoff-location').value.trim();
+            const fareText = document.getElementById('estimated-fare-text');
+
+            if (!dropoff) {
+                fareText.innerText = "Rp 0 (0 km)";
+                return;
+            }
+
+            // Simulasi jarak berdasarkan panjang teks tujuan atau tarif dasar per layanan
+            let baseRate = activeServiceType === 'ride' ? 10000 : activeServiceType === 'food' ? 15000 : 12000;
+            let estimatedKm = (dropoff.length % 8) + 3; // Simulasi jarak 3 - 10 km
+            let totalFare = baseRate + (estimatedKm * 2500);
+
+            fareText.innerText = `Rp ${totalFare.toLocaleString('id-ID')} (${estimatedKm} km)`;
+        }
+
+        // Ambil Data Profil & Saldo Pengguna
+        async function loadUserData() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            currentUser = session.user;
+
+            let { data: profile } = await _supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+            if (profile) {
+                document.getElementById('user-greeting').innerText = `Halo, ${profile.email.split('@')[0]}`;
+                document.getElementById('header-wallet-balance').innerText = `Rp ${(profile.wallet_balance || 0).toLocaleString('id-ID')}`;
+            }
+        }
+
+        // Tombol Pemesanan Terintegrasi ke Tabel orders Supabase
+        async function submitOrder() {
+            const pickup = document.getElementById('pickup-location').value.trim();
+            const dropoff = document.getElementById('dropoff-location').value.trim();
+            const fareText = document.getElementById('estimated-fare-text').innerText;
+
+            if (!pickup || !dropoff) {
+                alert('Mohon lengkapi lokasi penjemputan dan tujuan!');
+                return;
+            }
+
+            const btn = document.getElementById('btn-submit-order');
+            btn.innerText = "Mencari Driver...";
+            btn.disabled = true;
+
+            const { error } = await _supabase.from('orders').insert([
+                {
+                    passenger_id: currentUser.id,
+                    service_type: activeServiceType,
+                    pickup_location: pickup,
+                    dropoff_location: dropoff,
+                    fare_estimation: fareText,
+                    status: 'searching',
+                    created_at: new Date()
+                }
+            ]);
+
+            if (error) {
+                alert('Gagal membuat pesanan: ' + error.message);
+                btn.innerText = "Pesan Sekarang";
+                btn.disabled = false;
+            } else {
+                alert('Pesanan berhasil dibuat! Sistem sedang mencari driver terdekat.');
+                btn.innerText = "Menunggu Driver...";
+            }
+        }
+
+        function handleLogout() {
+            _supabase.auth.signOut();
+            window.location.href = 'auth.html';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            loadUserData();
+        });
+    </script>
+</body>
+</html>

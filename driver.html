@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran Mitra - SWIFT Super-App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #030712; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+        .swift-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; padding: 16px; }
+    </style>
+</head>
+<body class="pb-20">
+    <header style="background: #0b0f19; border-bottom: 1px solid #1e293b; padding: 12px 16px; position: sticky; top: 0; z-index: 50;">
+        <div style="max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 12px;">
+            <a href="index.html" style="background: #1e293b; color: #f8fafc; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; border: 1px solid #334155;">← Kembali</a>
+            <h1 style="font-size: 14px; font-weight: bold; color: white;">Pendaftaran Mitra SWIFT</h1>
+        </div>
+    </header>
+
+    <main style="max-width: 480px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+        <div class="swift-card" style="background: linear-gradient(135deg, #0f172a 0%, #450a0a 100%); border-left: 4px solid #dc2626;">
+            <h2 style="font-size: 14px; font-weight: bold; color: #f87171;">Formulir Pendaftaran Resmi</h2>
+            <p style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">Lengkapi data diri Anda untuk bergabung bersama ekosistem SWIFT.</p>
+        </div>
+
+        <div class="swift-card" style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+                <label style="font-size: 11px; font-weight: bold; color: #94a3b8; display: block; margin-bottom: 4px;">Pilih Kategori Kemitraan</label>
+                <select id="partner-category" style="width: 100%; background: #1e293b; color: #f1f5f9; font-size: 12px; padding: 10px; border-radius: 8px; border: 1px solid #334155; outline: none;">
+                    <option value="driver_mobil">🚗 Driver Mobil</option>
+                    <option value="ojek_motor">🛵 Ojek Motor</option>
+                    <option value="mitra_niaga">🏪 Mitra Usaha / Niaga / Kedai</option>
+                    <option value="kurir_box">📦 Kurir / Express / Box</option>
+                </select>
+            </div>
+
+            <div>
+                <label style="font-size: 11px; font-weight: bold; color: #94a3b8; display: block; margin-bottom: 4px;">Nama Lengkap (Sesuai KTP)</label>
+                <input type="text" placeholder="Masukkan nama lengkap..." style="width: 100%; background: #1e293b; color: #f1f5f9; font-size: 12px; padding: 10px; border-radius: 8px; border: 1px solid #334155; outline: none;">
+            </div>
+
+            <div>
+                <label style="font-size: 11px; font-weight: bold; color: #94a3b8; display: block; margin-bottom: 4px;">Nomor WhatsApp Aktif</label>
+                <input type="text" placeholder="Contoh: 081234567890" style="width: 100%; background: #1e293b; color: #f1f5f9; font-size: 12px; padding: 10px; border-radius: 8px; border: 1px solid #334155; outline: none;">
+            </div>
+
+            <div>
+                <label style="font-size: 11px; font-weight: bold; color: #94a3b8; display: block; margin-bottom: 4px;">Nomor Plat Kendaraan / Nama Usaha</label>
+                <input type="text" placeholder="Contoh: B 1234 XYZ / Kedai Berkah" style="width: 100%; background: #1e293b; color: #f1f5f9; font-size: 12px; padding: 10px; border-radius: 8px; border: 1px solid #334155; outline: none;">
+            </div>
+
+            <button onclick="submitRegistration()" style="width: 100%; background: #dc2626; color: white; font-size: 13px; font-weight: bold; padding: 12px; border-radius: 10px; border: none; cursor: pointer; margin-top: 8px;">Kirim Pendaftaran 🚀</button>
+        </div>
+    </main>
+
+    <script>
+        function submitRegistration() {
+            alert('Pendaftaran berhasil dikirim! Tim verifikasi SWIFT akan segera menghubungi Anda.');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dompet & Pembayaran SWIFT - SWIFT Super-App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            background-color: #030712;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .swift-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 16px;
+        }
+        .payment-channel-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+        .payment-channel-btn:hover {
+            border-color: #34d399;
+            background: #1e293b88;
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <header style="background: #0b0f19; border-bottom: 1px solid #1e293b; padding: 12px 16px; position: sticky; top: 0; z-index: 50;">
+        <div style="max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 12px;">
+            <a href="index.html" style="background: #1e293b; color: #f8fafc; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; border: 1px solid #334155;">← Kembali</a>
+            <h1 style="font-size: 14px; font-weight: bold; color: white;">Dompet & Gateway Pembayaran Resmi</h1>
+        </div>
+    </header>
+
+    <!-- TAMPILAN UTAMA DOMPET -->
+    <main id="wallet-main-view" style="max-width: 480px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+
+        <div class="swift-card" style="background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%); border-left: 4px solid #34d399; position: relative; overflow: hidden;">
+            <p style="font-size: 11px; color: #34d399; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Total Saldo Aktif (Supabase Database)</p>
+            <h2 id="wallet-balance" style="font-size: 28px; font-weight: 900; color: #ffffff; margin-top: 4px;">Memuat...</h2>
+            <div style="display: flex; gap: 8px; margin-top: 14px;">
+                <button onclick="openTopUpModal()" style="flex: 1; background: #34d399; color: #030712; font-size: 12px; font-weight: 800; padding: 10px; border-radius: 10px; border: none; cursor: pointer;">+ Top Up Saldo</button>
+                <button onclick="fetchWalletBalance()" style="flex: 1; background: #1e293b; color: #f1f5f9; font-size: 12px; font-weight: 700; padding: 10px; border-radius: 10px; border: 1px solid #334155; cursor: pointer;">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+            <div class="swift-card" style="text-align: center; padding: 10px 4px; cursor: pointer;" onclick="openTopUpModal('midtrans')">
+                <span style="font-size: 18px;">💳</span>
+                <p style="font-size: 10px; font-weight: bold; color: #cbd5e1; margin-top: 4px;">Midtrans</p>
+            </div>
+            <div class="swift-card" style="text-align: center; padding: 10px 4px; cursor: pointer;" onclick="openTopUpModal('qris')">
+                <span style="font-size: 18px;">📱</span>
+                <p style="font-size: 10px; font-weight: bold; color: #cbd5e1; margin-top: 4px;">QRIS</p>
+            </div>
+            <div class="swift-card" style="text-align: center; padding: 10px 4px; cursor: pointer;" onclick="openTopUpModal('dana')">
+                <span style="font-size: 18px;">💙</span>
+                <p style="font-size: 10px; font-weight: bold; color: #cbd5e1; margin-top: 4px;">DANA</p>
+            </div>
+            <div class="swift-card" style="text-align: center; padding: 10px 4px; cursor: pointer;" onclick="processCODSelection()">
+                <span style="font-size: 18px;">💵</span>
+                <p style="font-size: 10px; font-weight: bold; color: #cbd5e1; margin-top: 4px;">COD / Tunai</p>
+            </div>
+        </div>
+
+        <div class="swift-card">
+            <h3 style="font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">Riwayat Transaksi & Mutasi</h3>
+            <div id="transaction-list" style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #1e293b;">
+                    <div>
+                        <h4 style="font-size: 12px; font-weight: bold; color: white;">Menghubungkan Ledger Database...</h4>
+                        <span style="font-size: 10px; color: #94a3b8;">-</span>
+                    </div>
+                    <span style="font-size: 12px; font-weight: bold; color: #34d399;">Rp 0</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- TAMPILAN HALAMAN QRIS DINAMIS -->
+    <main id="qris-view" style="display: none; max-width: 480px; margin: 0 auto; padding: 16px; flex-direction: column; gap: 16px;">
+        <div class="swift-card" style="text-align: center;">
+            <p style="font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">Total Pembayaran QRIS</p>
+            <h2 id="qris-amount-display" style="font-size: 26px; font-weight: 900; color: #34d399; margin: 4px 0 12px 0;">Rp 0</h2>
+            <div style="background: #1e293b; padding: 8px; border-radius: 8px; display: inline-block;">
+                <span style="font-size: 11px; color: #cbd5e1;">Merchant: <b>SWIFT Ecosystem Official</b></span><br>
+                <span style="font-size: 10px; color: #64748b;">NMID: ID1029384756102</span>
+            </div>
+        </div>
+
+        <div class="swift-card" style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+            <p style="font-size: 11px; color: #cbd5e1; text-align: center;">Scan QR Code ini menggunakan aplikasi m-Banking atau E-Wallet (BCA, Mandiri, GoPay, OVO, DANA, ShopeePay)</p>
+            <div id="qrcode-container" style="background: white; padding: 16px; border-radius: 12px; display: flex; justify-content: center; align-items: center;"></div>
+            <div id="countdown-timer" style="font-size: 11px; color: #f87171; font-weight: bold;">Sisa Waktu Pembayaran: 14:59</div>
+        </div>
+
+        <div class="swift-card" style="display: flex; flex-direction: column; gap: 8px;">
+            <button onclick="confirmQrisPayment()" style="width: 100%; background: #34d399; color: #030712; font-size: 13px; font-weight: 800; padding: 12px; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);">Simulasi Pembayaran Berhasil ✅</button>
+            <button onclick="backToWalletView()" style="width: 100%; background: #1e293b; color: #94a3b8; font-size: 11px; font-weight: bold; padding: 10px; border-radius: 10px; border: 1px solid #334155; cursor: pointer;">Batalkan dan Kembali</button>
+        </div>
+    </main>
+
+    <!-- Modal Pilihan Top Up -->
+    <div id="topup-modal" style="display: none; position: fixed; inset: 0; background: rgba(3,7,18,0.85); z-index: 100; align-items: center; justify-content: center; padding: 16px;">
+        <div class="swift-card" style="width: 100%; max-width: 380px; background: #0f172a; border: 1px solid #334155; display: flex; flex-direction: column; gap: 12px;">
+            <h3 id="modal-title" style="font-size: 14px; font-weight: bold; color: white;">Pilih Nominal Top-Up & Pembayaran</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                <button onclick="setNominal(50000)" style="background: #1e293b; color: white; border: 1px solid #334155; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;">Rp 50.000</button>
+                <button onclick="setNominal(100000)" style="background: #1e293b; color: white; border: 1px solid #334155; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;">Rp 100.000</button>
+                <button onclick="setNominal(200000)" style="background: #1e293b; color: white; border: 1px solid #334155; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;">Rp 200.000</button>
+                <button onclick="setNominal(500000)" style="background: #1e293b; color: white; border: 1px solid #334155; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;">Rp 500.000</button>
+            </div>
+
+            <div>
+                <label style="font-size: 11px; color: #94a3b8; font-weight: bold;">Atau Nominal Custom (Rp):</label>
+                <input type="number" id="custom-nominal" placeholder="Contoh: 75000" style="width: 100%; background: #1e293b; border: 1px solid #334155; color: white; padding: 10px; border-radius: 8px; margin-top: 4px; font-size: 13px; outline: none;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+                <button onclick="executePaymentGateway('midtrans')" class="payment-channel-btn">💳 Bayar via Midtrans Snap (CC, VA, E-Wallet)</button>
+                <button onclick="executePaymentGateway('qris')" class="payment-channel-btn">📱 Bayar via QRIS Dinamis (GoPay, OVO, ShopeePay)</button>
+                <button onclick="executePaymentGateway('dana')" class="payment-channel-btn">💙 Bayar langsung via DANA Direct</button>
+            </div>
+
+            <button onclick="closeTopUpModal()" style="width: 100%; background: #dc2626; color: white; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 4px;">Batal</button>
+        </div>
+    </div>
+
+    <script>
+        // KREDENSIAL SUPABASE ANDA YANG TERHUBUNG LENGKAP
+        const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+
+        function getSupabaseClient() {
+            const { createClient } = supabase;
+            return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+        const currentUserId = "user-uuid-12345";
+        let selectedAmount = 50000;
+        let selectedMethod = 'midtrans';
+
+        function setNominal(amount) {
+            selectedAmount = amount;
+            document.getElementById('custom-nominal').value = amount;
+        }
+
+        function openTopUpModal(method = 'midtrans') {
+            selectedMethod = method;
+            document.getElementById('topup-modal').style.display = 'flex';
+            document.getElementById('modal-title').innerText = `Top Up via ${method.toUpperCase()}`;
+        }
+
+        function closeTopUpModal() {
+            document.getElementById('topup-modal').style.display = 'none';
+        }
+
+        async function fetchWalletBalance() {
+            try {
+                const client = getSupabaseClient();
+                const { data, error } = await client
+                    .from('wallets')
+                    .select('balance')
+                    .eq('user_id', currentUserId)
+                    .single();
+
+                if (error) {
+                    await client.from('wallets').insert([{ user_id: currentUserId, balance: 0 }]);
+                    document.getElementById('wallet-balance').innerText = 'Rp 0';
+                    return;
+                }
+
+                if (data) {
+                    document.getElementById('wallet-balance').innerText = 'Rp ' + Number(data.balance).toLocaleString('id-ID');
+                }
+                fetchTransactionHistory();
+            } catch (err) {
+                console.error("Gagal terhubung ke database:", err.message);
+                document.getElementById('wallet-balance').innerText = 'Rp 0 (Offline Mode)';
+            }
+        }
+
+        async function fetchTransactionHistory() {
+            try {
+                const client = getSupabaseClient();
+                const { data, error } = await client
+                    .from('transactions')
+                    .select('*')
+                    .eq('user_id', currentUserId)
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                const listEl = document.getElementById('transaction-list');
+                if (error || !data || data.length === 0) {
+                    listEl.innerHTML = `<div style="font-size: 11px; color: #94a3b8; text-align: center; padding: 8px;">Belum ada riwayat transaksi tercatat.</div>`;
+                    return;
+                }
+
+                listEl.innerHTML = data.map(tx => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #1e293b;">
+                        <div>
+                            <h4 style="font-size: 12px; font-weight: bold; color: white;">${tx.description || 'Top Up Saldo'}</h4>
+                            <span style="font-size: 10px; color: #94a3b8;">${new Date(tx.created_at).toLocaleString('id-ID')} (${tx.method || 'Gateway'})</span>
+                        </div>
+                        <span style="font-size: 12px; font-weight: bold; color: ${tx.type === 'credit' ? '#34d399' : '#f87171'};">
+                            ${tx.type === 'credit' ? '+' : '-'} Rp ${Number(tx.amount).toLocaleString('id-ID')}
+                        </span>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.warn("Gagal memuat riwayat:", err.message);
+            }
+        }
+
+        async function executePaymentGateway(method) {
+            const customInput = document.getElementById('custom-nominal').value;
+            if (customInput && !isNaN(customInput) && Number(customInput) > 0) {
+                selectedAmount = Number(customInput);
+            }
+
+            closeTopUpModal();
+
+            if (method === 'qris') {
+                document.getElementById('wallet-main-view').style.display = 'none';
+                document.getElementById('qris-view').style.display = 'flex';
+                document.getElementById('qris-amount-display').innerText = "Rp " + selectedAmount.toLocaleString('id-ID');
+                
+                generateDynamicQRCode(selectedAmount);
+                return;
+            }
+
+            if (method === 'midtrans') {
+                alert(`[Simulasi Midtrans Sandbox] Memproses pembayaran Rp ${selectedAmount.toLocaleString('id-ID')}...`);
+                await recordTopUpSuccess(selectedAmount, 'Midtrans Gateway');
+            } else if (method === 'dana') {
+                alert(`[DANA Direct] Memproses mutasi DANA sebesar Rp ${selectedAmount.toLocaleString('id-ID')}.`);
+                await recordTopUpSuccess(selectedAmount, 'DANA Wallet');
+            }
+        }
+
+        function generateDynamicQRCode(amount) {
+            const qrisPayloadString = `00020101021126660014ID.CO.QRIS.WWW01189360091100000000000203030350303UMI51440014ID.SOE.SWIFT0215SWIFTAPPREALTIME53033605802ID5915SWIFT ECOSYSTEM6013KUALA LUMPUR6304`;
+            const container = document.getElementById('qrcode-container');
+            container.innerHTML = "";
+
+            new QRCode(container, {
+                text: `${qrisPayloadString}&AMT=${amount}`,
+                width: 200,
+                height: 200,
+                colorDark: "#030712",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        function backToWalletView() {
+            document.getElementById('qris-view').style.display = 'none';
+            document.getElementById('wallet-main-view').style.display = 'flex';
+            fetchWalletBalance();
+        }
+
+        async function confirmQrisPayment() {
+            await recordTopUpSuccess(selectedAmount, 'QRIS Dinamis');
+            backToWalletView();
+        }
+
+        async function processCODSelection() {
+            const confirmCOD = confirm("Aktifkan metode pembayaran COD (Cash on Delivery / Tunai) untuk pesanan berikutnya?");
+            if (confirmCOD) {
+                alert("Metode pembayaran COD berhasil dipilih.");
+                sessionStorage.setItem('payment_method', 'COD');
+            }
+        }
+
+        async function recordTopUpSuccess(amount, methodName) {
+            try {
+                const client = getSupabaseClient();
+                
+                let { data: currentData } = await client
+                    .from('wallets')
+                    .select('balance')
+                    .eq('user_id', currentUserId)
+                    .single();
+
+                let oldBalance = currentData ? Number(currentData.balance) : 0;
+                let newBalance = oldBalance + amount;
+
+                await client
+                    .from('wallets')
+                    .upsert({ user_id: currentUserId, balance: newBalance, updated_at: new Date() }, { onConflict: 'user_id' });
+
+                await client
+                    .from('transactions')
+                    .insert([{
+                        user_id: currentUserId,
+                        amount: amount,
+                        type: 'credit',
+                        method: methodName,
+                        description: `Top Up Saldo via ${methodName}`,
+                        created_at: new Date()
+                    }]);
+
+                alert(`Top Up Rp ${amount.toLocaleString('id-ID')} (${methodName}) Berhasil Disimpan ke Database Supabase!`);
+                fetchWalletBalance();
+            } catch (err) {
+                alert('Gagal menyinkronkan database: ' + err.message);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchWalletBalance();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Mitra Usaha - SWIFT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #030712; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+        .swift-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; padding: 16px; }
+    </style>
+</head>
+<body class="pb-20">
+    <header style="background: #0b0f19; border-bottom: 1px solid #1e293b; padding: 12px 16px; position: sticky; top: 0; z-index: 50;">
+        <div style="max-width: 480px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+            <h1 style="font-size: 14px; font-weight: bold; color: white;">Dashboard Kedai / Niaga</h1>
+            <a href="index.html" style="font-size: 11px; background: #1e293b; color: #f87171; padding: 6px 10px; border-radius: 8px; text-decoration: none; border: 1px solid #334155;">Keluar</a>
+        </div>
+    </header>
+
+    <main style="max-width: 480px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+        <div class="swift-card" style="background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%); border-left: 4px solid #34d399;">
+            <p style="font-size: 11px; color: #34d399; font-weight: bold; text-transform: uppercase;">Pendapatan Hari Ini</p>
+            <h2 style="font-size: 24px; font-weight: 900; color: white; margin-top: 4px;">Rp 450.000</h2>
+            <span style="font-size: 10px; color: #cbd5e1;">Status Kedai: <strong style="color: #34d399;">Buka / Aktif</strong></span>
+        </div>
+
+        <div class="swift-card">
+            <h3 style="font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; margin-bottom: 12px;">Pesanan Masuk Terbaru</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="background: #1e293b; padding: 12px; border-radius: 10px; border: 1px solid #334155;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <strong style="font-size: 12px; color: white;">Burger King Legend</strong>
+                        <span style="font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px;">Baru</span>
+                    </div>
+                    <p style="font-size: 11px; color: #94a3b8; margin-bottom: 8px;">1x Paket Combo Special (Rp 35.000)</p>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="alert('Pesanan diterima!')" style="flex: 1; background: #10b981; color: #030712; font-size: 11px; font-weight: bold; padding: 6px; border-radius: 6px; border: none; cursor: pointer;">Terima</button>
+                        <button onclick="alert('Pesanan ditolak.')" style="flex: 1; background: #dc2626; color: white; font-size: 11px; font-weight: bold; padding: 6px; border-radius: 6px; border: none; cursor: pointer;">Tolak</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

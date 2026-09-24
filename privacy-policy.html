@@ -7,6 +7,9 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 24px; max-width: 800px; margin: 0 auto; background-color: #0b1120; color: #e2e8f0; }
+    .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .btn-back { display: inline-flex; align-items: center; gap: 6px; color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 600; background: rgba(239, 68, 68, 0.1); padding: 8px 14px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .btn-back:hover { background: rgba(239, 68, 68, 0.2); }
     h1 { color: #ef4444; font-size: 24px; margin-bottom: 8px; border-bottom: 2px solid #1e293b; padding-bottom: 12px; }
     h2 { color: #f8fafc; font-size: 16px; margin-top: 20px; margin-bottom: 8px; }
     p, li { font-size: 14px; color: #94a3b8; margin-bottom: 10px; }
@@ -19,16 +22,20 @@
 </head>
 <body>
 
-  <h1>Kebijakan Privasi SWIFT Super-App</h1>
-  <p><em>Terakhir Diperbarui: September 2026</em></p>
+  <div class="nav-header">
+    <a href="./index.html" class="btn-back">&larr; Kembali ke Aplikasi</a>
+  </div>
 
-  <p>Aplikasi <strong>SWIFT</strong> ("Kami") berkomitmen penuh untuk melindungi privasi, data pribadi, dan keamanan seluruh pengguna serta mitra driver kami. Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi Anda saat menggunakan aplikasi SWIFT.</p>
+  <h1>Kebijakan Privasi SWIFT Super-App</h1>
+  <p><em>Terakhir Diperbarui: 16 September 2026</em></p>
+
+  <p>Aplikasi <strong>SWIFT</strong> ("Kami") berkomitmen penuh untuk melindungi privasi, data pribadi, dan keamanan seluruh pengguna serta mitra driver/merchant kami. Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi Anda saat menggunakan ekosistem SWIFT.</p>
 
   <h2>1. Informasi yang Kami Kumpulkan</h2>
   <ul>
     <li><strong>Data Identitas Profil:</strong> Nama lengkap, alamat email, nomor telepon/WhatsApp, dan foto profil.</li>
-    <li><strong>Data Dokumen Mitra (Khusus Driver & Merchant):</strong> Foto KTP, SIM, STNK, serta informasi kendaraan untuk verifikasi legalitas operasional.</li>
-    <li><strong>Data Transaksi & Keuangan:</strong> Riwayat pemesanan layanan, riwayat pengisian saldo (top-up), serta informasi akun bank untuk proses penarikan saldo (payout).</li>
+    <li><strong>Data Dokumen & KYC (Khusus Driver & Merchant):</strong> Foto KTP, SIM, STNK, foto selfie/verifikasi wajah, serta informasi toko/kendaraan untuk validasi legalitas operasional.</li>
+    <li><strong>Data Transaksi & Keuangan:</strong> Riwayat pemesanan layanan (Ride, Food, Mart, Express), riwayat top-up e-wallet, saldo SWIFT Points, dan akun bank untuk pencairan dana (payout).</li>
   </ul>
 
   <!-- PERSYARATAN WAJIB GOOGLE PLAY STORE -->
@@ -36,21 +43,22 @@
     <h3>2. Penggunaan Akses Lokasi Latar Belakang (Background Location)</h3>
     <p>Aplikasi SWIFT mengumpulkan dan memproses data lokasi presisi (GPS) Anda, <strong>termasuk saat aplikasi ditutup atau tidak sedang aktif digunakan di layar (in the background)</strong>, untuk mengaktifkan fungsi-fungsi utama berikut:</p>
     <ul>
-      <li><strong>Matchmaking System:</strong> Menghubungkan pesanan layanan (SWIFT Ride, Send, Express, Car, Box) kepada mitra driver yang berada di radius terdekat.</li>
-      <li><strong>Pelacakan Real-time (Live Tracking):</strong> Memungkinkan pelanggan memantau posisi perjalanan driver secara akurat demi alasan keamanan dan kepastian estimasi waktu tiba.</li>
+      <li><strong>Matchmaking System:</strong> Menghubungkan pesanan layanan kepada mitra driver yang berada di radius terdekat.</li>
+      <li><strong>Pelacakan Real-time (Live Tracking):</strong> Memungkinkan pelanggan memantau posisi perjalanan driver secara akurat demi keamanan dan kepastian estimasi waktu tiba (ETA).</li>
       <li><strong>Perhitungan Jarak & Tarif:</strong> Memastikan akumulasi jarak tempuh dan kalkulasi biaya perjalanan dihitung secara presisi.</li>
     </ul>
-    <p><em>Catatan: Data lokasi pengguna hanya digunakan untuk kepentingan operasional aplikasi dan tidak pernah diperjualbelikan kepada pihak ketiga manapun.</em></p>
+    <p><em>Catatan: Data lokasi pengguna hanya digunakan untuk kepentingan operasional aplikasi dan tidak pernah diperjualbelikan kepada pihak ketiga.</em></p>
   </div>
 
   <h2>3. Keamanan Data</h2>
   <p>Kami menerapkan enkripsi standar industri (SSL/TLS) dan memanfaatkan infrastruktur cloud terenkripsi dari Supabase untuk mencegah akses, pengubahan, atau pengungkapan data pribadi tanpa izin.</p>
 
-  <h2>4. Hak dan Pengendalian Pengguna</h2>
-  <p>Pengguna dapat mengedit profil, memperbarui data diri, serta mencabut izin lokasi kapan saja melalui menu pengaturan perangkat Anda. Namun, mematikan izin lokasi dapat menyebabkan sebagian layanan berbasis transportasi tidak dapat berfungsi dengan optimal.</p>
+  <h2>4. Hak Pengguna & Penghapusan Data (Data Deletion)</h2>
+  <p>Pengguna dapat mengedit profil, memperbarui data diri, atau mencabut izin lokasi kapan saja melalui menu pengaturan perangkat Anda.</p>
+  <p>Jika Anda ingin mengajukan <strong>penghapusan akun dan seluruh data pribadi secara permanen</strong>, Anda dapat mengirimkan permintaan melalui menu Pengaturan Akun di aplikasi atau menghubungi kami melalui email dukungan di bawah ini.</p>
 
   <h2>5. Hubungi Kami</h2>
-  <p>Jika Anda memiliki pertanyaan, kendala, atau permintaan penghapusan data pribadi, Anda dapat menghubungi tim dukungan kami melalui email di: <strong>support@swiftapp.com</strong></p>
+  <p>Jika Anda memiliki pertanyaan, kendala, atau permintaan terkait privasi data, Anda dapat menghubungi tim dukungan kami melalui email di: <strong>support@swiftapp.com</strong></p>
 
   <div class="footer">
     &copy; 2026 SWIFT Ecosystem. All rights reserved.

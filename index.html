@@ -1,373 +1,256 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SWIFT Super-App Ecosystem</title>
-  
-  <!-- MANIFEST PWA & THEME COLOR -->
-  <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#ef4444">
-
-  <!-- REGISTRASI SERVICE WORKER (PWA ENABLER) -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((reg) => console.log('SWIFT Service Worker Registered!', reg))
-          .catch((err) => console.error('Service Worker Registration Failed!', err));
-      });
-    }
-  </script>
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #0b1120; color: #f8fafc; padding: 16px; padding-bottom: 80px; max-width: 480px; margin: 0 auto; min-height: 100vh; }
-    
-    .top-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.6); padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #334155; }
-    .top-bar select { background: #1e293b; color: white; border: 1px solid #334155; padding: 4px 8px; border-radius: 6px; font-size: 11px; outline: none; }
-    
-    .wallet-card { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); padding: 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); margin-bottom: 16px; }
-    .wallet-title { font-size: 12px; color: #fca5a5; font-weight: 500; }
-    .wallet-amount { font-size: 22px; font-weight: 800; color: #ffffff; margin-top: 2px; }
-    .btn-topup { background: #ffffff; color: #0f172a; border: none; padding: 8px 16px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; }
-
-    .banner-container { position: relative; border-radius: 16px; overflow: hidden; margin-bottom: 20px; border: 1px solid #334155; height: 140px; }
-    .banner-img { width: 100%; height: 100%; object-fit: cover; }
-    .banner-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 10px 12px; font-size: 11px; font-weight: bold; color: #ffffff; display: flex; align-items: center; gap: 6px; }
-
-    .section-title { font-size: 13px; font-weight: 600; color: #94a3b8; margin-bottom: 10px; }
-    
-    .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
-    .service-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .service-card:active { transform: scale(0.95); background: #334155; }
-    .service-icon { font-size: 22px; margin-bottom: 4px; }
-    .service-name { font-size: 11px; font-weight: 500; color: #e2e8f0; line-height: 1.2; }
-
-    .mitra-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 20px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .mitra-title { color: #ef4444; font-size: 15px; font-weight: bold; margin-bottom: 2px; }
-    .mitra-sub { color: #94a3b8; font-size: 11px; margin-bottom: 12px; }
-    
-    .mitra-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-    .mitra-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 12px 8px; text-align: center; cursor: pointer; }
-    .mitra-card.active { border: 1.5px solid #ef4444; background: #1e293b; }
-    .mitra-card:active { transform: scale(0.96); }
-    .mitra-card-text { font-size: 11px; font-weight: 600; color: #f8fafc; margin-top: 4px; }
-
-    .form-group { margin-bottom: 10px; }
-    .form-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
-    .form-group input { width: 100%; background: #020617; border: 1px solid #334155; color: #ffffff; padding: 9px 12px; border-radius: 10px; font-size: 12px; outline: none; }
-    .form-group input:focus { border-color: #ef4444; }
-
-    .btn-submit { width: 100%; background: #dc2626; color: #ffffff; font-weight: bold; padding: 10px; border: none; border-radius: 10px; font-size: 12px; cursor: pointer; margin-top: 4px; }
-    .btn-submit:active { background: #b91c1c; }
-
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 99999; padding: 16px; }
-    .modal-content { background: #1e293b; width: 100%; max-width: 440px; padding: 20px; border-radius: 16px; border: 1px solid #334155; max-height: 85vh; overflow-y: auto; }
-    #mapContainer { width: 100%; height: 180px; border-radius: 10px; margin-bottom: 12px; background: #0f172a; }
-    .toast-alert { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #f8fafc; padding: 10px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 100000; display: none; border: 1px solid #334155; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIFT Super-App Ecosystem</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            background-color: #030712;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .swift-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 16px;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
 </head>
-<body class="max-w-md mx-auto min-h-screen">
+<body class="pb-20">
 
-  <!-- TOP BAR -->
-  <div class="top-bar">
-    <span style="font-size:11px; color:#94a3b8;">🌏 Regional</span>
-    <select id="countrySelect" onchange="showToast('Mata uang diperbarui')">
-      <option value="ID" selected>🇮🇩 Indonesia (IDR)</option>
-    </select>
-  </div>
-
-  <!-- WALLET CARD -->
-  <div class="wallet-card">
-    <div>
-      <p class="wallet-title">Saldo Dompet SWIFT</p>
-      <h2 class="wallet-amount">Rp 250.000</h2>
-    </div>
-    <button onclick="showToast('Fitur Top Up diproses')" class="btn-topup">Top Up</button>
-  </div>
-
-  <!-- BANNER PROMO -->
-  <div class="banner-container">
-    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" alt="Promo" class="banner-img">
-    <div class="banner-caption">
-      <span>🔥</span> PROMO SPESIAL & DISKON KILAT HARI INI
-    </div>
-  </div>
-
-  <!-- LAYANAN SWIFT (8 GRID) -->
-  <div>
-    <h3 class="section-title">Layanan SWIFT</h3>
-    <div class="services-grid">
-      <div onclick="openDriverModal('SWIFT Ride', 'ride')" class="service-card">
-        <span class="service-icon">🛵</span>
-        <span class="service-name">SWIFT Ride</span>
-      </div>
-      <div onclick="openDriverModal('SWIFT Send', 'send')" class="service-card">
-        <span class="service-icon">📦</span>
-        <span class="service-name">SWIFT Send</span>
-      </div>
-      <div onclick="showToast('Katalog Food diproses')" class="service-card">
-        <span class="service-icon">🍔</span>
-        <span class="service-name">SWIFT Food</span>
-      </div>
-      <div onclick="showToast('Katalog Mart diproses')" class="service-card">
-        <span class="service-icon">🏪</span>
-        <span class="service-name">SWIFT Mart</span>
-      </div>
-      <div onclick="openDriverModal('SWIFT Express', 'express')" class="service-card">
-        <span class="service-icon">⚡</span>
-        <span class="service-name">SWIFT Express</span>
-      </div>
-      <div onclick="openDriverModal('SWIFT Car', 'car')" class="service-card">
-        <span class="service-icon">🚗</span>
-        <span class="service-name">SWIFT Car</span>
-      </div>
-      <div onclick="openDriverModal('SWIFT Box', 'box')" class="service-card">
-        <span class="service-icon">🚚</span>
-        <span class="service-name">SWIFT Box</span>
-      </div>
-      <div onclick="showToast('Live & Promo Segera Hadir')" class="service-card">
-        <span class="service-icon">📺</span>
-        <span class="service-name">Live & Promo</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- GABUNG JADI MITRA SWIFT -->
-  <div class="mitra-box">
-    <h3 class="mitra-title">Gabung Jadi Mitra SWIFT</h3>
-    <p class="mitra-sub">Pilih kategori pendaftaran untuk bergabung:</p>
-
-    <div class="mitra-grid">
-      <div onclick="pilihMitra('Driver Mobil', this)" class="mitra-card">
-        <span style="font-size:20px;">🚗</span>
-        <div class="mitra-card-text">Daftar Driver Mobil</div>
-      </div>
-      <div onclick="pilihMitra('Ojek Motor', this)" class="mitra-card active">
-        <span style="font-size:20px;">🛵</span>
-        <div class="mitra-card-text">Daftar Ojek Motor</div>
-      </div>
-      <div onclick="pilihMitra('Kurir Express', this)" class="mitra-card">
-        <span style="font-size:20px;">📦</span>
-        <div class="mitra-card-text">Daftar Kurir Express</div>
-      </div>
-      <div onclick="pilihMitra('Merchant Food/Mart', this)" class="mitra-card">
-        <span style="font-size:20px;">🏪</span>
-        <div class="mitra-card-text">Daftar Merchant Food/Mart</div>
-      </div>
-    </div>
-
-    <form id="formMitraSwift" onsubmit="handleFormSubmit(event)">
-      <input type="hidden" id="kategoriMitra" value="Ojek Motor">
-      <div class="form-group">
-        <label>Nama Lengkap</label>
-        <input type="text" id="namaLengkap" required placeholder="Masukkan nama lengkap">
-      </div>
-      <div class="form-group">
-        <label>Nomor WhatsApp / HP</label>
-        <input type="tel" id="nomorHp" required placeholder="08xxxxxxxxxx">
-      </div>
-      <button type="submit" id="btnSubmitMitra" class="btn-submit">Kirim Pendaftaran Mitra</button>
-    </form>
-  </div>
-
-  <!-- TOAST ALERT -->
-  <div id="toastNotification" class="toast-alert"></div>
-
-  <!-- MODAL MAP LEAFLET -->
-  <div id="driverModal" class="modal-overlay">
-    <div class="modal-content">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h3 id="rideModalTitle" style="font-size:14px; color:#ffffff;">LOKASI LAYANAN</h3>
-        <span onclick="closeModal('driverModal')" style="cursor:pointer; font-size:22px; color:#94a3b8;">&times;</span>
-      </div>
-      <div id="mapContainer"></div>
-      <input type="hidden" id="currentServiceType">
-      <button style="width:100%; background:#ef4444; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="createRealTimeOrder()">Pesan Sekarang</button>
-    </div>
-  </div>
-
-  <!-- EXTERNAL SCRIPTS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./config.js"></script>
-  <script src="./script.js"></script>
-
-  <script>
-    let mapInstance = null;
-
-    // KONSTANTA & INISIALISASI UNTUK SINKRONISASI SUPABASE MASTER ENGINE
-    const CURRENT_APP_VERSION = "1.0.0";
-    const PLATFORM = "android"; // 'android' atau 'ios'
-    const USER_ROLE = "customer"; // 'customer', 'driver', atau 'merchant'
-
-    document.addEventListener("DOMContentLoaded", () => {
-      // Menjalankan pengecekan sistem & listener realtime saat aplikasi dibuka
-      initSupabaseSync();
-    });
-
-    async function initSupabaseSync() {
-      // Pastikan objek supabase tersedia dari config.js / window.supabase
-      if (typeof supabase !== 'undefined' && supabase) {
-        await checkAppSystemStatus();
-        listenForGlobalBroadcasts(USER_ROLE);
-      } else {
-        console.warn("Supabase SDK belum siap. Menunggu inisialisasi...");
-        setTimeout(initSupabaseSync, 1000);
-      }
-    }
-
-    // --- 1. LOGIKA PENGECEKAN SISTEM & MAINTENANCE GUARD ---
-    async function checkAppSystemStatus() {
-      try {
-        const { data, error } = await supabase
-          .from('app_settings')
-          .select('value')
-          .eq('key', 'app_version_control')
-          .single();
-
-        if (error) {
-          console.error("Gagal memeriksa status sistem:", error.message);
-          return;
-        }
-
-        if (data && data.value) {
-          const config = data.value;
-
-          // Cek Maintenance Mode
-          if (config.maintenance === 'ON') {
-            showMaintenanceScreen();
-            return;
-          }
-
-          // Cek Versi Minimal Aplikasi
-          const minVersion = PLATFORM === 'android' ? config.android_min : config.ios_min;
-          if (minVersion && isVersionOutdated(CURRENT_APP_VERSION, minVersion)) {
-            showForceUpdateScreen(minVersion);
-            return;
-          }
-
-          console.log("Sistem SWIFT Normal: Aplikasi siap digunakan.");
-        }
-      } catch (err) {
-        console.error("Kesalahan jaringan/sistem:", err);
-      }
-    }
-
-    // Helper untuk pembandingan versi semver
-    function isVersionOutdated(current, minimum) {
-      const v1 = current.split('.').map(Number);
-      const v2 = minimum.split('.').map(Number);
-
-      for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
-        const num1 = v1[i] || 0;
-        const num2 = v2[i] || 0;
-        if (num1 < num2) return true;
-        if (num1 > num2) return false;
-      }
-      return false;
-    }
-
-    // Tampilan Kunci jika Maintenance Mode Aktif
-    function showMaintenanceScreen() {
-      document.body.innerHTML = `
-        <div style="background:#0b0f19; color:white; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px;">
-          <h1 style="color:#ef4444; font-size:24px; margin-bottom:12px;">🚧 Pemeliharaan Sistem</h1>
-          <p style="color:#94a3b8; max-width:400px; font-size:13px; line-height:1.5;">
-            Aplikasi SWIFT sedang dalam peningkatan layanan. Silakan coba beberapa saat lagi.
-          </p>
+    <!-- Header Profesional -->
+    <header style="background: #0b0f19; border-bottom: 1px solid #1e293b; padding: 12px 16px; position: sticky; top: 0; z-index: 50;">
+        <div style="max-width: 480px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 11px; font-weight: bold; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3);">🌍 IDR</span>
+                <select style="background: #1e293b; color: #f1f5f9; font-size: 12px; padding: 4px 8px; border-radius: 8px; border: 1px solid #334155; outline: none;">
+                    <option>Indonesia</option>
+                </select>
+            </div>
+            <div id="auth-nav-action">
+                <a href="auth.html" style="font-size: 12px; font-weight: bold; background: #dc2626; color: white; padding: 6px 14px; border-radius: 10px; text-decoration: none; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);">Masuk / Daftar</a>
+            </div>
         </div>
-      `;
-    }
+    </header>
 
-    // Tampilan Paksa Update jika Versi Usang
-    function showForceUpdateScreen(minVersion) {
-      document.body.innerHTML = `
-        <div style="background:#0b0f19; color:white; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px;">
-          <h1 style="color:#06b6d4; font-size:24px; margin-bottom:12px;">🚀 Perbarui Aplikasi</h1>
-          <p style="color:#94a3b8; max-width:400px; font-size:13px; line-height:1.5;">
-            Versi baru (${minVersion}) telah tersedia. Silakan perbarui aplikasi Anda untuk melanjutkan.
-          </p>
-          <a href="https://play.google.com/store" style="margin-top:20px; background:#16a34a; color:white; padding:12px 24px; border-radius:10px; text-decoration:none; font-weight:bold; font-size:13px;">
-            Update Sekarang
-          </a>
+    <main style="max-width: 480px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+
+        <!-- Dompet Saldo Mewah -->
+        <div class="swift-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border-left: 4px solid #10b981; position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Saldo Dompet SWIFT</p>
+                    <h2 id="user-balance" style="font-size: 24px; font-weight: 900; color: #ffffff; margin-top: 4px;">Rp 0</h2>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="wallet.html" style="background: #10b981; color: #030712; font-size: 12px; font-weight: 800; padding: 8px 14px; border-radius: 10px; text-decoration: none;">Top Up</a>
+                    <a href="wallet.html" style="background: #334155; color: #e2e8f0; font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: 10px; text-decoration: none;">Riwayat</a>
+                </div>
+            </div>
         </div>
-      `;
-    }
 
-    // --- 2. SUPABASE REALTIME CHANNEL LISTENER (BROADCAST) ---
-    function listenForGlobalBroadcasts(userRole = 'customer') {
-      supabase
-        .channel('public:broadcasts')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'broadcasts' }, payload => {
-          const newBroadcast = payload.new;
+        <!-- Banner Promo & Iklan Otomatis -->
+        <div class="swift-card" style="padding: 0; overflow: hidden; position: relative;">
+            <div id="promo-banner-bg" style="height: 140px; background: linear-gradient(to top, rgba(3,7,18,0.95), rgba(3,7,18,0.4)), url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80') center/cover; display: flex; align-items: flex-end; padding: 16px; transition: background-image 0.5s ease-in-out;">
+                <div>
+                    <span id="promo-badge" style="font-size: 10px; font-weight: 800; background: #dc2626; color: white; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">🔥 Promo Spesial</span>
+                    <h3 id="promo-title" style="font-size: 13px; font-weight: bold; color: #ffffff; margin-top: 6px; line-height: 1.4;">Diskon Kilat Hari Ini di Semua Layanan SWIFT Ecosystem!</h3>
+                </div>
+            </div>
+        </div>
 
-          // Filter pesan berdasarkan role pengguna
-          if (newBroadcast.target === 'all' || newBroadcast.target === userRole) {
-            displayBroadcastNotification(newBroadcast.title, newBroadcast.message);
-          }
-        })
-        .subscribe();
-    }
+        <!-- Grid Layanan Utama (4x2) -->
+        <div class="swift-card">
+            <h3 style="font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">Layanan Utama</h3>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                <a href="order.html?service=ride" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 22px; margin-bottom: 4px;">🛵</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Ride</span>
+                </a>
+                <a href="order.html?service=send" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 22px; margin-bottom: 4px;">📦</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Send</span>
+                </a>
+                <a href="order.html?service=food" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 22px; margin-bottom: 4px;">🍔</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Food</span>
+                </a>
+                <a href="order.html?service=mart" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 22px; margin-bottom: 4px;">🏪</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Mart</span>
+                </a>
+                <a href="order.html?service=express" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 22px; margin-bottom: 4px;">⚡</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Express</span>
+                </a>
+                <a href="order.html?service=car" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 22px; margin-bottom: 4px;">🚗</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Car</span>
+                </a>
+                <a href="order.html?service=box" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 22px; margin-bottom: 4px;">🚚</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Box</span>
+                </a>
+                <a href="auth.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 22px; margin-bottom: 4px;">📺</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Live</span>
+                </a>
+            </div>
+        </div>
 
-    function displayBroadcastNotification(title, message) {
-      alert(`📢 PENGUMUMAN SWIFT:\n\n${title}\n${message}`);
-    }
+        <!-- Kolom Produk & Kedai Viral (Horizontal Scroll) -->
+        <div class="swift-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 style="font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">🔥 Kedai & Produk Viral</h3>
+                <a href="order.html?service=food" style="font-size: 11px; color: #34d399; text-decoration: none; font-weight: bold;">Lihat Semua</a>
+            </div>
+            
+            <div class="hide-scrollbar" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px;">
+                <!-- Item 1 -->
+                <div style="min-width: 140px; background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=300&q=80" style="height: 90px; object-fit: cover;" alt="Burger">
+                    <div style="padding: 8px; display: flex; flex-direction: column; gap: 4px; flex: 1;">
+                        <span style="font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; width: fit-content; font-weight: bold;">⭐ 4.9</span>
+                        <h4 style="font-size: 11px; font-weight: bold; color: white; line-height: 1.2;">Burger King Legend</h4>
+                        <p style="font-size: 10px; color: #94a3b8;">Rp 35.000</p>
+                        <a href="order.html?service=food" style="margin-top: auto; background: #2563eb; color: white; font-size: 10px; font-weight: bold; padding: 4px; text-align: center; border-radius: 6px; text-decoration: none;">Order Kedai</a>
+                    </div>
+                </div>
+                <!-- Item 2 -->
+                <div style="min-width: 140px; background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=300&q=80" style="height: 90px; object-fit: cover;" alt="Pizza">
+                    <div style="padding: 8px; display: flex; flex-direction: column; gap: 4px; flex: 1;">
+                        <span style="font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; width: fit-content; font-weight: bold;">⭐ 4.8</span>
+                        <h4 style="font-size: 11px; font-weight: bold; color: white; line-height: 1.2;">Pizza Italia Express</h4>
+                        <p style="font-size: 10px; color: #94a3b8;">Rp 65.000</p>
+                        <a href="order.html?service=food" style="margin-top: auto; background: #2563eb; color: white; font-size: 10px; font-weight: bold; padding: 4px; text-align: center; border-radius: 6px; text-decoration: none;">Order Kedai</a>
+                    </div>
+                </div>
+                <!-- Item 3 -->
+                <div style="min-width: 140px; background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+                    <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=300&q=80" style="height: 90px; object-fit: cover;" alt="Coffee">
+                    <div style="padding: 8px; display: flex; flex-direction: column; gap: 4px; flex: 1;">
+                        <span style="font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; width: fit-content; font-weight: bold;">⭐ 5.0</span>
+                        <h4 style="font-size: 11px; font-weight: bold; color: white; line-height: 1.2;">Kopi Kenangan Senja</h4>
+                        <p style="font-size: 10px; color: #94a3b8;">Rp 18.000</p>
+                        <a href="order.html?service=food" style="margin-top: auto; background: #2563eb; color: white; font-size: 10px; font-weight: bold; padding: 4px; text-align: center; border-radius: 6px; text-decoration: none;">Order Kedai</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    // --- FUNGSI INTERAKTIF UI bawaan ---
-    function showToast(text) {
-      const toast = document.getElementById('toastNotification');
-      toast.innerText = text;
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 3000);
-    }
+        <!-- Pendaftaran Mitra Lengkap (4 Kategori) -->
+        <div class="swift-card" style="border-left: 4px solid #dc2626; background: linear-gradient(135deg, #0f172a 0%, #450a0a 100%);">
+            <h3 style="font-size: 12px; font-weight: bold; color: #f87171; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Gabung Jadi Mitra SWIFT</h3>
+            <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 12px;">Pilih kategori pendaftaran sesuai bidang usaha atau keahlian Anda:</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                <a href="driver.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>🚗</span>
+                    <span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Driver Mobil</span>
+                </a>
+                <a href="driver.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>🛵</span>
+                    <span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Ojek Motor</span>
+                </a>
+                <a href="merchant-dashboard.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>🏪</span>
+                    <span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Mitra Usaha / Niaga</span>
+                </a>
+                <a href="driver.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>📦</span>
+                    <span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Kurir / Express / Box</span>
+                </a>
+            </div>
+        </div>
 
-    function pilihMitra(kategori, element) {
-      const cards = document.querySelectorAll('.mitra-card');
-      cards.forEach(card => card.classList.remove('active'));
-      element.classList.add('active');
-      document.getElementById('kategoriMitra').value = kategori;
-    }
+        <!-- Kolom Bagikan Aplikasi (Share & Referral) -->
+        <div class="swift-card" style="background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%); border-left: 4px solid #34d399; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h4 style="font-size: 12px; font-weight: bold; color: #34d399;">Bagikan SWIFT Ecosystem</h4>
+                <p style="font-size: 11px; color: #cbd5e1; margin-top: 2px;">Ajak teman & dapatkan komisi saldo gratis!</p>
+            </div>
+            <button onclick="shareApp()" style="background: #34d399; color: #030712; font-size: 11px; font-weight: 800; padding: 8px 14px; border-radius: 10px; border: none; cursor: pointer;">Bagikan 🔗</button>
+        </div>
 
-    function openDriverModal(serviceName, type) {
-      document.getElementById('rideModalTitle').innerText = serviceName;
-      document.getElementById('currentServiceType').value = type;
-      document.getElementById('driverModal').style.display = 'flex';
-      
-      setTimeout(() => {
-        if (!mapInstance && window.L) {
-          mapInstance = L.map('mapContainer').setView([-6.175392, 106.827153], 15);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
-          L.marker([-6.175392, 106.827153]).addTo(mapInstance).bindPopup('Lokasi Penjemputan').openPopup();
-        } else if (mapInstance) {
-          mapInstance.invalidateSize();
+    </main>
+
+    <!-- Panggil Backend Engine -->
+    <script src="app.js"></script>
+    <script>
+        // Fitur Iklan Otomatis (Berganti Banner Tiap 4 Detik)
+        const adsList = [
+            { title: "Diskon Kilat Hari Ini di Semua Layanan SWIFT Ecosystem!", img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80", badge: "🔥 PROMO SPESIAL" },
+            { title: "Cashback 50% Khusus Pengguna Baru SWIFT Pay!", img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=600&q=80", badge: "💎 CASHBACK" },
+            { title: "Kirim Barang Lebih Cepat & Hemat dengan SWIFT Box!", img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80", badge: "🚀 EKSPRES" }
+        ];
+        let currentAd = 0;
+
+        setInterval(() => {
+            currentAd = (currentAd + 1) % adsList.length;
+            const banner = document.getElementById('promo-banner-bg');
+            const title = document.getElementById('promo-title');
+            const badge = document.getElementById('promo-badge');
+            if (banner && title && badge) {
+                banner.style.backgroundImage = `linear-gradient(to top, rgba(3,7,18,0.95), rgba(3,7,18,0.4)), url('${adsList[currentAd].img}')`;
+                title.innerText = adsList[currentAd].title;
+                badge.innerText = adsList[currentAd].badge;
+            }
+        }, 4000);
+
+        // Fungsi Tombol Bagikan
+        function shareApp() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'SWIFT Super-App Ecosystem',
+                    text: 'Yuk gabung dan nikmati kemudahan layanan super-app SWIFT sekarang!',
+                    url: window.location.href,
+                }).catch(() => {});
+            } else {
+                alert('Tautan disalin ke papan klip! Bagikan ke teman-teman Anda.');
+            }
         }
-      }, 300);
-    }
 
-    function closeModal(modalId) {
-      document.getElementById(modalId).style.display = 'none';
-    }
+        window.addEventListener('DOMContentLoaded', async () => {
+            setTimeout(async () => {
+                if (typeof SWIFT_Engine !== 'undefined') {
+                    const theme = await SWIFT_Engine.applyMasterTheme();
+                    if (theme && theme.bannerText) {
+                        document.getElementById('promo-title').innerText = theme.bannerText;
+                    }
+                }
 
-    function createRealTimeOrder() {
-      showToast('🔄 Mencari Driver SWIFT Terdekat...');
-      setTimeout(() => {
-        closeModal('driverModal');
-        showToast('✅ Pesanan Berhasil Dibuat!');
-      }, 1500);
-    }
+                const client = typeof getSupabase === 'function' ? getSupabase() : null;
+                if (client) {
+                    const { data: { session } } = await client.auth.getSession();
+                    const navAction = document.getElementById('auth-nav-action');
+                    if (session) {
+                        navAction.innerHTML = `<button onclick="handleLogout()" style="font-size: 12px; font-weight: bold; background: #1e293b; color: #f87171; border: 1px solid #334155; padding: 6px 12px; border-radius: 10px; cursor: pointer;">Keluar</button>`;
+                    }
+                }
+            }, 1200);
+        });
 
-    function handleFormSubmit(e) {
-      e.preventDefault();
-      if (typeof registerMitraToSupabase === 'function') {
-        registerMitraToSupabase();
-      } else {
-        showToast('🔄 Mengirim Pendaftaran Mitra...');
-      }
-    }
-  </script>
+        async function handleLogout() {
+            const client = typeof getSupabase === 'function' ? getSupabase() : null;
+            if (client) {
+                await client.auth.signOut();
+                window.location.reload();
+            }
+        }
+    </script>
 </body>
 </html>

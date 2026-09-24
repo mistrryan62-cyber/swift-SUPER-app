@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gateway QRIS Dinamis - SWIFT Super-App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- QR Code Generator Library (QRCode.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            background-color: #030712;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .swift-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 16px;
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Header Navigasi -->
+    <header style="background: #0b0f19; border-bottom: 1px solid #1e293b; padding: 12px 16px; position: sticky; top: 0; z-index: 50;">
+        <div style="max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 12px;">
+            <a href="wallet.html" style="background: #1e293b; color: #f8fafc; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; border: 1px solid #334155;">← Kembali ke Dompet</a>
+            <h1 style="font-size: 14px; font-weight: bold; color: white;">QRIS Dinamis Pembayaran</h1>
+        </div>
+    </header>
+
+    <main style="max-width: 480px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+
+        <!-- Kartu Informasi Tagihan -->
+        <div class="swift-card" style="text-align: center;">
+            <p style="font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">Total Pembayaran QRIS</p>
+            <h2 id="qris-amount" style="font-size: 26px; font-weight: 900; color: #34d399; margin: 4px 0 12px 0;">Rp 0</h2>
+            <div style="background: #1e293b; padding: 8px; border-radius: 8px; display: inline-block;">
+                <span style="font-size: 11px; color: #cbd5e1;">Merchant: <b>SWIFT Ecosystem Official</b></span><br>
+                <span style="font-size: 10px; color: #64748b;">NMID: ID1029384756102</span>
+            </div>
+        </div>
+
+        <!-- Area Tampilan QR Code -->
+        <div class="swift-card" style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+            <p style="font-size: 11px; color: #cbd5e1; text-align: center;">Scan QR Code ini menggunakan aplikasi m-Banking atau E-Wallet (BCA, Mandiri, GoPay, OVO, DANA, ShopeePay)</p>
+            
+            <!-- Kontainer Render QR -->
+            <div id="qrcode-container" style="background: white; padding: 16px; border-radius: 12px; display: flex; justify-content: center; align-items: center;"></div>
+            
+            <div id="countdown-timer" style="font-size: 11px; color: #f87171; font-weight: bold;">Sisa Waktu Pembayaran: 14:59</div>
+        </div>
+
+        <!-- Tombol Simulasi Pembayaran Sukses -->
+        <div class="swift-card" style="display: flex; flex-direction: column; gap: 8px;">
+            <button onclick="simulateQrisSuccess()" style="width: 100%; background: #34d399; color: #030712; font-size: 13px; font-weight: 800; padding: 12px; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);">Simulasi Pembayaran Berhasil ✅</button>
+            <a href="wallet.html" style="text-align: center; font-size: 11px; color: #94a3b8; text-decoration: none; margin-top: 4px;">Batalkan dan Kembali</a>
+        </div>
+
+    </main>
+
+    <script>
+        // Kredensial Supabase Anda
+        const SUPABASE_URL = 'https://xxxxxx.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsIn...';
+
+        function getSupabaseClient() {
+            const { createClient } = supabase;
+            return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+        const currentUserId = "user-uuid-12345";
+        let paymentAmount = 50000;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Tangkap nominal dari URL parameter (jika dikirim dari halaman wallet)
+            const params = new URLSearchParams(window.location.search);
+            const amountParam = params.get('amount');
+            if (amountParam && !isNaN(amountParam)) {
+                paymentAmount = Number(amountParam);
+            }
+
+            document.getElementById('qris-amount').innerText = "Rp " + paymentAmount.toLocaleString('id-ID');
+
+            // Generate string payload QRIS dinamis & render ke elemen HTML
+            generateDynamicQRCode(paymentAmount);
+        });
+
+        function generateDynamicQRCode(amount) {
+            // Payload string QRIS standar EMVCo simulasi untuk SWIFT Super-App
+            const qrisPayloadString = `00020101021126660014ID.CO.QRIS.WWW01189360091100000000000203030350303UMI51440014ID.SOE.SWIFT0215SWIFTAPPREALTIME53033605802ID5915SWIFT ECOSYSTEM6013KUALA LUMPUR6304`;
+            
+            // Bersihkan kontainer lama jika ada
+            const container = document.getElementById('qrcode-container');
+            container.innerHTML = "";
+
+            // Render menggunakan QRCode.js
+            new QRCode(container, {
+                text: `${qrisPayloadString}&AMT=${amount}`,
+                width: 200,
+                height: 200,
+                colorDark: "#030712",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        async function simulateQrisSuccess() {
+            try {
+                const client = getSupabaseClient();
+
+                // 1. Ambil saldo lama user dari Supabase
+                let { data: currentData } = await client
+                    .from('wallets')
+                    .select('balance')
+                    .eq('user_id', currentUserId)
+                    .single();
+
+                let oldBalance = currentData ? currentData.balance : 0;
+                let newBalance = oldBalance + paymentAmount;
+
+                // 2. Update saldo baru ke tabel wallets
+                await client
+                    .from('wallets')
+                    .upsert({ user_id: currentUserId, balance: newBalance, updated_at: new Date() }, { onConflict: 'user_id' });
+
+                // 3. Catat mutasi ke tabel transactions
+                await client
+                    .from('transactions')
+                    .insert([{
+                        user_id: currentUserId,
+                        amount: paymentAmount,
+                        type: 'credit',
+                        method: 'QRIS Dinamis',
+                        description: 'Top Up Saldo via QRIS Dinamis',
+                        created_at: new Date()
+                    }]);
+
+                alert(`Pembayaran QRIS sebesar Rp ${paymentAmount.toLocaleString('id-ID')} Berhasil! Saldo telah ditambahkan.`);
+                window.location.href = 'wallet.html';
+            } catch (err) {
+                alert('Gagal menyinkronkan transaksi ke database: ' + err.message);
+                window.location.href = 'wallet.html';
+            }
+        }
+    </script>
+</body>
+</html>

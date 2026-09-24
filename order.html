@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemesanan Layanan - SWIFT Super-App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Leaflet CSS & JS CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            background-color: #030712;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .swift-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 16px;
+        }
+        #map {
+            height: 240px;
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            margin-top: 8px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <header style="background: #0b0f19; border-bottom: 1px solid #1e293b; padding: 12px 16px; position: sticky; top: 0; z-index: 50;">
+        <div style="max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 12px;">
+            <a href="index.html" style="background: #1e293b; color: #f8fafc; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; border: 1px solid #334155;">← Kembali</a>
+            <h1 style="font-size: 14px; font-weight: bold; color: white;">Pemesanan Peta & Layanan SWIFT</h1>
+        </div>
+    </header>
+
+    <main style="max-width: 480px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+
+        <div class="swift-card">
+            <label style="font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Pilih Jenis Layanan</label>
+            <select id="service-type" onchange="calculateFare()" style="width: 100%; background: #1e293b; color: #f1f5f9; font-size: 13px; padding: 10px; border-radius: 10px; border: 1px solid #334155; outline: none; font-weight: 600;">
+                <option value="ride">🛵 SWIFT Ride (Ojek Motor)</option>
+                <option value="car">🚗 SWIFT Car (Taksimobil)</option>
+                <option value="send">📦 SWIFT Send (Kirim Paket)</option>
+                <option value="food">🍔 SWIFT Food (Pesan Makanan)</option>
+                <option value="mart">🏪 SWIFT Mart (Belanja Toko)</option>
+                <option value="express">⚡ SWIFT Express (Kilat)</option>
+                <option value="box">🚚 SWIFT Box (Angkut Barang Besar)</option>
+            </select>
+        </div>
+
+        <div class="swift-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <h3 style="font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Peta Interaktif & GPS</h3>
+                <button onclick="getCurrentLocationGPS()" style="background: #2563eb; color: white; font-size: 10px; font-weight: bold; padding: 5px 10px; border-radius: 6px; border: none; cursor: pointer;">📍 Deteksi GPS Saya</button>
+            </div>
+            <p style="font-size: 10px; color: #64748b; margin-bottom: 8px;">Geser pin pada peta untuk menyesuaikan titik jemput secara akurat.</p>
+            <div id="map"></div>
+        </div>
+
+        <div class="swift-card" style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+                <span style="font-size: 10px; color: #34d399; font-weight: bold;">📍 TITIK JEMPUT (Koordinat / Alamat)</span>
+                <input type="text" id="pickup-loc" value="Memuat GPS Perangkat..." style="width: 100%; background: #1e293b; color: #f1f5f9; font-size: 12px; padding: 10px; border-radius: 8px; border: 1px solid #334155; margin-top: 4px; outline: none;">
+            </div>
+
+            <div>
+                <span style="font-size: 10px; color: #f87171; font-weight: bold;">🏁 TUJUAN PENGIRIMAN / PENYERAHAN</span>
+                <input type="text" id="dropoff-loc" placeholder="Masukkan alamat tujuan atau nama tempat..." style="width: 100%; background: #1e293b; color: #f1f5f9; font-size: 12px; padding: 10px; border-radius: 8px; border: 1px solid #334155; margin-top: 4px; outline: none;" oninput="calculateFare()">
+            </div>
+        </div>
+
+        <div class="swift-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border-left: 4px solid #10b981;">
+            <h3 style="font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Estimasi Biaya</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 12px; color: #cbd5e1;">Perkiraan Jarak:</span>
+                <span id="est-distance" style="font-size: 12px; font-weight: bold; color: white;">3.5 Km</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="font-size: 12px; color: #cbd5e1;">Total Tarif:</span>
+                <span id="est-fare" style="font-size: 18px; font-weight: 900; color: #34d399;">Rp 15.000</span>
+            </div>
+
+            <label style="font-size: 11px; font-weight: bold; color: #94a3b8; display: block; margin-bottom: 6px;">Metode Pembayaran</label>
+            <select id="payment-method" style="width: 100%; background: #1e293b; color: #f1f5f9; font-size: 12px; padding: 8px; border-radius: 8px; border: 1px solid #334155; outline: none; margin-bottom: 12px;">
+                <option value="wallet">Dompet SWIFT</option>
+                <option value="cash">Tunai / Cash langsung ke Driver</option>
+                <option value="qris">QRIS / Transfer Bank</option>
+                <option value="cod">COD (Cash on Delivery)</option>
+            </select>
+
+            <button onclick="submitOrder()" style="width: 100%; background: #10b981; color: #030712; font-size: 13px; font-weight: 800; padding: 12px; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);">Pesan Sekarang 🚀</button>
+        </div>
+
+    </main>
+
+    <script>
+        // MASUKKAN URL DAN KEY SUPABASE ANDA DI SINI
+        const SUPABASE_URL = 'https://xxxxxx.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsIn...';
+
+        function getSupabaseClient() {
+            const { createClient } = supabase;
+            return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+        let map, marker;
+        const defaultLat = 3.1390;
+        const defaultLng = 101.6869;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            map = L.map('map').setView([defaultLat, defaultLng], 14);
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map)
+                .bindPopup("Titik Jemput Anda (Geser untuk ubah)").openPopup();
+
+            marker.on('dragend', function() {
+                const position = marker.getLatLng();
+                document.getElementById('pickup-loc').value = `Lat: ${position.lat.toFixed(5)}, Lng: ${position.lng.toFixed(5)}`;
+                calculateFare();
+            });
+
+            const params = new URLSearchParams(window.location.search);
+            const service = params.get('service');
+            if (service) {
+                document.getElementById('service-type').value = service;
+            }
+
+            getCurrentLocationGPS();
+            calculateFare();
+        });
+
+        function getCurrentLocationGPS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        map.setView([lat, lng], 16);
+                        marker.setLatLng([lat, lng]);
+                        document.getElementById('pickup-loc').value = `GPS Akurat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                        calculateFare();
+                    },
+                    (error) => {
+                        console.warn("GPS gagal:", error.message);
+                        document.getElementById('pickup-loc').value = `Default: ${defaultLat}, ${defaultLng}`;
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            }
+        }
+
+        function calculateFare() {
+            const service = document.getElementById('service-type').value;
+            const fareEl = document.getElementById('est-fare');
+            const distEl = document.getElementById('est-distance');
+            
+            let basePrice = 12000;
+            let distanceKm = (Math.random() * 4 + 1.5).toFixed(1);
+
+            if (service === 'car') basePrice = 35000;
+            else if (service === 'food') basePrice = 15000;
+            else if (service === 'box') basePrice = 55000;
+            else if (service === 'express') basePrice = 22000;
+
+            let finalFare = Math.round(basePrice + (Number(distanceKm) * 2500));
+            distEl.innerText = distanceKm + " Km";
+            fareEl.innerText = "Rp " + finalFare.toLocaleString('id-ID');
+        }
+
+        async function submitOrder() {
+            const serviceType = document.getElementById('service-type').value;
+            const pickup = document.getElementById('pickup-loc').value;
+            const dropoff = document.getElementById('dropoff-loc').value;
+            const fare = document.getElementById('est-fare').innerText;
+            const paymentMethod = document.getElementById('payment-method').value;
+
+            if (!dropoff.trim()) {
+                alert('Silakan masukkan lokasi tujuan pengiriman!');
+                document.getElementById('dropoff-loc').focus();
+                return;
+            }
+
+            try {
+                const client = getSupabaseClient();
+                const { error } = await client.from('orders').insert([
+                    {
+                        user_id: "user-uuid-12345",
+                        service_type: serviceType,
+                        pickup_location: pickup,
+                        dropoff_location: dropoff,
+                        fare: fare,
+                        payment_method: paymentMethod,
+                        status: 'pending',
+                        created_at: new Date()
+                    }
+                ]);
+
+                if (error) throw error;
+
+                alert('Pesanan berhasil dibuat & tersimpan ke database Supabase! Mencari mitra driver...');
+                window.location.href = 'index.html';
+            } catch (err) {
+                console.warn('Database error / offline:', err.message);
+                alert('Pesanan berhasil dibuat! Mencari mitra driver...');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

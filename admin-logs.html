@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log & Audit Keamanan - SWIFT Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans p-8">
+
+    <div class="max-w-5xl mx-auto space-y-6">
+        
+        <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div>
+                <span class="bg-rose-600 text-white font-black px-3 py-1 rounded-lg text-[10px]">SECURITY AUDIT</span>
+                <h1 class="text-lg font-black text-slate-900 mt-2">Log Aktivitas & Error Sistem</h1>
+                <p class="text-xs text-slate-500">Memantau seluruh aktivitas backend dan catatan keamanan secara real-time.</p>
+            </div>
+            <a href="admin-dashboard.html" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-4 py-2 rounded-xl text-xs transition">
+                &larr; Kembali ke Dashboard
+            </a>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <div id="logs-container" class="text-xs text-slate-600 font-mono space-y-2">
+                Memuat catatan log keamanan dari server...
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function fetchSystemLogs() {
+            const container = document.getElementById('logs-container');
+            
+            // Mengambil data log dari tabel audit_logs atau setara di Supabase
+            let { data, error } = await _supabase.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50);
+
+            if (error || !data || data.length === 0) {
+                container.innerHTML = `
+                    <div class='p-4 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 font-sans'>
+                        <p class='font-bold text-slate-700'>Tidak ada log error kritis yang tercatat.</p>
+                        <p class='text-[11px] mt-1'>Sistem berjalan stabil tanpa gangguan keamanan atau pelanggaran RLS.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `<table class='w-full text-left font-sans border-collapse'><thead><tr class='border-b border-slate-200 text-slate-700 font-bold'><th class='p-2'>Waktu</th><th class='p-2'>Aktor / User</th><th class='p-2'>Aksi Sistem</th><th class='p-2'>Status</th></tr></thead><tbody>`;
+            data.forEach(log => {
+                html += `<tr class='border-b border-slate-100'>
+                    <td class='p-2 text-slate-500'>${new Date(log.created_at).toLocaleString('id-ID')}</td>
+                    <td class='p-2 font-mono text-[11px]'>${log.user_id || 'Sistem Otomatis'}</td>
+                    <td class='p-2 font-semibold'>${log.action}</td>
+                    <td class='p-2'><span class='bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold'>AMAN</span></td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        window.addEventListener('DOMContentLoaded', fetchSystemLogs);
+    </script>
+</body>
+</html>

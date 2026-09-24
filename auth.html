@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autentikasi & Masuk - SWIFT Super-App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .card-bg { background-color: #ffffff; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .input-light { background-color: #f8fafc; border: 1px solid #94a3b8; color: #0f172a; }
+        .input-light:focus { outline: none; border-color: #2563eb; background-color: #ffffff; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen flex items-center justify-center font-sans p-4">
+
+    <div class="w-full max-w-md space-y-6">
+        
+        <!-- HEADER LOGO -->
+        <div class="text-center space-y-2">
+            <span class="bg-blue-600 text-white font-black px-4 py-2 rounded-xl text-sm tracking-wider shadow-md">SWIFT SUPER-APP</span>
+            <h1 class="text-xl font-black text-slate-900 mt-2">Pusat Autentikasi Sistem</h1>
+            <p class="text-xs text-slate-600">Masuk atau daftar untuk mengakses ekosistem SWIFT.</p>
+        </div>
+
+        <!-- MAIN AUTH CARD -->
+        <div class="card-bg p-6 rounded-2xl space-y-6">
+            
+            <!-- TAB TOGGLE (LOGIN / SIGNUP) -->
+            <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
+                <button onclick="switchTab('login')" id="tab-login" class="flex-1 py-2.5 rounded-lg bg-blue-600 text-white shadow-sm transition">Masuk</button>
+                <button onclick="switchTab('signup')" id="tab-signup" class="flex-1 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition">Daftar Baru</button>
+            </div>
+
+            <!-- FORM LOGIN -->
+            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-800 mb-1">Email Anda</label>
+                    <input type="email" id="login-email" required placeholder="nama@email.com" class="input-light w-full px-3 py-2.5 rounded-lg text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-800 mb-1">Kata Sandi</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" class="input-light w-full px-3 py-2.5 rounded-lg text-xs">
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                    <label class="flex items-center space-x-2 text-slate-600">
+                        <input type="checkbox" class="rounded border-slate-300">
+                        <span>Ingat saya</span>
+                    </label>
+                    <button type="button" onclick="handleForgotPassword()" class="text-blue-600 hover:underline font-bold">Lupa Sandi?</button>
+                </div>
+                <button type="submit" id="btn-login-submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs transition shadow-sm">Masuk ke Dashboard</button>
+            </form>
+
+            <!-- FORM SIGNUP (DAFTAR) -->
+            <form id="form-signup" onsubmit="handleSignup(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-bold text-slate-800 mb-1">Email Aktif</label>
+                    <input type="email" id="signup-email" required placeholder="nama@email.com" class="input-light w-full px-3 py-2.5 rounded-lg text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-800 mb-1">Buat Kata Sandi</label>
+                    <input type="password" id="signup-password" required placeholder="Minimal 6 karakter" class="input-light w-full px-3 py-2.5 rounded-lg text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-800 mb-1">Pilih Peran Akun (Role)</label>
+                    <select id="signup-role" class="input-light w-full px-3 py-2.5 rounded-lg text-xs font-semibold">
+                        <option value="passenger">Penumpang / Pengguna Umum (Passenger)</option>
+                        <option value="driver">Driver / Mitra Pengemudi (Driver)</option>
+                        <option value="admin">Administrator (Admin Panel)</option>
+                    </select>
+                </div>
+                <button type="submit" id="btn-signup-submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs transition shadow-sm">Daftar Akun Baru</button>
+            </form>
+
+        </div>
+
+        <div class="text-center text-[11px] text-slate-500">
+            &copy; 2026 SWIFT Super-App Security Protocol. All rights reserved.
+        </div>
+
+    </div>
+
+    <!-- SKRIP LOGIKA AUTENTIKASI & REDIRECT OTOMATIS -->
+    <script>
+        const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Fungsi Tab Switcher
+        function switchTab(tab) {
+            const loginForm = document.getElementById('form-login');
+            const signupForm = document.getElementById('form-signup');
+            const tabLogin = document.getElementById('tab-login');
+            const tabSignup = document.getElementById('tab-signup');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                tabLogin.className = "flex-1 py-2.5 rounded-lg bg-blue-600 text-white shadow-sm transition";
+                tabSignup.className = "flex-1 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                tabSignup.className = "flex-1 py-2.5 rounded-lg bg-emerald-600 text-white shadow-sm transition";
+                tabLogin.className = "flex-1 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+            }
+        }
+
+        // Fungsi Redirect Otomatis Berdasarkan Role
+        async function redirectBasedOnRole(userId) {
+            try {
+                // Ambil profil pengguna dari database tabel 'profiles'
+                let { data: profile, error } = await _supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', userId)
+                    .single();
+
+                let role = profile ? profile.role : 'passenger';
+
+                // Jika kolom role belum ada atau kosong, fallback ke passenger
+                if (error || !role) {
+                    role = 'passenger';
+                }
+
+                // Arahkan ke dashboard yang sesuai
+                if (role === 'admin') {
+                    window.location.href = 'admin-dashboard.html';
+                } else if (role === 'driver') {
+                    window.location.href = 'driver-dashboard.html';
+                } else {
+                    window.location.href = 'passenger-dashboard.html';
+                }
+            } catch (err) {
+                console.warn('Gagal membaca role database, mengarahkan ke passenger default:', err.message);
+                window.location.href = 'passenger-dashboard.html';
+            }
+        }
+
+        // Proses Login
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('btn-login-submit');
+
+            btn.innerText = "Memeriksa Sesi...";
+            btn.disabled = true;
+
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                alert('Gagal Masuk: ' + error.message);
+                btn.innerText = "Masuk ke Dashboard";
+                btn.disabled = false;
+                return;
+            }
+
+            if (data.user) {
+                await redirectBasedOnRole(data.user.id);
+            }
+        }
+
+        // Proses Signup (Pendaftaran)
+        async function handleSignup(event) {
+            event.preventDefault();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const role = document.getElementById('signup-role').value;
+            const btn = document.getElementById('btn-signup-submit');
+
+            btn.innerText = "Mendaftarkan Akun...";
+            btn.disabled = true;
+
+            const { data, error } = await _supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: { role: role } // Menyimpan metadata role awal
+                }
+            });
+
+            if (error) {
+                alert('Gagal Daftar: ' + error.message);
+                btn.innerText = "Daftar Akun Baru";
+                btn.disabled = false;
+                return;
+            }
+
+            if (data.user) {
+                // Simpan juga ke tabel profiles untuk memastikan sinkronisasi data master
+                await _supabase.from('profiles').upsert([
+                    { id: data.user.id, email: email, role: role, wallet_balance: 0, created_at: new Date() }
+                ]);
+
+                alert('Pendaftaran berhasil! Akun Anda telah dibuat.');
+                await redirectBasedOnRole(data.user.id);
+            }
+        }
+
+        // Pemulihan Kata Sandi (Forgot Password)
+        async function handleForgotPassword() {
+            const email = prompt("Masukkan email akun Anda untuk pemulihan kata sandi:");
+            if (!email) return;
+
+            const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/auth.html'
+            });
+
+            if (error) {
+                alert('Gagal mengirim email pemulihan: ' + error.message);
+            } else {
+                alert('Tautan pemulihan kata sandi telah dikirim ke email Anda. Silakan cek kotak masuk.');
+            }
+        }
+
+        // Periksa apakah sesi sudah aktif saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session && session.user) {
+                // Jika sudah login, langsung arahkan ke dashboard yang sesuai
+                await redirectBasedOnRole(session.user.id);
+            }
+        });
+    </script>
+</body>
+</html>

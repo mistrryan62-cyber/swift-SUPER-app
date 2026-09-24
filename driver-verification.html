@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Dokumen Driver - SWIFT Super-App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans p-4 md:p-8 flex items-center justify-center min-h-screen">
+
+    <div class="max-w-xl w-full space-y-6">
+        
+        <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div>
+                <span class="bg-amber-600 text-white font-black px-3 py-1 rounded-lg text-[10px]">MITRA DRIVER</span>
+                <h1 class="text-lg font-black text-slate-900 mt-2">Unggah Dokumen Verifikasi</h1>
+            </div>
+            <a href="driver-dashboard.html" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-4 py-2 rounded-xl text-xs transition">
+                &larr; Kembali
+            </a>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <p class="text-xs text-slate-600">Silakan unggah dokumen resmi (SIM, STNK, dan Foto Diri) untuk diverifikasi oleh sistem administrator.</p>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Foto SIM (Surat Izin Mengemudi)</label>
+                    <input type="file" id="file-sim" accept="image/*" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Foto STNK Kendaraan</label>
+                    <input type="file" id="file-stnk" accept="image/*" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Foto Diri Terbaru (Selfie)</label>
+                    <input type="file" id="file-selfie" accept="image/*" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs bg-slate-50">
+                </div>
+            </div>
+
+            <button onclick="submitVerificationDocuments()" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-sm">
+                Kirim Dokumen ke Server
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function uploadFileToStorage(file, folder, driverId) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${driverId}/${folder}-${Date.now()}.${fileExt}`;
+            
+            const { data, error } = await _supabase.storage
+                .from('driver-docs')
+                .upload(fileName, file);
+
+            if (error) throw error;
+
+            // Ambil Public URL dari file yang diunggah
+            const { data: { publicUrl } } = _supabase.storage
+                .from('driver-docs')
+                .getPublicUrl(fileName);
+
+            return publicUrl;
+        }
+
+        async function submitVerificationDocuments() {
+            const simFile = document.getElementById('file-sim').files[0];
+            const stnkFile = document.getElementById('file-stnk').files[0];
+            const selfieFile = document.getElementById('file-selfie').files[0];
+            const btnSubmit = document.getElementById('btn-submit');
+
+            if (!simFile || !stnkFile || !selfieFile) {
+                alert('Mohon lengkapi semua dokumen (SIM, STNK, dan Foto Diri) sebelum mengirim!');
+                return;
+            }
+
+            try {
+                btnSubmit.innerText = "Mengunggah berkas ke server...";
+                btnSubmit.disabled = true;
+
+                const { data: { session } } = await _supabase.auth.getSession();
+                if (!session) {
+                    alert('Sesi anda telah habis. Silakan login kembali.');
+                    window.location.href = 'auth.html';
+                    return;
+                }
+                const driverId = session.user.id;
+
+                // Unggah ketiganya ke Supabase Storage bucket 'driver-docs'
+                const simUrl = await uploadFileToStorage(simFile, 'sim', driverId);
+                const stnkUrl = await uploadFileToStorage(stnkFile, 'stnk', driverId);
+                const selfieUrl = await uploadFileToStorage(selfieFile, 'selfie', driverId);
+
+                // Simpan URL dan status 'pending' ke tabel driver_documents
+                const { error: dbError } = await _supabase
+                    .from('driver_documents')
+                    .insert([
+                        { driver_id: driverId, sim_url: simUrl, stnk_url: stnkUrl, selfie_url: selfieUrl, verification_status: 'pending' }
+                    ]);
+
+                if (dbError) throw dbError;
+
+                alert('Dokumen berhasil diunggah dan disimpan ke database! Menunggu verifikasi admin.');
+                window.location.href = 'driver-dashboard.html';
+
+            } catch (err) {
+                alert('Gagal mengunggah dokumen: ' + err.message);
+                btnSubmit.innerText = "Kirim Dokumen ke Server";
+                btnSubmit.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

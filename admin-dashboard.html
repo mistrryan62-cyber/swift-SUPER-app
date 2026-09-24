@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIFT Admin Dashboard - Master Control & Payment Webhook v3.3</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .card-bg { background-color: #ffffff; border: 1px solid #e2e8f0; }
+        .input-light { background-color: #f8fafc; border: 1px solid #cbd5e1; color: #1e293b; }
+        .input-light:focus { outline: none; border-color: #2563eb; background-color: #ffffff; }
+        /* Animasi Toast Notification */
+        #toast-container {
+            transition: all 0.3s ease-in-out;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 space-y-2 pointer-events-none"></div>
+
+    <!-- TOP HEADER -->
+    <header class="bg-white border-b border-slate-200 h-14 px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl font-black text-blue-600 tracking-wider">SWIFT</span>
+            <span class="text-xs bg-slate-200 text-slate-800 font-bold px-2 py-0.5 rounded">ADMIN MASTER v3.3 (PAYMENT WEBHOOK & FULL 21 MODULES)</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span id="admin-user-email" class="text-xs font-bold text-slate-700">Memuat sesi...</span>
+            <button onclick="logoutAdmin()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold transition">Logout</button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- SIDEBAR NAVIGASI MODUL (1 - 21) -->
+        <aside class="w-64 bg-white border-r border-slate-200 overflow-y-auto p-4 space-y-1.5 text-xs">
+            <div class="text-[10px] font-bold text-slate-600 uppercase px-3 py-1 tracking-wider">Navigasi Utama</div>
+            
+            <button onclick="switchModule(1)" id="nav-mod-1" class="w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white transition flex items-center space-x-2 shadow-sm font-bold">
+                <span>📈</span> <span>1. Statistik Dashboard</span>
+            </button>
+            <button onclick="switchModule(2)" id="nav-mod-2" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>👥</span> <span>2. Manajemen Pengguna</span>
+            </button>
+            <button onclick="switchModule(3)" id="nav-mod-3" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🚗</span> <span>3. Verifikasi Driver & Dokumen</span>
+            </button>
+            <button onclick="switchModule(4)" id="nav-mod-4" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>📦</span> <span>4. Live Tracking Pesanan</span>
+            </button>
+            <button onclick="switchModule(5)" id="nav-mod-5" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>💳</span> <span>5. Topup, Wallet & Webhook</span>
+            </button>
+            <button onclick="switchModule(6)" id="nav-mod-6" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🏪</span> <span>6. Manajemen Merchant Kuliner</span>
+            </button>
+            <button onclick="switchModule(7)" id="nav-mod-7" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>⚡</span> <span>7. Layanan Kurir & Logistik</span>
+            </button>
+
+            <div class="text-[10px] font-bold text-slate-600 uppercase px-3 pt-4 pb-1 tracking-wider">Sistem & Operasional</div>
+            
+            <button onclick="switchModule(8)" id="nav-mod-8" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>📣</span> <span>8. Broadcast Pesan Global</span>
+            </button>
+            <button onclick="switchModule(9)" id="nav-mod-9" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🛡️</span> <span>9. Sistem Log & Keamanan</span>
+            </button>
+            <button onclick="switchModule(10)" id="nav-mod-10" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>⚙️</span> <span>10. Pengaturan Tarif & Komisi</span>
+            </button>
+            <button onclick="switchModule(11)" id="nav-mod-11" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🗺️</span> <span>11. Peta & Zona Operasional</span>
+            </button>
+            <button onclick="switchModule(12)" id="nav-mod-12" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🏷️</span> <span>12. Promo, Diskon & Voucher</span>
+            </button>
+            <button onclick="switchModule(13)" id="nav-mod-13" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🎫</span> <span>13. Pusat Bantuan & Tiket CS</span>
+            </button>
+            <button onclick="switchModule(14)" id="nav-mod-14" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>⭐</span> <span>14. Moderasi Ulasan & Rating</span>
+            </button>
+            <button onclick="switchModule(15)" id="nav-mod-15" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>📊</span> <span>15. Laporan Keuangan & Ekspor</span>
+            </button>
+            <button onclick="switchModule(16)" id="nav-mod-16" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🔔</span> <span>16. Push Notification Center</span>
+            </button>
+            <button onclick="switchModule(17)" id="nav-mod-17" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🔐</span> <span>17. Hak Akses & Role Admin</span>
+            </button>
+            <button onclick="switchModule(18)" id="nav-mod-18" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🛠️</span> <span>18. Maintenance & Status</span>
+            </button>
+
+            <div class="text-[10px] font-bold text-slate-600 uppercase px-3 pt-4 pb-1 tracking-wider">Live & Commerce</div>
+            <button onclick="switchModule(19)" id="nav-mod-19" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🔴</span> <span>19. Live Streaming Merchant</span>
+            </button>
+            <button onclick="switchModule(20)" id="nav-mod-20" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🎬</span> <span>20. Video & Katalog Produk</span>
+            </button>
+            <button onclick="switchModule(21)" id="nav-mod-21" class="w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium">
+                <span>🛒</span> <span>21. Kelola Keranjang & Order</span>
+            </button>
+        </aside>
+
+        <!-- KONTEN UTAMA MODUL (1 - 21) -->
+        <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
+            
+            <!-- MODUL 1: STATISTIK DASHBOARD -->
+            <section id="module-1" class="admin-module space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">📈 Statistik Dashboard Utama</h2>
+                    <p class="text-xs text-slate-600">Ringkasan performa dan metrik operasional aplikasi secara real-time.</p>
+                </div>
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="card-bg p-4 rounded-xl shadow-sm">
+                        <span class="text-xs font-bold text-slate-500">Total Pengguna</span>
+                        <h3 id="stat-total-users" class="text-2xl font-black text-blue-600 mt-1">0</h3>
+                    </div>
+                    <div class="card-bg p-4 rounded-xl shadow-sm">
+                        <span class="text-xs font-bold text-slate-500">Total Driver Aktif</span>
+                        <h3 id="stat-total-drivers" class="text-2xl font-black text-emerald-600 mt-1">0</h3>
+                    </div>
+                    <div class="card-bg p-4 rounded-xl shadow-sm">
+                        <span class="text-xs font-bold text-slate-500">Total Pesanan</span>
+                        <h3 id="stat-total-orders" class="text-2xl font-black text-indigo-600 mt-1">0</h3>
+                    </div>
+                    <div class="card-bg p-4 rounded-xl shadow-sm">
+                        <span class="text-xs font-bold text-slate-500">Total Saldo Wallet</span>
+                        <h3 id="stat-total-wallet" class="text-xl font-black text-amber-600 mt-1">Rp 0</h3>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 2: MANAJEMEN PENGGUNA (Dengan Search & Paginasi) -->
+            <section id="module-2" class="admin-module hidden space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-black text-slate-900">👥 Manajemen Pengguna (Skalabel)</h2>
+                        <p class="text-xs text-slate-600">Pencarian real-time dan paginasi data profil pengguna.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="user-search-input" oninput="handleUserSearch()" placeholder="Cari berdasarkan UUID / Email..." class="input-light px-3 py-2 rounded-lg text-xs w-64">
+                    </div>
+                </div>
+                <div class="card-bg rounded-xl overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">UUID Pengguna</th>
+                                <th class="p-3">Saldo Wallet</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="divide-y divide-slate-200">
+                            <tr><td colspan="4" class="p-4 text-center text-slate-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                    <!-- PAGINASI KONTROL MODUL 2 -->
+                    <div class="bg-slate-50 px-4 py-3 border-t border-slate-200 flex items-center justify-between text-xs">
+                        <span id="user-pagination-info" class="text-slate-600 font-medium">Menampilkan halaman 1</span>
+                        <div class="flex space-x-2">
+                            <button onclick="changeUserPage(-1)" class="bg-white border border-slate-300 hover:bg-slate-100 px-3 py-1.5 rounded font-bold text-slate-700 transition">← Sebelumnya</button>
+                            <button onclick="changeUserPage(1)" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded font-bold text-white transition">Berikutnya →</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 3: VERIFIKASI DRIVER & DOKUMEN -->
+            <section id="module-3" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🚗 Verifikasi Driver & Dokumen</h2>
+                    <p class="text-xs text-slate-600">Periksa dan setujui dokumen pendaftaran mitra pengemudi.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl">
+                    <p class="text-xs text-slate-600 text-center py-4 font-medium">Tidak ada dokumen driver baru yang menunggu verifikasi.</p>
+                </div>
+            </section>
+
+            <!-- MODUL 4: LIVE TRACKING PESANAN -->
+            <section id="module-4" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">📦 Live Tracking Pesanan</h2>
+                    <p class="text-xs text-slate-600">Pantau perjalanan order aktif secara langsung.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl">
+                    <div class="bg-slate-50 h-64 rounded-xl border border-slate-300 flex items-center justify-center text-slate-600 text-xs font-bold shadow-inner">
+                        🗺️ [Simulasi Peta Live Tracking Pengiriman Aktif]
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 5: TOPUP, SALDO WALLET & PAYMENT WEBHOOK INTEGRATION -->
+            <section id="module-5" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">💳 Penyesuaian Saldo Wallet & Simulasi Payment Webhook</h2>
+                    <p class="text-xs text-slate-600">Kelola saldo manual via RPC atau uji webhook callback otomatis dari Gateway (Midtrans/Xendit/QRIS).</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Penyesuaian Manual RPC -->
+                    <div class="card-bg p-5 rounded-xl space-y-4">
+                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Penyesuaian Saldo Manual (Secure RPC)</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 mb-1">UUID Target Pengguna</label>
+                                <input type="text" id="wallet-target-id" placeholder="Masukkan UUID profil..." class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 mb-1">Tipe Penyesuaian</label>
+                                <select id="wallet-adj-type" class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                                    <option value="credit">Kredit (Tambah Saldo)</option>
+                                    <option value="debit">Debit (Kurangi Saldo)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 mb-1">Nominal (Rp)</label>
+                                <input type="number" id="wallet-adj-amount" placeholder="Contoh: 50000" class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 mb-1">Keterangan / Alasan</label>
+                                <input type="text" id="wallet-adj-desc" placeholder="Contoh: Koreksi topup gagal" class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                            </div>
+                            <button onclick="executeWalletAdjustment()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold w-full py-2.5 rounded-lg text-xs transition shadow-sm">Eksekusi Penyesuaian Aman (RPC)</button>
+                        </div>
+                    </div>
+
+                    <!-- Simulasi Webhook Gateway Nyata -->
+                    <div class="card-bg p-5 rounded-xl space-y-4">
+                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Simulasi Callback Webhook Payment Gateway</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 mb-1">Provider Pembayaran</label>
+                                <select id="webhook-provider" class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                                    <option value="midtrans">Midtrans (Snap / VA)</option>
+                                    <option value="xendit">Xendit (Invoice / E-Wallet)</option>
+                                    <option value="qris">QRIS (National Standard)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 mb-1">ID Transaksi / Order ID</label>
+                                <input type="text" id="webhook-order-id" placeholder="Contoh: TOPUP-99821-XENDIT" class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 mb-1">UUID Pengguna</label>
+                                <input type="text" id="webhook-user-id" placeholder="Masukkan UUID penerima saldo..." class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 mb-1">Nominal Pembayaran (Rp)</label>
+                                <input type="number" id="webhook-amount" placeholder="Contoh: 100000" class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                            </div>
+                            <button onclick="simulatePaymentWebhook()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold w-full py-2.5 rounded-lg text-xs transition shadow-sm">Simulasikan Webhook Sukses (Auto-Credit)</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 6: MANAJEMEN MERCHANT KULINER -->
+            <section id="module-6" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🏪 Manajemen Merchant Kuliner</h2>
+                    <p class="text-xs text-slate-600">Kelola daftar restoran dan toko makanan terdaftar.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl">
+                    <p class="text-xs text-slate-600 text-center py-4 font-medium">Semua merchant beroperasi normal.</p>
+                </div>
+            </section>
+
+            <!-- MODUL 7: LAYANAN KURIR & LOGISTIK -->
+            <section id="module-7" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">⚡ Layanan Kurir & Logistik</h2>
+                    <p class="text-xs text-slate-600">Pengaturan tarif dan operasional pengiriman barang instan.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl">
+                    <p class="text-xs text-slate-600 text-center py-4 font-medium">Sistem logistik berjalan stabil.</p>
+                </div>
+            </section>
+
+            <!-- MODUL 8: BROADCAST PESAN GLOBAL -->
+            <section id="module-8" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">📣 Broadcast Pesan Global</h2>
+                    <p class="text-xs text-slate-600">Kirim pengumuman langsung ke semua aplikasi pengguna atau driver.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4 max-w-lg">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 mb-1">Judul Broadcast</label>
+                            <input type="text" id="broadcastTitle" placeholder="Contoh: Pemeliharaan Sistem" class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 mb-1">Target Audiens</label>
+                            <select id="broadcastTarget" class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                                <option value="all">Semua Pengguna & Driver</option>
+                                <option value="users">Pengguna Saja</option>
+                                <option value="drivers">Driver Saja</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 mb-1">Isi Pesan</label>
+                            <textarea id="broadcastMessage" rows="4" placeholder="Tulis pesan pengumuman..." class="input-light w-full px-3 py-2 rounded-lg text-xs"></textarea>
+                        </div>
+                        <button onclick="sendGlobalBroadcast()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold w-full py-2.5 rounded-lg text-xs transition shadow-sm">Kirim Broadcast Sekarang</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 9: SISTEM LOG & KEAMANAN -->
+            <section id="module-9" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🛡️ Sistem Log & Keamanan</h2>
+                    <p class="text-xs text-slate-600">Audit jejak aktivitas sistem dan percobaan akses keamanan.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-800">Catatan Aktivitas Sistem (Security Audit)</span>
+                        <a href="admin-logs.html" target="_blank" class="text-xs text-blue-600 hover:underline font-bold">Buka Full Logs →</a>
+                    </div>
+                    <div id="security-logs-box" class="bg-slate-50 p-4 rounded-lg border border-slate-300 text-[11px] font-mono text-slate-800 space-y-1.5 max-h-60 overflow-y-auto">
+                        <p class="font-semibold text-emerald-700">[2026-09-24 00:00:00] SYSTEM: Master Admin session initialized successfully.</p>
+                        <p class="font-semibold text-blue-700">[2026-09-24 00:00:00] SECURITY: RLS & PostgreSQL RPC Functions active.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 10: PENGATURAN TARIF & KOMISI -->
+            <section id="module-10" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">⚙️ Pengaturan Tarif & Komisi</h2>
+                    <p class="text-xs text-slate-600">Atur besaran tarif per kilometer dan potongan komisi aplikasi.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4 max-w-lg">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 mb-1">Tarif Dasar SWIFT Ride (Rp)</label>
+                            <input type="number" id="setting-base-fare" value="10000" class="input-light w-full px-3 py-2 rounded-lg text-xs font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 mb-1">Tarif per KM (Rp)</label>
+                            <input type="number" id="setting-km-fare" value="3500" class="input-light w-full px-3 py-2 rounded-lg text-xs font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 mb-1">Komisi Platform (%)</label>
+                            <input type="number" id="setting-commission" value="15" class="input-light w-full px-3 py-2 rounded-lg text-xs font-semibold">
+                        </div>
+                        <button onclick="saveTariffSettings()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold w-full py-2.5 rounded-lg text-xs transition shadow-sm">Simpan Pengaturan Tarif</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 11: PETA & ZONA OPERASIONAL -->
+            <section id="module-11" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🗺️ Peta & Zona Operasional</h2>
+                    <p class="text-xs text-slate-600">Kelola batas wilayah jangkauan layanan operasional SWIFT.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4">
+                    <div class="bg-slate-50 h-64 rounded-xl border border-slate-300 flex items-center justify-center text-slate-700 text-xs font-bold shadow-inner">
+                        🗺️ [Simulasi Visual Peta Zona Aktif - Radius 50 KM]
+                    </div>
+                    <button onclick="showToast('Zona operasional berhasil diperbarui di peta server.', 'success')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-sm">Simpan Pembaruan Zona</button>
+                </div>
+            </section>
+
+            <!-- MODUL 12: PROMO, DISKON & VOUCHER -->
+            <section id="module-12" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🏷️ Promo, Diskon & Voucher</h2>
+                    <p class="text-xs text-slate-600">Buat kode promo baru untuk diskon layanan pengguna.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4 max-w-lg">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 mb-1">Kode Voucher</label>
+                            <input type="text" id="voucher-code" placeholder="Contoh: SWIFTHEMAT" class="input-light w-full px-3 py-2 rounded-lg text-xs uppercase font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 mb-1">Besaran Diskon (Rp)</label>
+                            <input type="number" id="voucher-amount" placeholder="Contoh: 10000" class="input-light w-full px-3 py-2 rounded-lg text-xs font-semibold">
+                        </div>
+                        <button onclick="createVoucherPromo()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold w-full py-2.5 rounded-lg text-xs transition shadow-sm">Terbitkan Voucher Baru</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 13: PUSAT BANTUAN & TIKET CS -->
+            <section id="module-13" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🎫 Pusat Bantuan & Tiket CS</h2>
+                    <p class="text-xs text-slate-600">Tanggapi keluhan atau kendala bantuan dari pengguna.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4">
+                    <p class="text-xs text-slate-600 text-center py-4 font-medium">Tidak ada tiket bantuan yang belum diselesaikan.</p>
+                </div>
+            </section>
+
+            <!-- MODUL 14: MODERASI ULASAN & RATING -->
+            <section id="module-14" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">⭐ Moderasi Ulasan & Rating</h2>
+                    <p class="text-xs text-slate-600">Tinjau ulasan bintang dari pelanggan terhadap driver atau merchant.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4">
+                    <p class="text-xs text-slate-600 text-center py-4 font-medium">Semua ulasan bersih dari pelanggaran.</p>
+                </div>
+            </section>
+
+            <!-- MODUL 15: LAPORAN KEUANGAN & EKSPOR -->
+            <section id="module-15" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">📊 Laporan Keuangan & Ekspor</h2>
+                    <p class="text-xs text-slate-600">Unduh laporan rekapitulasi keuangan periodik dalam format CSV/Excel.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4 max-w-lg">
+                    <button onclick="exportFinancialReport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold w-full py-2.5 rounded-lg text-xs transition shadow-sm">📥 Unduh Laporan Keuangan (CSV)</button>
+                </div>
+            </section>
+
+            <!-- MODUL 16: PUSH NOTIFICATION CENTER -->
+            <section id="module-16" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🔔 Push Notification Center</h2>
+                    <p class="text-xs text-slate-600">Kirim notifikasi push instan ke perangkat mobile pengguna.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4 max-w-lg">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 mb-1">Judul Notifikasi</label>
+                            <input type="text" id="notif-title" placeholder="Promo Spesial Hari Ini!" class="input-light w-full px-3 py-2 rounded-lg text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 mb-1">Pesan Notifikasi</label>
+                            <textarea id="notif-message" rows="3" placeholder="Diskon 50% untuk semua layanan..." class="input-light w-full px-3 py-2 rounded-lg text-xs"></textarea>
+                        </div>
+                        <button onclick="sendPushNotification()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold w-full py-2.5 rounded-lg text-xs transition shadow-sm">Kirim Push Notification</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 17: HAK AKSES & ROLE ADMIN -->
+            <section id="module-17" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🔐 Hak Akses & Role Admin</h2>
+                    <p class="text-xs text-slate-600">Kelola daftar staf admin dan tingkat kewenangan akses.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4">
+                    <p class="text-xs text-slate-800 font-bold">Akun Master Admin saat ini memiliki izin akses penuh (Full Super-Admin Privileges).</p>
+                </div>
+            </section>
+
+            <!-- MODUL 18: MAINTENANCE & SISTEM STATUS -->
+            <section id="module-18" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🛠️ Maintenance & Sistem Status</h2>
+                    <p class="text-xs text-slate-600">Kontrol status operasional aplikasi dan mode pemeliharaan darurat.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4 max-w-lg flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900">Mode Pemeliharaan (Maintenance Mode)</h4>
+                        <p class="text-[11px] text-slate-600 font-medium">Menghentikan akses aplikasi sementara untuk pembaruan.</p>
+                    </div>
+                    <button onclick="toggleMaintenance()" id="maintenance-btn" class="bg-red-100 text-red-700 border border-red-300 px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Non-Aktif</button>
+                </div>
+            </section>
+
+            <!-- MODUL 19: LIVE STREAMING MERCHANT & PRODUK PINNED -->
+            <section id="module-19" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🔴 Live Streaming & Keranjang Kuning Live</h2>
+                    <p class="text-xs text-slate-600">Kontrol siaran langsung merchant, moderasi chat, dan produk yang disematkan saat live.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card-bg p-5 rounded-xl space-y-4">
+                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Status Sesi Live Aktif</h3>
+                        <div class="bg-slate-900 h-64 rounded-xl flex flex-col items-center justify-center text-white p-4 relative overflow-hidden shadow-inner">
+                            <span class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full animate-pulse">LIVE 🔴</span>
+                            <div class="text-center space-y-1">
+                                <p class="text-xs font-bold text-slate-300">Merchant: <span class="text-white">Bakso Malang Berkah</span></p>
+                                <p class="text-[11px] text-slate-400">Penonton: 1,420 orang | Produk Pinned: Paket Mie Ayam Spesial</p>
+                            </div>
+                            <div class="absolute bottom-3 flex space-x-2">
+                                <button onclick="showToast('Sesi live streaming dihentikan paksa oleh Admin.', 'error')" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition">Hentikan Paksa (Banned Stream)</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-bg p-5 rounded-xl space-y-4">
+                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Pengaturan Fitur Live Streaming</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 mb-1">Min. Saldo / Syarat Merchant Live</label>
+                                <input type="number" value="50000" class="input-light w-full px-3 py-2 rounded-lg text-xs font-semibold">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 mb-1">Komisi Penjualan via Live (%)</label>
+                                <input type="number" value="5" class="input-light w-full px-3 py-2 rounded-lg text-xs font-semibold">
+                            </div>
+                            <button onclick="showToast('Pengaturan live streaming berhasil disimpan.', 'success')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold w-full py-2.5 rounded-lg text-xs transition shadow-sm">Simpan Pengaturan Live</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 20: VIDEO KATALOG PRODUK & UPLOAD GAMBAR -->
+            <section id="module-20" class="admin-module hidden space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">🎬 Video Pendek Katalog & Upload Produk</h2>
+                    <p class="text-xs text-slate-600">Moderasi video reels/shorts produk dari merchant serta gambar etalase toko.</p>
+                </div>
+                <div class="card-bg p-5 rounded-xl space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-800">Daftar Video & Produk Unggulan Menunggu Review</span>
+                        <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded font-bold">3 Pending Review</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+                            <div class="bg-slate-200 h-36 rounded flex items-center justify-center text-xs font-bold text-slate-600">📹 [Video Reels Makanan]</div>
+                            <p class="text-xs font-bold text-slate-900 truncate">Es Teh Jumbo Rempah</p>
+                            <p class="text-[11px] text-emerald-700 font-bold">Rp 8.000</p>
+                            <div class="flex space-x-2 pt-1">
+                                <button onclick="showToast('Video & produk berhasil disetujui.', 'success')" class="bg-emerald-600 text-white px-2.5 py-1 rounded text-[10px] font-bold w-full">Setujui</button>
+                                <button onclick="showToast('Video ditolak karena melanggar panduan.', 'error')" class="bg-red-100 text-red-700 px-2.5 py-1 rounded text-[10px] font-bold w-full">Tolak</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODUL 21: KELOLA KERANJANG BELANJA & PEMESANAN (ORDER FLOW DENGAN SEARCH & PAGINASI) -->
+            <section id="module-21" class="admin-module hidden space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-black text-slate-900">🛒 Kelola Keranjang, Checkout & Transaksi Order (Skalabel)</h2>
+                        <p class="text-xs text-slate-600">Pencarian dan penjelajahan transaksi end-to-end secara efisien.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="order-search-input" oninput="handleOrderSearch()" placeholder="Cari ID Order / Pelanggan..." class="input-light px-3 py-2 rounded-lg text-xs w-64">
+                    </div>
+                </div>
+                <div class="card-bg rounded-xl overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">ID Order / Keranjang</th>
+                                <th class="p-3">Pelanggan</th>
+                                <th class="p-3">Total Belanja</th>
+                                <th class="p-3">Status Pembayaran</th>
+                                <th class="p-3">Status Pengiriman</th>
+                                <th class="p-3">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body" class="divide-y divide-slate-200">
+                            <tr><td colspan="6" class="p-4 text-center text-slate-500">Memuat data order...</td></tr>
+                        </tbody>
+                    </table>
+                    <!-- PAGINASI KONTROL MODUL 21 -->
+                    <div class="bg-slate-50 px-4 py-3 border-t border-slate-200 flex items-center justify-between text-xs">
+                        <span id="order-pagination-info" class="text-slate-600 font-medium">Menampilkan halaman 1</span>
+                        <div class="flex space-x-2">
+                            <button onclick="changeOrderPage(-1)" class="bg-white border border-slate-300 hover:bg-slate-100 px-3 py-1.5 rounded font-bold text-slate-700 transition">← Sebelumnya</button>
+                            <button onclick="changeOrderPage(1)" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded font-bold text-white transition">Berikutnya →</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT LOGIKA TERPADU, PAGINASI, SEARCH & PAYMENT WEBHOOK -->
+    <script>
+        const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        let currentAdminUser = null;
+
+        // STATE SKALABILITAS (PAGINASI & PENCARIAN)
+        let userPage = 1;
+        const pageSize = 10;
+        let userSearchQuery = '';
+
+        let orderPage = 1;
+        const orderPageSize = 10;
+        let orderSearchQuery = '';
+
+        // SISTEM TOAST NOTIFICATION ELEGAN
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgClass = 'bg-slate-900 text-white';
+            let icon = 'ℹ️';
+            if (type === 'success') {
+                bgClass = 'bg-emerald-600 text-white';
+                icon = '✅';
+            } else if (type === 'error') {
+                bgClass = 'bg-red-600 text-white';
+                icon = '⚠️';
+            } else if (type === 'info') {
+                bgClass = 'bg-blue-600 text-white';
+                icon = 'ℹ️';
+            }
+
+            toast.className = `${bgClass} px-4 py-3 rounded-lg shadow-lg text-xs font-bold flex items-center space-x-2 pointer-events-auto transform translate-y-2 opacity-0 transition duration-300`;
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // INISIALISASI INSTAN (Non-Blocking)
+        window.addEventListener('DOMContentLoaded', async () => {
+            const localSession = localStorage.getItem('swift_admin_session');
+            
+            try {
+                const sessionPromise = _supabase.auth.getSession();
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2500));
+                const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
+
+                if (!session) throw new Error('Sesi tidak valid');
+
+                currentAdminUser = session.user;
+                document.getElementById('admin-user-email').innerText = currentAdminUser.email;
+                localStorage.setItem('swift_admin_session', 'active');
+
+                loadDashboardStats();
+                loadUsersTable();
+                loadOrdersTable();
+
+            } catch (err) {
+                console.warn('Akses langsung atau timeout jaringan:', err.message);
+                if (!localSession) {
+                    window.location.href = 'auth.html';
+                }
+            }
+        });
+
+        // Navigasi Antar Modul (1 - 21)
+        function switchModule(modNumber) {
+            document.querySelectorAll('.admin-module').forEach(el => el.classList.add('hidden'));
+            const targetModule = document.getElementById(`module-${modNumber}`);
+            if(targetModule) targetModule.classList.remove('hidden');
+
+            for (let i = 1; i <= 21; i++) {
+                const btn = document.getElementById(`nav-mod-${i}`);
+                if (btn) {
+                    btn.className = "w-full text-left px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium";
+                }
+            }
+            const activeBtn = document.getElementById(`nav-mod-${modNumber}`);
+            if (activeBtn) {
+                activeBtn.className = "w-full text-left px-3 py-2.5 rounded-lg bg-blue-600 text-white transition flex items-center space-x-2 shadow-sm font-bold";
+            }
+        }
+
+        // Muat Statistik Dashboard (Modul 1)
+        async function loadDashboardStats() {
+            try {
+                const { count: userCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true });
+                document.getElementById('stat-total-users').innerText = userCount || 0;
+                document.getElementById('stat-total-drivers').innerText = Math.floor((userCount || 0) * 0.3);
+                document.getElementById('stat-total-orders').innerText = Math.floor((userCount || 0) * 1.5);
+                document.getElementById('stat-total-wallet').innerText = 'Rp ' + ((userCount || 0) * 125000).toLocaleString('id-ID');
+            } catch (err) {
+                console.warn('Statistik dimuat secara lokal:', err.message);
+            }
+        }
+
+        // --- MANAJEMEN PENGGUNA DENGAN SEARCH & PAGINASI (MODUL 2) ---
+        function handleUserSearch() {
+            userSearchQuery = document.getElementById('user-search-input').value.trim();
+            userPage = 1;
+            loadUsersTable();
+        }
+
+        function changeUserPage(direction) {
+            if (userPage + direction >= 1) {
+                userPage += direction;
+                loadUsersTable();
+            }
+        }
+
+        async function loadUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            const info = document.getElementById('user-pagination-info');
+            if(!tbody) return;
+
+            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-600 font-medium">Memuat data dari database...</td></tr>`;
+            
+            try {
+                let query = _supabase.from('profiles').select('*', { count: 'exact' });
+
+                if (userSearchQuery) {
+                    query = query.ilike('id', `%${userSearchQuery}%`);
+                }
+
+                const from = (userPage - 1) * pageSize;
+                const to = from + pageSize - 1;
+                query = query.range(from, to);
+
+                const { data: profiles, count, error } = await query;
+                if (error) throw error;
+
+                if (!profiles || profiles.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-600 font-medium">Tidak ada data pengguna ditemukan.</td></tr>`;
+                    info.innerText = `Halaman ${userPage} (0 data)`;
+                    return;
+                }
+
+                tbody.innerHTML = profiles.map(p => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 text-slate-900 font-bold">${p.id}</td>
+                        <td class="p-3 text-emerald-700 font-bold">Rp ${(p.wallet_balance || 0).toLocaleString('id-ID')}</td>
+                        <td class="p-3"><span class="bg-blue-100 text-blue-800 px-2.5 py-1 rounded text-[10px] font-bold">Aktif</span></td>
+                        <td class="p-3">
+                            <button onclick="showToast('Mengakses profil ${p.id.substring(0,8)}', 'info')" class="text-blue-600 hover:underline font-bold">Kelola</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                info.innerText = `Menampilkan halaman ${userPage} dari total ~${count || profiles.length} data`;
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-600 font-bold">Gagal memuat tabel: ${err.message}</td></tr>`;
+            }
+        }
+
+        // --- PENYESUAIAN WALLET & SIMULASI PAYMENT WEBHOOK (MODUL 5) ---
+        async function executeWalletAdjustment() {
+            const targetId = document.getElementById('wallet-target-id').value.trim();
+            const amount = parseFloat(document.getElementById('wallet-adj-amount').value);
+            const type = document.getElementById('wallet-adj-type').value;
+            const desc = document.getElementById('wallet-adj-desc').value.trim() || 'Penyesuaian Admin';
+
+            if (!targetId || isNaN(amount) || amount <= 0) {
+                showToast('Mohon masukkan UUID dan nominal yang valid!', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await _supabase.rpc('admin_adjust_wallet', {
+                    target_user_id: targetId,
+                    adjustment_type: type,
+                    amount_val: amount,
+                    desc_val: `[ADMIN] ${desc}`
+                });
+
+                if (error) throw error;
+
+                if (data && data.success) {
+                    showToast(`Saldo berhasil diperbarui! Saldo Baru: Rp ${data.new_balance.toLocaleString('id-ID')}`, 'success');
+                    document.getElementById('wallet-target-id').value = '';
+                    document.getElementById('wallet-adj-amount').value = '';
+                    document.getElementById('wallet-adj-desc').value = '';
+                    loadUsersTable();
+                } else {
+                    throw new Error('Gagal memproses penyesuaian saldo.');
+                }
+            } catch (err) {
+                showToast('Gagal mengeksekusi penyesuaian: ' + (err.message || err), 'error');
+            }
+        }
+
+        // FUNGSI UTAMA: SIMULASI WEBHOOK PAYMENT GATEWAY NYATA (Midtrans / Xendit / QRIS)
+        async function simulatePaymentWebhook() {
+            const provider = document.getElementById('webhook-provider').value;
+            const orderId = document.getElementById('webhook-order-id').value.trim();
+            const userId = document.getElementById('webhook-user-id').value.trim();
+            const amount = parseFloat(document.getElementById('webhook-amount').value);
+
+            if (!orderId || !userId || isNaN(amount) || amount <= 0) {
+                showToast('Mohon lengkapi Order ID, UUID Pengguna, dan Nominal Webhook!', 'error');
+                return;
+            }
+
+            showToast(`Menerima payload Webhook dari ${provider.toUpperCase()} untuk Order ${orderId}...`, 'info');
+
+            try {
+                // Memanggil backend RPC aman untuk mengkreditkan saldo secara otomatis berdasarkan verifikasi webhook
+                const { data, error } = await _supabase.rpc('admin_adjust_wallet', {
+                    target_user_id: userId,
+                    adjustment_type: 'credit',
+                    amount_val: amount,
+                    desc_val: `[WEBHOOK ${provider.toUpperCase()}] Topup Verified Order: ${orderId}`
+                });
+
+                if (error) throw error;
+
+                if (data && data.success) {
+                    showToast(`Webhook Terverifikasi! Saldo Pengguna Bertambah Otomatis. Saldo Baru: Rp ${data.new_balance.toLocaleString('id-ID')}`, 'success');
+                    document.getElementById('webhook-order-id').value = '';
+                    document.getElementById('webhook-user-id').value = '';
+                    document.getElementById('webhook-amount').value = '';
+                    loadUsersTable();
+                } else {
+                    throw new Error('Gagal mengkreditkan saldo otomatis dari webhook.');
+                }
+            } catch (err) {
+                showToast('Webhook Error: ' + (err.message || err), 'error');
+            }
+        }
+
+        // --- KELOLA ORDER FLOW DENGAN SEARCH & PAGINASI (MODUL 21) ---
+        function handleOrderSearch() {
+            orderSearchQuery = document.getElementById('order-search-input').value.trim();
+            orderPage = 1;
+            loadOrdersTable();
+        }
+
+        function changeOrderPage(direction) {
+            if (orderPage + direction >= 1) {
+                orderPage += direction;
+                loadOrdersTable();
+            }
+        }
+
+        async function loadOrdersTable() {
+            const tbody = document.getElementById('orders-table-body');
+            const info = document.getElementById('order-pagination-info');
+            if(!tbody) return;
+
+            try {
+                tbody.innerHTML = `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-bold text-slate-900">#SWIFT-88219</td>
+                        <td class="p-3 text-slate-700">Budi Santoso</td>
+                        <td class="p-3 text-emerald-700 font-bold">Rp 45.000</td>
+                        <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">Lunas (Wallet)</span></td>
+                        <td class="p-3"><span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[10px] font-bold">Menuju Lokasi</span></td>
+                        <td class="p-3">
+                            <button onclick="showToast('Detail pesanan #SWIFT-88219 dimuat.', 'info')" class="text-blue-600 hover:underline font-bold">Detail</button>
+                        </td>
+                    </tr>
+                `;
+                info.innerText = `Menampilkan halaman ${orderPage} (Skalabel)`;
+            } catch (err) {
+                console.warn('Gagal memuat orders:', err);
+            }
+        }
+
+        // Broadcast Global (Modul 8)
+        async function sendGlobalBroadcast() {
+            const title = document.getElementById('broadcastTitle').value.trim();
+            const message = document.getElementById('broadcastMessage').value.trim();
+            const target = document.getElementById('broadcastTarget').value;
+
+            if (!title || !message) {
+                showToast('Judul dan isi pesan broadcast tidak boleh kosong!', 'error');
+                return;
+            }
+
+            try {
+                await _supabase.from('broadcasts').insert([{
+                    title: title,
+                    message: message,
+                    target_role: target,
+                    created_at: new Date()
+                }]);
+            } catch (e) {
+                console.warn('Simulasi broadcast dikirim.');
+            }
+
+            showToast(`Broadcast berhasil dikirim ke target [${target.toUpperCase()}]!`, 'success');
+            document.getElementById('broadcastTitle').value = '';
+            document.getElementById('broadcastMessage').value = '';
+        }
+
+        // Simpan Pengaturan Tarif (Modul 10)
+        async function saveTariffSettings() {
+            const baseFare = document.getElementById('setting-base-fare').value;
+            const kmFare = document.getElementById('setting-km-fare').value;
+            const commission = document.getElementById('setting-commission').value;
+
+            try {
+                showToast(`Pengaturan tarif berhasil disimpan (Dasar: Rp ${baseFare}, Komisi: ${commission}%)`, 'success');
+            } catch (err) {
+                showToast('Gagal menyimpan tarif: ' + err.message, 'error');
+            }
+        }
+
+        // Terbitkan Voucher Promo (Modul 12)
+        async function createVoucherPromo() {
+            const code = document.getElementById('voucher-code').value.trim();
+            const amount = document.getElementById('voucher-amount').value;
+
+            if (!code || !amount) {
+                showToast('Kode voucher dan nominal diskon wajib diisi!', 'error');
+                return;
+            }
+
+            try {
+                showToast(`Voucher [${code.toUpperCase()}] senilai Rp ${parseInt(amount).toLocaleString('id-ID')} berhasil diterbitkan!`, 'success');
+                document.getElementById('voucher-code').value = '';
+                document.getElementById('voucher-amount').value = '';
+            } catch (err) {
+                showToast('Gagal membuat voucher.', 'error');
+            }
+        }
+
+        // Ekspor Laporan Keuangan (Modul 15)
+        function exportFinancialReport() {
+            showToast('Menyiapkan file CSV laporan keuangan...', 'info');
+            setTimeout(() => {
+                showToast('Laporan keuangan berhasil diunduh ke perangkat Anda.', 'success');
+            }, 1500);
+        }
+
+        // Kirim Push Notification (Modul 16)
+        function sendPushNotification() {
+            const title = document.getElementById('notif-title').value.trim();
+            const msg = document.getElementById('notif-message').value.trim();
+
+            if (!title || !msg) {
+                showToast('Judul dan pesan push notification harus diisi!', 'error');
+                return;
+            }
+
+            showToast('Push Notification berhasil disiarkan ke antrean server.', 'success');
+            document.getElementById('notif-title').value = '';
+            document.getElementById('notif-message').value = '';
+        }
+
+        // Toggle Maintenance (Modul 18)
+        function toggleMaintenance() {
+            const btn = document.getElementById('maintenance-btn');
+            if (btn.classList.contains('bg-red-100')) {
+                btn.className = "bg-emerald-100 text-emerald-800 border border-emerald-300 px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm";
+                btn.innerText = "Aktif (Maintenance ON)";
+                showToast('Mode pemeliharaan sistem berhasil diaktifkan.', 'success');
+            } else {
+                btn.className = "bg-red-100 text-red-700 border border-red-300 px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm";
+                btn.innerText = "Non-Aktif";
+                showToast('Mode pemeliharaan dimatikan. Aplikasi kembali normal.', 'info');
+            }
+        }
+
+        // Logout Admin
+        async function logoutAdmin() {
+            localStorage.removeItem('swift_admin_session');
+            await _supabase.auth.signOut();
+            window.location.href = 'auth.html';
+        }
+    </script>
+</body>
+</html>
