@@ -8,7 +8,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- SWIFT Ecosystem Engines Integration -->
+    <script src="swift-neural-engine.js"></script>
+    <script src="biometric-auth-engine.js"></script>
+    <script src="mesh-network-sync.js"></script>
+    <script src="universal-xr-bridge.js"></script>
     <style>
+        :root {
+            --color-primary: #10b981;
+        }
         body {
             background-color: #030712;
             color: #f8fafc;
@@ -27,20 +35,36 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        .logo-container {
+            height: 36px;
+            max-width: 140px;
+            display: flex;
+            align-items: center;
+        }
+        .smart-logo {
+            max-height: 100%;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
     </style>
 </head>
-<body class="pb-20">
+<body class="pb-24">
 
-    <!-- Header Profesional -->
+    <!-- Header Profesional (Tersinkron Logo Pintar Admin) -->
     <header style="background: #0b0f19; border-bottom: 1px solid #1e293b; padding: 12px 16px; position: sticky; top: 0; z-index: 50;">
         <div style="max-width: 480px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 11px; font-weight: bold; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3);">🌍 IDR</span>
-                <select style="background: #1e293b; color: #f1f5f9; font-size: 12px; padding: 4px 8px; border-radius: 8px; border: 1px solid #334155; outline: none;">
-                    <option>Indonesia</option>
-                </select>
+                <!-- Logo Pintar Admin -->
+                <div class="logo-container">
+                    <img id="app-logo-brand" src="" alt="SWIFT Logo" class="smart-logo" onerror="this.onerror=null; this.parentElement.innerHTML='<span style=\'font-size:12px; font-weight:bold; color:#34d399;\'>SWIFT Ecosystem</span>';">
+                </div>
             </div>
-            <div id="auth-nav-action">
+            <div style="display: flex; align-items: center; gap: 8px;" id="auth-nav-action">
+                <button onclick="triggerBiometricLogin()" title="Login Biometrik" style="background: #1e293b; border: 1px solid #334155; color: #34d399; padding: 6px 10px; border-radius: 10px; font-size: 12px; cursor: pointer;">🔐</button>
                 <a href="auth.html" style="font-size: 12px; font-weight: bold; background: #dc2626; color: white; padding: 6px 14px; border-radius: 10px; text-decoration: none; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);">Masuk / Daftar</a>
             </div>
         </div>
@@ -72,49 +96,31 @@
             </div>
         </div>
 
+        <!-- Tombol Canggih Tambahan (XR & Mesh Test) -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+            <button onclick="launchXRView()" style="background: #1e293b; border: 1px solid #334155; color: #34d399; font-size: 11px; font-weight: bold; padding: 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;"><span>🕶️</span> Spatial AR View</button>
+            <button onclick="testMeshSync()" style="background: #1e293b; border: 1px solid #334155; color: #60a5fa; font-size: 11px; font-weight: bold; padding: 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;"><span>📡</span> Test Mesh P2P</button>
+        </div>
+
         <!-- Grid Layanan Utama (4x2) -->
         <div class="swift-card">
             <h3 style="font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">Layanan Utama</h3>
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
-                <a href="order.html?service=ride" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 22px; margin-bottom: 4px;">🛵</span>
-                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Ride</span>
-                </a>
-                <a href="order.html?service=send" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 22px; margin-bottom: 4px;">📦</span>
-                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Send</span>
-                </a>
-                <a href="order.html?service=food" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 22px; margin-bottom: 4px;">🍔</span>
-                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Food</span>
-                </a>
-                <a href="order.html?service=mart" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 22px; margin-bottom: 4px;">🏪</span>
-                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Mart</span>
-                </a>
-                <a href="order.html?service=express" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 22px; margin-bottom: 4px;">⚡</span>
-                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Express</span>
-                </a>
-                <a href="order.html?service=car" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 22px; margin-bottom: 4px;">🚗</span>
-                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Car</span>
-                </a>
-                <a href="order.html?service=box" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 22px; margin-bottom: 4px;">🚚</span>
-                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Box</span>
-                </a>
-                <a href="auth.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 22px; margin-bottom: 4px;">📺</span>
-                    <span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Live</span>
-                </a>
+                <a href="order.html?service=ride" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;"><span style="font-size: 22px; margin-bottom: 4px;">🛵</span><span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Ride</span></a>
+                <a href="order.html?service=send" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;"><span style="font-size: 22px; margin-bottom: 4px;">📦</span><span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Send</span></a>
+                <a href="order.html?service=food" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;"><span style="font-size: 22px; margin-bottom: 4px;">🍔</span><span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Food</span></a>
+                <a href="order.html?service=mart" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;"><span style="font-size: 22px; margin-bottom: 4px;">🏪</span><span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Mart</span></a>
+                <a href="order.html?service=express" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;"><span style="font-size: 22px; margin-bottom: 4px;">⚡</span><span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Express</span></a>
+                <a href="order.html?service=car" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;"><span style="font-size: 22px; margin-bottom: 4px;">🚗</span><span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Car</span></a>
+                <a href="order.html?service=box" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;"><span style="font-size: 22px; margin-bottom: 4px;">🚚</span><span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Box</span></a>
+                <a href="auth.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px 4px; border-radius: 12px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center;"><span style="font-size: 22px; margin-bottom: 4px;">📺</span><span style="font-size: 11px; font-weight: 600; color: #e2e8f0;">Live</span></a>
             </div>
         </div>
 
-        <!-- Kolom Produk & Kedai Viral (Horizontal Scroll) -->
+        <!-- Kolom Produk & Kedai Viral (Didukung Neural Engine) -->
         <div class="swift-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h3 style="font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">🔥 Kedai & Produk Viral</h3>
+                <h3 style="font-size: 11px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">🔥 Kedai & Produk Viral (AI Curated)</h3>
                 <a href="order.html?service=food" style="font-size: 11px; color: #34d399; text-decoration: none; font-weight: bold;">Lihat Semua</a>
             </div>
             
@@ -152,32 +158,19 @@
             </div>
         </div>
 
-        <!-- Pendaftaran Mitra Lengkap (4 Kategori) -->
+        <!-- Pendaftaran Mitra Lengkap -->
         <div class="swift-card" style="border-left: 4px solid #dc2626; background: linear-gradient(135deg, #0f172a 0%, #450a0a 100%);">
             <h3 style="font-size: 12px; font-weight: bold; color: #f87171; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Gabung Jadi Mitra SWIFT</h3>
             <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 12px;">Pilih kategori pendaftaran sesuai bidang usaha atau keahlian Anda:</p>
-            
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
-                <a href="driver.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span>🚗</span>
-                    <span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Driver Mobil</span>
-                </a>
-                <a href="driver.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span>🛵</span>
-                    <span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Ojek Motor</span>
-                </a>
-                <a href="merchant-dashboard.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span>🏪</span>
-                    <span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Mitra Usaha / Niaga</span>
-                </a>
-                <a href="driver.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span>📦</span>
-                    <span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Kurir / Express / Box</span>
-                </a>
+                <a href="driver.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;"><span>🚗</span><span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Driver Mobil</span></a>
+                <a href="driver.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;"><span>🛵</span><span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Ojek Motor</span></a>
+                <a href="merchant-dashboard.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;"><span>🏪</span><span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Mitra Usaha / Niaga</span></a>
+                <a href="driver.html" style="background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;"><span>📦</span><span style="font-size: 11px; font-weight: bold; color: #f1f5f9;">Kurir / Express / Box</span></a>
             </div>
         </div>
 
-        <!-- Kolom Bagikan Aplikasi (Share & Referral) -->
+        <!-- Kolom Bagikan Aplikasi -->
         <div class="swift-card" style="background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%); border-left: 4px solid #34d399; display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h4 style="font-size: 12px; font-weight: bold; color: #34d399;">Bagikan SWIFT Ecosystem</h4>
@@ -188,17 +181,86 @@
 
     </main>
 
-    <!-- Panggil Backend Engine -->
-    <script src="app.js"></script>
+    <!-- Skrip Sinkronisasi & Integrasi Engine Mutakhir -->
     <script>
-        // Fitur Iklan Otomatis (Berganti Banner Tiap 4 Detik)
+        window.addEventListener('DOMContentLoaded', async () => {
+            // 1. Cek Maintenance Mode dari Admin
+            const maintenanceStatus = localStorage.getItem('swift_maintenance_status');
+            if (maintenanceStatus === 'active') {
+                document.body.innerHTML = `
+                    <div style="display:flex; height:100vh; flex-direction:column; justify-content:center; align-items:center; background:#0f172a; color:#fff; font-family:sans-serif; text-align:center; padding:20px;">
+                        <h1 style="font-size:22px; font-weight:bold; margin-bottom:8px;">🛠️ Aplikasi SWIFT Sedang Dalam Pemeliharaan</h1>
+                        <p style="font-size:13px; color:#94a3b8;">Sistem sedang diperbarui oleh Master Admin. Silakan kembali beberapa saat lagi.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 2. Sinkronisasi Logo Pintar dari Admin (Modul 22)
+            const savedLogo = localStorage.getItem('swift_ui_logo_url');
+            const logoElement = document.getElementById('app-logo-brand');
+            if (savedLogo && logoElement) {
+                logoElement.src = savedLogo;
+            } else if (logoElement) {
+                logoElement.parentElement.innerHTML = `<span style="font-size: 12px; font-weight: bold; color: #34d399;">SWIFT Ecosystem</span>`;
+            }
+
+            // 3. Eksekusi Welcome Bonus Otomatis via Neural Engine
+            if (window.SwiftAI) {
+                const bonusTriggered = window.SwiftAI.processAutonomousWelcomeBonus();
+                if (bonusTriggered > 0) {
+                    alert(`🎉 Selamat! Anda mendapatkan Saldo Sambutan (Welcome Bonus) sebesar Rp ${bonusTriggered.toLocaleString('id-ID')} secara otomatis dari SWIFT AI!`);
+                }
+            }
+
+            // Tampilkan Saldo Dompet Terkini
+            let wallet = parseInt(localStorage.getItem('swift_local_wallet') || '0');
+            document.getElementById('user-balance').innerText = 'Rp ' + wallet.toLocaleString('id-ID');
+        });
+
+        // Trigger Biometric Login/Verification
+        async function triggerBiometricLogin() {
+            if (window.SwiftBiometric) {
+                const isRegistered = localStorage.getItem('swift_biometric_registered');
+                if (!isRegistered) {
+                    const register = confirm("Belum ada kredensial biometrik terdaftar di perangkat ini. Apakah Anda ingin mendaftarkan biometrik sekarang?");
+                    if (register) {
+                        const success = await window.SwiftBiometric.registerBiometric();
+                        if (success) alert("✅ Biometrik berhasil didaftarkan!");
+                    }
+                } else {
+                    const auth = await window.SwiftBiometric.authenticateBiometric();
+                    if (auth) {
+                        alert("🔓 Autentikasi biometrik berhasil! Selamat datang kembali.");
+                    } else {
+                        alert("❌ Autentikasi biometrik gagal atau dibatalkan.");
+                    }
+                }
+            }
+        }
+
+        // Trigger XR Spatial View
+        function launchXRView() {
+            if (window.SwiftXR) {
+                window.SwiftXR.launchSpatialARView("SWIFT Super-App Experience");
+            }
+        }
+
+        // Trigger Mesh P2P Test
+        function testMeshSync() {
+            if (window.SwiftMesh) {
+                window.SwiftMesh.broadcastData("PING_PEER", { status: "Online Node Active" });
+                alert("📡 Sinyal Mesh P2P berhasil disiarkan ke jaringan lokal terdekat!");
+            }
+        }
+
+        // Karusel Banner Iklan Otomatis
         const adsList = [
             { title: "Diskon Kilat Hari Ini di Semua Layanan SWIFT Ecosystem!", img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80", badge: "🔥 PROMO SPESIAL" },
             { title: "Cashback 50% Khusus Pengguna Baru SWIFT Pay!", img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=600&q=80", badge: "💎 CASHBACK" },
             { title: "Kirim Barang Lebih Cepat & Hemat dengan SWIFT Box!", img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80", badge: "🚀 EKSPRES" }
         ];
         let currentAd = 0;
-
         setInterval(() => {
             currentAd = (currentAd + 1) % adsList.length;
             const banner = document.getElementById('promo-banner-bg');
@@ -214,41 +276,9 @@
         // Fungsi Tombol Bagikan
         function shareApp() {
             if (navigator.share) {
-                navigator.share({
-                    title: 'SWIFT Super-App Ecosystem',
-                    text: 'Yuk gabung dan nikmati kemudahan layanan super-app SWIFT sekarang!',
-                    url: window.location.href,
-                }).catch(() => {});
+                navigator.share({ title: 'SWIFT Super-App', text: 'Yuk gabung di SWIFT Ecosystem!', url: window.location.href }).catch(() => {});
             } else {
-                alert('Tautan disalin ke papan klip! Bagikan ke teman-teman Anda.');
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', async () => {
-            setTimeout(async () => {
-                if (typeof SWIFT_Engine !== 'undefined') {
-                    const theme = await SWIFT_Engine.applyMasterTheme();
-                    if (theme && theme.bannerText) {
-                        document.getElementById('promo-title').innerText = theme.bannerText;
-                    }
-                }
-
-                const client = typeof getSupabase === 'function' ? getSupabase() : null;
-                if (client) {
-                    const { data: { session } } = await client.auth.getSession();
-                    const navAction = document.getElementById('auth-nav-action');
-                    if (session) {
-                        navAction.innerHTML = `<button onclick="handleLogout()" style="font-size: 12px; font-weight: bold; background: #1e293b; color: #f87171; border: 1px solid #334155; padding: 6px 12px; border-radius: 10px; cursor: pointer;">Keluar</button>`;
-                    }
-                }
-            }, 1200);
-        });
-
-        async function handleLogout() {
-            const client = typeof getSupabase === 'function' ? getSupabase() : null;
-            if (client) {
-                await client.auth.signOut();
-                window.location.reload();
+                alert('Tautan berhasil disalin ke klip!');
             }
         }
     </script>
