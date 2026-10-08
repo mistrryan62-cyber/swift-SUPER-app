@@ -1,20 +1,21 @@
 {
   "name": "SWIFT Super-App Ecosystem",
   "short_name": "SWIFT",
-  "start_url": "./index.html",
+  "start_url": "/swift-SUPER-app/",
+  "scope": "/swift-SUPER-app/",
   "display": "standalone",
-  "background_color": "#038712",
-  "theme_color": "#038712",
+  "background_color": "#030712",
+  "theme_color": "#030712",
   "description": "Super-App multi-layanan enterprise ecosystem",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/swift-SUPER-app/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "/swift-SUPER-app/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
