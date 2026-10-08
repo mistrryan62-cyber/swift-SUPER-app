@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWIFT Super-App Ecosystem (Advanced Enterprise Edition)</title>
     
-    <!-- Konfigurasi PWA Standar Play Store -->
-    <link rel="manifest" href="manifest.json">
+    <!-- Konfigurasi PWA Standar Play Store (Kompatibel GitHub Pages & PWABuilder) -->
+    <link rel="manifest" href="/swift-SUPER-app/manifest.json">
     <meta name="theme-color" content="#030712">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=192&q=80">
+    <link rel="apple-touch-icon" href="/swift-SUPER-app/icon-192.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -837,15 +837,15 @@
                                 <div class="flex items-center gap-3">
                                     <img src="${v.img}" alt="${v.name}" class="w-14 h-14 rounded-xl object-cover border border-slate-700">
                                     <div class="flex-1">
-                                        <h5 class="font-bold text-white text-xs">${v.name}</h5>
+                                        <h5 class="font-bold text-white text-xs">\${v.name}</h5>
                                         <p class="text-[10px] text-slate-400">🕒 Buka: <span class="text-emerald-400 font-semibold">${v.openTime}</span> (${v.isOpen ? 'Buka Sekarang' : 'Tutup'})</p>
-                                        <span class="inline-block mt-1 text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold"><i class="fa-solid fa-location-dot"></i> ${v.distanceKm} km dari lokasi Anda</span>
+                                        <span class="inline-block mt-1 text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold"><i class="fa-solid fa-location-dot"></i> \${v.distanceKm} km dari lokasi Anda</span>
                                     </div>
                                 </div>
                                 <div class="border-t border-slate-800 pt-2">
                                     <p class="text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Rekomendasi & Stok Produk:</p>
                                     <div class="space-y-2">
-                                        ${v.menu.map(m => `
+                                        \${v.menu.map(m => `
                                             <div class="flex items-center justify-between bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
                                                 <div class="flex items-center gap-2.5">
                                                     <img src="${m.img}" alt="${m.name}" class="w-10 h-10 rounded-lg object-cover">
@@ -862,7 +862,7 @@
                                         `).join('')}
                                     </div>
                                 </div>
-                                <button onclick="alert('Pesanan di ${v.name} berhasil diproses ke kasir!'); document.getElementById('service-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2 rounded-xl cursor-pointer border-none transition text-xs mt-1">Checkout / Pesan dari Kedai Ini 🛒</button>
+                                <button onclick="alert('Pesanan di \${v.name} berhasil diproses ke kasir!'); document.getElementById('service-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2 rounded-xl cursor-pointer border-none transition text-xs mt-1">Checkout / Pesan dari Kedai Ini 🛒</button>
                             </div>
                         `).join('')}
                     </div>
@@ -1067,7 +1067,7 @@
             const select = document.getElementById('currency-select');
             currentCurrency = select.value;
             if(currentCurrency === 'IDR') currencySymbol = 'Rp';
-            else if(currentCurrency === 'SGD') currencySymbol = 'S$';
+            else if(currentCurrency === 'SGD') currencySymbol = 'S\$';
             else currencySymbol = 'RM';
 
             document.getElementById('currency-symbol').innerText = currencySymbol;
