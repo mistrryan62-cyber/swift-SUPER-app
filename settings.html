@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIFT — Pengaturan Aplikasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { darkbg: '#030712', cardbg: '#0f172a', cardborder: '#1e293b' } } } }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body { background-color: #030712; color: #f8fafc; font-family: system-ui, sans-serif; padding-bottom: 40px; }
+        .swift-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 28px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        @media (min-width: 768px) {
+            body { background: radial-gradient(circle at center, #1e1b4b 0%, #030712 100%); padding: 24px 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+            .app-wrapper { width: 100%; max-width: 480px; background: #030712; border-radius: 36px; border: 1px solid #1e293b; overflow: hidden; position: relative; }
+        }
+        @media (max-width: 767px) { .app-wrapper { width: 100%; } }
+    </style>
+</head>
+<body class="antialiased">
+<div class="app-wrapper">
+    <header class="bg-[#0b0f19] border-b border-[#1e293b] p-4 flex items-center justify-between sticky top-0 z-50">
+        <a href="index.html" class="text-slate-400 hover:text-white text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
+        <h1 class="text-sm font-black text-white uppercase tracking-wider">Pengaturan Sistem</h1>
+        <div class="w-10"></div>
+    </header>
+
+    <main class="p-4 flex flex-col gap-4">
+        <div class="swift-card space-y-4">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-sliders mr-1 text-emerald-400"></i> Preferensi Antarmuka</h3>
+            
+            <div class="space-y-3 text-xs">
+                <div class="flex justify-between items-center p-3 bg-slate-900 rounded-2xl border border-slate-800">
+                    <span class="font-bold text-white">Tema Tampilan</span>
+                    <select id="pref-theme" onchange="savePreferences()" class="bg-slate-800 text-white p-2 rounded-xl outline-none font-mono">
+                        <option value="dark">Dark Mode (Gelap)</option>
+                        <option value="light">Light Mode (Terang)</option>
+                    </select>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-900 rounded-2xl border border-slate-800">
+                    <span class="font-bold text-white">Bahasa Utama</span>
+                    <select id="pref-lang" class="bg-slate-800 text-white p-2 rounded-xl outline-none font-mono">
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="ms">Bahasa Melayu</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function savePreferences() {
+        const theme = document.getElementById('pref-theme').value;
+        const settings = JSON.parse(localStorage.getItem('swift_global_app_settings') || '{}');
+        settings.theme = theme;
+        localStorage.setItem('swift_global_app_settings', JSON.stringify(settings));
+        alert('Pengaturan berhasil disimpan!');
+    }
+</script>
+</body>
+</html>

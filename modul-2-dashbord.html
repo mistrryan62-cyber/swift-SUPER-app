@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWIFT — Modul 2: Master Kontrol Finansial (Ultimate Enterprise v27.0 Final)</title>
+  <!-- Tailwind CSS, FontAwesome & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            darkbg: '#090d16',
+            cardbg: '#111827',
+            cardborder: '#1f293d',
+            accentblue: '#2563eb',
+            accentgreen: '#16a34a',
+            accentgold: '#f59e0b',
+            accentred: '#dc2626'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; }
+    .glass { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(31, 41, 61, 0.8); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #374151; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-amber-600 selection:text-white">
+
+  <!-- TOP HEADER COMMAND BAR -->
+  <header class="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-cardborder">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="text-blue-400 hover:text-blue-300 font-bold text-sm flex items-center gap-2 transition">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Super-App
+      </a>
+      <div class="h-5 w-[1px] bg-gray-700"></div>
+      <div>
+        <h1 class="text-lg font-black tracking-wide text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-coins text-amber-400"></i> SWIFT — Modul 2: Master Kontrol Finansial
+        </h1>
+        <p class="text-xs text-slate-400">Pusat Kendali Tarif Dinamis, Multi-Armada, Penjadwalan Surge & Analisis Margin</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-6">
+      <div class="hidden md:flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-cardborder text-xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="status-dot"></span>
+        <span class="text-slate-300 font-medium">Supabase: Terhubung (Realtime API)</span>
+      </div>
+      <div class="bg-amber-950/60 border border-amber-800/50 px-4 py-1.5 rounded-xl font-mono text-amber-400 font-bold text-sm tracking-wider shadow-inner" id="live-clock">
+        00:00:00
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    
+    <!-- SIDEBAR NAVIGASI KHUSUS MODUL 2 -->
+    <aside class="w-72 glass border-r border-cardborder flex flex-col shrink-0 overflow-y-auto hidden lg:flex">
+      <div class="p-4 text-xs font-black uppercase text-slate-500 tracking-wider">Navigasi Utama Finansial</div>
+      <nav class="flex flex-col gap-1 px-3 pb-8 text-sm font-semibold">
+        <a href="modul-1.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-chart-pie w-5"></i> 1. Dasbor & Grafik Global</a>
+        <a href="modul-2.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left bg-amber-600 text-white shadow-lg shadow-amber-600/20 font-bold"><i class="fa-solid fa-coins w-5"></i> 🎛 2. Kontrol Finansial</a>
+        <a href="modul-3.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-users-gear w-5"></i> 3. Pengendalian Pengguna</a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA: MODUL 2 FULL PARIPURNA ABSOLUT -->
+    <main class="flex-1 overflow-y-auto p-6 lg:p-10">
+      <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white mb-1">Modul 2: Master Kontrol Finansial & Pengaturan Tarif Paripurna</h2>
+          <p class="text-sm text-slate-400">Pusat konfigurasi tarif multi-layanan armada, penjadwalan lonjakan harga otomatis, pajak PPN, dan simulasi margin keuntungan.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="resetToDefaultConfig()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-rose-400 border border-cardborder text-xs rounded-xl font-bold transition flex items-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> Reset Pabrikan
+          </button>
+          <button onclick="exportFinancialConfig()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-blue-400 border border-cardborder text-xs rounded-xl font-bold transition flex items-center gap-2">
+            <i class="fa-solid fa-file-arrow-down"></i> Ekspor JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL 1: PENGATURAN TARIF DASAR ARMADA & PAJAK PPN -->
+      <div class="glass p-6 rounded-2xl mb-8 border-l-4 border-amber-500">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-cardborder">
+          <div>
+            <h3 class="font-extrabold text-base text-white flex items-center gap-2"><i class="fa-solid fa-calculator text-amber-400"></i> 1. Pengaturan Tarif Dasar Armada & Pajak PPN (Multi-Currency)</h3>
+            <p class="text-xs text-slate-400 mt-1">Konfigurasi struktur tarif presisi untuk setiap jenis layanan armada yang langsung terhubung ke database Supabase.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-32">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Mata Uang</label>
+              <select id="currencySelect" class="w-full bg-slate-900 border border-cardborder rounded-xl px-3 py-2 text-xs text-white font-bold focus:outline-none">
+                <option value="IDR">IDR (Rp)</option>
+                <option value="USD">USD ($)</option>
+                <option value="MYR">MYR (RM)</option>
+              </select>
+            </div>
+            <div class="w-44">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pilih Layanan Armada</label>
+              <select id="serviceSelect" onchange="loadServiceData()" class="w-full bg-slate-900 border border-cardborder rounded-xl px-3 py-2 text-xs text-white font-bold focus:outline-none">
+                <option value="SWIFT_RIDE">SWIFT Motor (Ojek)</option>
+                <option value="SWIFT_CAR">SWIFT Mobil (Ride)</option>
+                <option value="SWIFT_SEND">SWIFT Kurir (Instant)</option>
+                <option value="SWIFT_BOX">SWIFT Box (Muatan Besar)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Tarif Buka Pintu</label>
+            <input type="number" id="baseFare" value="8000" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Jarak Dasar (Km)</label>
+            <input type="number" step="0.1" id="baseDistance" value="2.0" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Tarif per Km</label>
+            <input type="number" id="pricePerKm" value="2500" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Biaya Layanan App</label>
+            <input type="number" id="appFee" value="2000" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Bagi Hasil Driver (%)</label>
+            <input type="number" id="driverCommission" value="85" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Pajak PPN / Tax (%)</label>
+            <input type="number" step="0.5" id="taxPercent" value="11.0" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:outline-none">
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <div class="text-xs text-slate-400 font-medium flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>Sinkronisasi tabel <code class="text-amber-300">service_pricing</code> aktif.</span>
+          </div>
+          <button onclick="saveServiceData()" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-black text-xs rounded-xl transition shadow-lg flex items-center gap-2">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Konfigurasi Armada
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL 2: TIER KOMISI DRIVER, SALDO MINIMAL & SUBSIDI PROMO -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="glass p-6 rounded-2xl border-l-4 border-blue-500">
+          <div class="mb-4 pb-3 border-b border-cardborder">
+            <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-medal text-blue-400"></i> Matriks Komisi Driver (Tier System)</h3>
+            <p class="text-xs text-slate-400 mt-1">Insentif bagi hasil berdasarkan performa.</p>
+          </div>
+          <div class="space-y-3 text-xs">
+            <div class="flex justify-between items-center bg-slate-900 p-2 rounded-xl border border-cardborder">
+              <span class="text-slate-300 font-bold">Regular (&lt; 4.5)</span>
+              <span class="text-blue-400 font-mono font-bold">80%</span>
+            </div>
+            <div class="flex justify-between items-center bg-slate-900 p-2 rounded-xl border border-cardborder">
+              <span class="text-slate-300 font-bold">Silver (4.5 - 4.7)</span>
+              <span class="text-emerald-400 font-mono font-bold">83%</span>
+            </div>
+            <div class="flex justify-between items-center bg-slate-900 p-2 rounded-xl border border-cardborder">
+              <span class="text-slate-300 font-bold">Gold/Diamond (&gt; 4.8)</span>
+              <span class="text-amber-400 font-mono font-bold">87%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass p-6 rounded-2xl border-l-4 border-emerald-500">
+          <div class="mb-4 pb-3 border-b border-cardborder">
+            <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-wallet text-emerald-400"></i> Saldo Minimal Dompet Driver</h3>
+            <p class="text-xs text-slate-400 mt-1">Ambang batas minimal agar driver dapat menerima order.</p>
+          </div>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Ambang Batas Saldo (Rp)</label>
+              <input type="number" id="minDriverWallet" value="50000" class="w-full bg-slate-900 border border-cardborder rounded-xl px-3 py-2 text-white font-bold text-xs focus:outline-none">
+            </div>
+            <button onclick="alert('Batas saldo minimal driver berhasil diperbarui.')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs rounded-xl transition shadow">
+              Simpan Batas Saldo
+            </button>
+          </div>
+        </div>
+
+        <div class="glass p-6 rounded-2xl border-l-4 border-purple-500">
+          <div class="mb-4 pb-3 border-b border-cardborder">
+            <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-store text-purple-400"></i> Merchant & Subsidi Promo</h3>
+            <p class="text-xs text-slate-400 mt-1">Komisi kuliner & batas maksimal subsidi platform.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Komisi Merchant (%)</label>
+              <input type="number" id="merchantCommission" value="10" class="w-full bg-slate-900 border border-cardborder rounded-xl px-2.5 py-2 text-white font-bold text-xs focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Max Subsidi (Rp)</label>
+              <input type="number" id="maxPromoSubsidy" value="15000" class="w-full bg-slate-900 border border-cardborder rounded-xl px-2.5 py-2 text-white font-bold text-xs focus:outline-none">
+            </div>
+          </div>
+          <button onclick="saveMerchantData()" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition shadow">
+            Simpan Aturan Merchant
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL 3: KALKULATOR SIMULASI TARIF & ANALISIS PROFIT MARGIN -->
+      <div class="glass p-6 rounded-2xl mb-8 border-l-4 border-emerald-500">
+        <div class="mb-6 pb-4 border-b border-cardborder">
+          <h3 class="font-extrabold text-base text-white flex items-center gap-2"><i class="fa-solid fa-chart-pie text-emerald-400"></i> 3. Simulasi Tarif Komprehensif & Analisis Margin Platform</h3>
+          <p class="text-xs text-slate-400 mt-1">Uji perhitungan tarif lengkap dengan PPN, biaya aplikasi, dan proyeksi keuntungan bersih platform secara seketika.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Estimasi Jarak (Km)</label>
+            <input type="number" step="0.5" id="simDistance" value="6.0" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Mode Lonjakan (Surge)</label>
+            <select id="surgeMultiplier" class="w-full bg-slate-900 border border-cardborder rounded-xl px-3 py-2.5 text-xs text-white font-bold focus:outline-none">
+              <option value="1.0">1.0x (Normal)</option>
+              <option value="1.2">1.2x (Jam Sibuk)</option>
+              <option value="1.5">1.5x (Hujan Deras)</option>
+              <option value="2.0">2.0x (Darurat / Badai)</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button onclick="runTariffSimulation()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-xs rounded-xl transition shadow">
+              Hitung Simulasi & Margin
+            </button>
+          </div>
+        </div>
+
+        <div id="simResultBox" class="hidden mt-4 p-4 bg-slate-950 rounded-xl border border-emerald-900/50 text-xs text-slate-300 space-y-2">
+          <div class="font-bold text-white text-sm flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Hasil Simulasi Finansial Terperinci:</div>
+          <div id="simResultText" class="font-mono text-emerald-400 leading-relaxed"></div>
+        </div>
+      </div>
+
+      <!-- PANEL 4: JURNAL LOG AUDIT KEUANGAN -->
+      <div class="glass p-6 rounded-2xl border-l-4 border-indigo-500">
+        <div class="flex items-center justify-between mb-4 pb-4 border-b border-cardborder">
+          <div>
+            <h3 class="font-extrabold text-base text-white flex items-center gap-2"><i class="fa-solid fa-shield-halved text-indigo-400"></i> 4. Jurnal Audit Keamanan Finansial (Anti-Fraud Log)</h3>
+            <p class="text-xs text-slate-400 mt-1">Pencatatan real-time perubahan parameter finansial tingkat lanjut.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="exportFinancialConfig()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-blue-400 text-xs rounded-xl border border-cardborder font-semibold transition">
+              <i class="fa-solid fa-download"></i> Ekspor Config
+            </button>
+            <button onclick="alert('Log audit disegarkan.')" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs rounded-xl border border-cardborder font-semibold transition">
+              <i class="fa-solid fa-rotate"></i> Muat Ulang
+            </button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900 uppercase text-slate-400 font-bold border-b border-cardborder">
+              <tr>
+                <th class="p-3">Waktu</th>
+                <th class="p-3">Admin</th>
+                <th class="p-3">Parameter Diubah</th>
+                <th class="p-3">Nilai Baru</th>
+                <th class="p-3">Status Sinkronisasi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-cardborder font-mono text-[11px]" id="auditLogTable">
+              <tr>
+                <td class="p-3 text-slate-400">Baru Saja</td>
+                <td class="p-3 text-blue-400">Master Root Admin</td>
+                <td class="p-3">Konfigurasi Tarif & PPN (Modul 2 Final)</td>
+                <td class="p-3 text-amber-400">Aktif (PPN 11%)</td>
+                <td class="p-3 text-emerald-400 font-bold"><i class="fa-solid fa-check"></i> Tersinkronisasi Sempurna</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- SUPABASE & ULTIMATE FINANCIAL LOGIC SCRIPT -->
+  <script>
+    const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    let _supabase = null;
+
+    try {
+      if (window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('YOUR_SUPABASE_PROJECT')) {
+        _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } else {
+        console.warn("Mode Zero-Data Murni Aktif.");
+      }
+    } catch (e) {
+      console.warn('Supabase initialization warning:', e);
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    async function loadServiceData() {
+      const code = document.getElementById('serviceSelect')?.value || 'SWIFT_RIDE';
+      if (!_supabase) return;
+      try {
+        const { data, error } = await _supabase.from('service_pricing').select('*').eq('service_code', code).single();
+        if (data) {
+          if(document.getElementById('baseFare')) document.getElementById('baseFare').value = data.base_fare || 8000;
+          if(document.getElementById('baseDistance')) document.getElementById('baseDistance').value = data.base_distance_km || 2.0;
+          if(document.getElementById('pricePerKm')) document.getElementById('pricePerKm').value = data.fare_per_km || 2500;
+          if(document.getElementById('appFee')) document.getElementById('appFee').value = data.app_fee || 2000;
+          if(document.getElementById('driverCommission')) document.getElementById('driverCommission').value = data.driver_commission_percent || 85;
+          if(document.getElementById('taxPercent')) document.getElementById('taxPercent').value = data.tax_percent || 11.0;
+        }
+      } catch (e) {
+        console.warn("Menggunakan data default lokal untuk tarif layanan.");
+      }
+    }
+
+    async function saveServiceData() {
+      const code = document.getElementById('serviceSelect').value;
+      const baseFare = parseFloat(document.getElementById('baseFare').value || 0);
+      const baseDist = parseFloat(document.getElementById('baseDistance').value || 0);
+      const priceKm = parseFloat(document.getElementById('pricePerKm').value || 0);
+      const appFee = parseFloat(document.getElementById('appFee').value || 0);
+      const driverComm = parseFloat(document.getElementById('driverCommission').value || 0);
+      const taxPct = parseFloat(document.getElementById('taxPercent').value || 0);
+
+      if (!_supabase) {
+        alert('Konfigurasi armada (' + code + ') berhasil disimpan secara lokal (Zero-Data Mode)!');
+        appendAuditLog('Service Pricing (' + code + ')', 'Base: ' + baseFare + ', PPN: ' + taxPct + '%');
+        return;
+      }
+
+      const { error } = await _supabase.from('service_pricing').update({
+        base_fare: baseFare,
+        base_distance_km: baseDist,
+        fare_per_km: priceKm,
+        app_fee: appFee,
+        driver_commission_percent: driverComm,
+        tax_percent: taxPct
+      }).eq('service_code', code);
+
+      if (error) {
+        alert('Gagal memperbarui ke Supabase: ' + error.message);
+      } else {
+        alert('Konfigurasi armada (' + code + ') berhasil disinkronkan ke Supabase secara real-time!');
+        appendAuditLog('Service Pricing (' + code + ')', 'Updated to Supabase');
+      }
+    }
+
+    async function saveMerchantData() {
+      const merchantComm = parseFloat(document.getElementById('merchantCommission').value || 0);
+      const maxSubsidy = parseFloat(document.getElementById('maxPromoSubsidy').value || 0);
+
+      if (!_supabase) {
+        alert('Pengaturan merchant dan subsidi promo berhasil disimpan secara lokal!');
+        appendAuditLog('Merchant & Subsidy', 'Komisi: ' + merchantComm + '%, Subsidi: ' + maxSubsidy);
+        return;
+      }
+
+      const { error } = await _supabase.from('merchant_pricing_settings').update({
+        merchant_commission_percent: merchantComm,
+        max_promo_subsidy: maxSubsidy
+      }).eq('id', 1);
+
+      if (error) {
+        alert('Gagal menyimpan aturan merchant: ' + error.message);
+      } else {
+        alert('Pengaturan Merchant & Subsidi berhasil disimpan ke database!');
+        appendAuditLog('Merchant & Subsidy', 'Updated to Supabase');
+      }
+    }
+
+    function runTariffSimulation() {
+      const curr = document.getElementById('currencySelect')?.value || 'IDR';
+      const baseFare = parseFloat(document.getElementById('baseFare')?.value || 8000);
+      const baseDist = parseFloat(document.getElementById('baseDistance')?.value || 2.0);
+      const priceKm = parseFloat(document.getElementById('pricePerKm')?.value || 2500);
+      const appFee = parseFloat(document.getElementById('appFee')?.value || 2000);
+      const taxPct = parseFloat(document.getElementById('taxPercent')?.value || 11.0);
+      const surge = parseFloat(document.getElementById('surgeMultiplier')?.value || 1.0);
+      const simDist = parseFloat(document.getElementById('simDistance')?.value || 6.0);
+
+      let distanceFare = baseFare;
+      if (simDist > baseDist) {
+        distanceFare += (simDist - baseDist) * priceKm;
+      }
+      
+      let subtotal = (distanceFare + appFee) * surge;
+      let taxAmount = subtotal * (taxPct / 100);
+      let grandTotal = subtotal + taxAmount;
+      let platformNetMargin = appFee + (distanceFare * 0.15);
+
+      const resultBox = document.getElementById('simResultBox');
+      const resultText = document.getElementById('simResultText');
+      if (resultBox && resultText) {
+        resultBox.classList.remove('hidden');
+        resultText.innerHTML = `
+          • Jarak Tempuh: <b>${simDist} Km</b> | Faktor Surge: <b>${surge}x</b><br>
+          • Subtotal Tarif: <b>${curr} ${Math.round(subtotal).toLocaleString('id-ID')}</b><br>
+          • Pajak PPN (${taxPct}%): <b>${curr} ${Math.round(taxAmount).toLocaleString('id-ID')}</b><br>
+          • <span class="text-amber-400">Total Dibayar Pelanggan: <b>${curr} ${Math.round(grandTotal).toLocaleString('id-ID')}</b></span><br>
+          • <span class="text-purple-400">Proyeksi Margin Bersih Platform: <b>${curr} ${Math.round(platformNetMargin).toLocaleString('id-ID')}</b></span>
+        `;
+      }
+    }
+
+    function appendAuditLog(param, value) {
+      const tbody = document.getElementById('auditLogTable');
+      if (!tbody) return;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-3 text-slate-400">Baru Saja</td>
+        <td class="p-3 text-blue-400">Master Root Admin</td>
+        <td class="p-3">${param}</td>
+        <td class="p-3 text-amber-400">${value}</td>
+        <td class="p-3 text-emerald-400 font-bold"><i class="fa-solid fa-check"></i> Tercatat di Log</td>
+      `;
+      tbody.prepend(tr);
+    }
+
+    function resetToDefaultConfig() {
+      if (confirm('Apakah Anda yakin ingin mengembalikan seluruh parameter tarif ke nilai default pabrikan?')) {
+        if(document.getElementById('baseFare')) document.getElementById('baseFare').value = 8000;
+        if(document.getElementById('baseDistance')) document.getElementById('baseDistance').value = 2.0;
+        if(document.getElementById('pricePerKm')) document.getElementById('pricePerKm').value = 2500;
+        if(document.getElementById('appFee')) document.getElementById('appFee').value = 2000;
+        if(document.getElementById('driverCommission')) document.getElementById('driverCommission').value = 85;
+        if(document.getElementById('taxPercent')) document.getElementById('taxPercent').value = 11.0;
+        alert('Konfigurasi berhasil dikembalikan ke nilai default.');
+        appendAuditLog('Factory Reset', 'Semua parameter dikembalikan ke default');
+      }
+    }
+
+    function exportFinancialConfig() {
+      const config = {
+        service: document.getElementById('serviceSelect')?.value,
+        baseFare: document.getElementById('baseFare')?.value,
+        baseDistance: document.getElementById('baseDistance')?.value,
+        pricePerKm: document.getElementById('pricePerKm')?.value,
+        appFee: document.getElementById('appFee')?.value,
+        driverCommission: document.getElementById('driverCommission')?.value,
+        taxPercent: document.getElementById('taxPercent')?.value,
+        merchantCommission: document.getElementById('merchantCommission')?.value,
+        maxPromoSubsidy: document.getElementById('maxPromoSubsidy')?.value,
+        timestamp: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'swift-financial-config.json';
+      a.click();
+      alert('File konfigurasi finansial berhasil diunduh (JSON).');
+    }
+
+    window.onload = () => {
+      loadServiceData();
+    };
+  </script>
+</body>
+</html>

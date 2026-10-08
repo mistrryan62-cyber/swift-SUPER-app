@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWIFT — Modul 14: Enterprise API Gateway & Webhook Hub (Supreme)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            darkbg: '#090d16',
+            cardbg: '#111827',
+            cardborder: '#1f293d',
+            accentblue: '#2563eb',
+            accentgreen: '#16a34a',
+            accentgold: '#f59e0b',
+            accentred: '#dc2626'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; }
+    .glass { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(31, 41, 61, 0.8); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #374151; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white">
+
+  <!-- TOP HEADER COMMAND BAR -->
+  <header class="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-cardborder">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="text-purple-400 hover:text-purple-300 font-bold text-sm flex items-center gap-2 transition">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Super-App
+      </a>
+      <div class="h-5 w-[1px] bg-gray-700"></div>
+      <div>
+        <h1 class="text-lg font-black tracking-wide text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-gears text-purple-400"></i> SWIFT — Modul 14: Enterprise API Gateway & Webhook Hub
+        </h1>
+        <p class="text-xs text-slate-400">Pusat Kendali Endpoint API, Rate Limiting, & Sandbox Simulator</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-6">
+      <div class="hidden md:flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-cardborder text-xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-slate-300 font-medium">Gateway: Supreme Optimal</span>
+      </div>
+      <div class="bg-purple-950/60 border border-purple-800/50 px-4 py-1.5 rounded-xl font-mono text-purple-400 font-bold text-sm tracking-wider shadow-inner" id="live-clock">
+        00:00:00
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    
+    <!-- SIDEBAR NAVIGASI MASTER (Modul 1 - 16) -->
+    <aside class="w-72 glass border-r border-cardborder flex flex-col shrink-0 overflow-y-auto hidden lg:flex">
+      <div class="p-4 text-xs font-black uppercase text-slate-500 tracking-wider">Navigasi Utama Sistem (1-16)</div>
+      <nav class="flex flex-col gap-1 px-3 pb-8 text-sm font-semibold">
+        <a href="modul-1.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-chart-pie w-5"></i> 1. Statistik Dashboard</a>
+        <a href="modul-2.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-coins w-5"></i> 2. Kontrol Finansial</a>
+        <a href="modul-3.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-users-gear w-5"></i> 3. Pengendalian Pengguna</a>
+        <a href="modul-4.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-map-location-dot w-5"></i> 4. GPS Tracking & Matrix</a>
+        <a href="modul-5.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-wallet w-5"></i> 5. Topup & Webhook</a>
+        <a href="modul-6.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-store w-5"></i> 6. Manajemen Merchant</a>
+        <a href="modul-7.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-bolt w-5"></i> 7. Kurir & Peta Logistik</a>
+        <a href="modul-8.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-boxes-stacked w-5"></i> 8. Inventaris & Promo SKU</a>
+        <a href="modul-9.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-chart-line w-5"></i> 9. Analitik & Vault</a>
+        <a href="modul-10.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-satellite-dish w-5"></i> 10. Komunikasi & Push</a>
+        <a href="modul-11.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-shield-halved w-5"></i> 11. Keamanan & Audit</a>
+        <a href="modul-12.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-ticket w-5"></i> 12. Tiket & Support</a>
+        <a href="modul-13.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-bullhorn w-5"></i> 13. Kampanye & Ads</a>
+        <a href="modul-14.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left bg-purple-600 text-white shadow-lg shadow-purple-600/20 font-bold"><i class="fa-solid fa-gears w-5"></i> ⚙️ 14. Integrasi API Gateway</a>
+        <a href="modul-15.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-file-invoice-dollar w-5"></i> 15. Pajak & Kepatuhan</a>
+        <a href="modul-16.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-network-wired w-5"></i> 16. Enterprise System Core</a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 overflow-y-auto p-6 lg:p-10">
+      <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white mb-1">Modul 14: Enterprise API Gateway & Webhook Hub</h2>
+          <p class="text-sm text-slate-400">Pusat pengelolaan gerbang API tingkat lanjut dengan uji coba sandbox real-time dan manajemen rate limit.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="openNewEndpointModal()" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i> Tambah Endpoint API
+          </button>
+          <button onclick="seedEnterpriseApis()" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-cardborder text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Muat Data Enterprise
+          </button>
+          <button onclick="clearAllApis()" class="px-4 py-2.5 bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-800/50 text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-trash-can"></i> Kosongkan Data (Reset)
+          </button>
+        </div>
+      </div>
+
+      <!-- KARTU STATISTIK GATEWAY -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="glass p-6 rounded-2xl border-l-4 border-purple-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Endpoint Aktif</div>
+          <div class="text-3xl font-black text-white" id="stat-total-endpoints">0</div>
+          <div class="text-purple-400 text-xs mt-2 font-semibold">Layanan API Terdaftar</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-emerald-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Status Gateway Sehat</div>
+          <div class="text-3xl font-black text-emerald-400" id="stat-healthy-status">100%</div>
+          <div class="text-emerald-400 text-xs mt-2 font-semibold">Tanpa Gangguan Jaringan</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-blue-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Rata-Rata Latensi</div>
+          <div class="text-3xl font-black text-blue-400" id="stat-avg-latency">0 ms</div>
+          <div class="text-blue-400 text-xs mt-2 font-semibold">Respons Server Cepat</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-amber-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Request (Calls)</div>
+          <div class="text-3xl font-black text-amber-400" id="stat-total-requests">0</div>
+          <div class="text-amber-400 text-xs mt-2 font-semibold">Akumulasi Panggilan Hari Ini</div>
+        </div>
+      </div>
+
+      <!-- TABEL DAFTAR ENDPOINT GATEWAY -->
+      <div class="glass p-6 rounded-2xl border-l-4 border-purple-500 flex flex-col">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 pb-3 border-b border-cardborder gap-3">
+          <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-network-wired text-purple-400"></i> Manajer Endpoint API & Sandbox Testing</h3>
+          <div class="flex items-center gap-2">
+            <select id="filter-status" onchange="renderApiTable()" class="bg-slate-900 border border-cardborder text-slate-300 text-xs px-3 py-1.5 rounded-lg focus:outline-none">
+              <option value="ALL">Semua Status</option>
+              <option value="ACTIVE">Active</option>
+              <option value="MAINTENANCE">Maintenance</option>
+              <option value="DEPRECATED">Deprecated</option>
+            </select>
+            <button onclick="refreshApiData()" class="text-xs text-purple-400 hover:text-purple-300 font-bold flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-lg border border-cardborder cursor-pointer transition active:scale-95">
+              <i class="fa-solid fa-rotate" id="refresh-icon"></i> Refresh
+            </button>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto flex-1">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900 uppercase text-slate-400 font-bold border-b border-cardborder">
+              <tr>
+                <th class="p-3">Nama Layanan & Kunci API</th>
+                <th class="p-3">Endpoint URL & Metode</th>
+                <th class="p-3">Latensi & Rate Limit</th>
+                <th class="p-3 text-center">Status Layanan</th>
+                <th class="p-3 text-center">Aksi & Sandbox Test</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-cardborder font-mono text-[11px]" id="apiTableBody">
+              <tr>
+                <td colspan="5" class="p-6 text-center text-slate-500 font-sans">Belum ada endpoint API terdaftar. Sistem siap mengelola integrasi gateway.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL TAMBAH ENDPOINT API -->
+  <div id="newEndpointModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+    <div class="glass w-full max-w-xl p-6 rounded-2xl border border-cardborder relative max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-cardborder">
+        <h3 class="text-base font-black text-white flex items-center gap-2"><i class="fa-solid fa-gears text-purple-400"></i> Tambah Endpoint API Gateway Baru</h3>
+        <button onclick="closeNewEndpointModal()" class="text-slate-400 hover:text-white text-sm font-bold"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="apiForm" onsubmit="handleCreateApi(event)" class="space-y-4 text-xs font-sans">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Nama Layanan / Modul</label>
+            <input type="text" id="api-name" required class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono" placeholder="Contoh: Payment Gateway Webhook">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Metode HTTP</label>
+            <select id="api-method" class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono">
+              <option value="POST">POST (Webhook / Action)</option>
+              <option value="GET">GET (Fetch Data)</option>
+              <option value="PUT">PUT (Update Data)</option>
+              <option value="DELETE">DELETE (Remove Data)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 font-bold mb-1.5">Endpoint URL Path</label>
+          <input type="text" id="api-url" required class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono" placeholder="/api/v1/merchant/webhook-callback">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Kunci Akses (API Key)</label>
+            <input type="text" id="api-key" required class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono" placeholder="sw_live_998231">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Rate Limit (Req/Min)</label>
+            <input type="number" id="api-limit" required class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono" placeholder="1000">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Status Layanan</label>
+            <select id="api-status" class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono">
+              <option value="ACTIVE">ACTIVE (Normal)</option>
+              <option value="MAINTENANCE">MAINTENANCE</option>
+              <option value="DEPRECATED">DEPRECATED</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-cardborder">
+          <button type="button" onclick="closeNewEndpointModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition text-xs">Batal</button>
+          <button type="submit" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition text-xs shadow-lg shadow-purple-600/25">Simpan & Daftarkan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL SANDBOX SIMULATOR & TESTER -->
+  <div id="sandboxModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+    <div class="glass w-full max-w-2xl p-6 rounded-2xl border border-cardborder relative max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-cardborder">
+        <h3 class="text-base font-black text-white flex items-center gap-2"><i class="fa-solid fa-terminal text-purple-400"></i> Sandbox API Tester & Payload Inspector</h3>
+        <button onclick="closeSandboxModal()" class="text-slate-400 hover:text-white text-sm font-bold"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-4 text-xs font-mono text-slate-300">
+        <div class="bg-slate-900 p-4 rounded-xl border border-cardborder space-y-2">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Target Endpoint:</span>
+            <span id="sandbox-url" class="text-purple-400 font-bold">-</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">HTTP Method & Key:</span>
+            <span id="sandbox-meta" class="text-emerald-400 font-bold">-</span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 font-bold mb-1.5 font-sans">Simulasi Request Payload (JSON)</label>
+          <textarea id="sandbox-payload" rows="4" class="w-full bg-slate-900 border border-cardborder rounded-xl p-3 text-emerald-400 font-mono text-xs focus:outline-none focus:border-purple-500">{
+  "event": "transaction.success",
+  "merchant_id": "MERCH-8821",
+  "amount": 250000,
+  "timestamp": "2026-10-07T12:50:00Z"
+}</textarea>
+        </div>
+        <div>
+          <label class="block text-slate-400 font-bold mb-1.5 font-sans">Hasil Respon Server (Response Simulation)</label>
+          <pre id="sandbox-response" class="w-full bg-darkbg border border-cardborder rounded-xl p-3 text-slate-400 font-mono text-[11px] overflow-x-auto min-h-[80px]">// Klik tombol "Kirim Request Uji Coba" di bawah untuk melihat hasil respon API.</pre>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-between items-center pt-4 border-t border-cardborder">
+        <button onclick="executeSandboxTest()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition text-xs flex items-center gap-2">
+          <i class="fa-solid fa-play"></i> Kirim Request Uji Coba
+        </button>
+        <button onclick="closeSandboxModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition text-xs font-sans">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT KONTROL UTAMA MODUL 14 -->
+  <script>
+    // Jam Real-Time
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    // Ambil Data dari LocalStorage
+    function getStoredApis() {
+      try {
+        const data = localStorage.getItem('swift_enterprise_apigateway_supreme');
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveStoredApis(apis) {
+      localStorage.setItem('swift_enterprise_apigateway_supreme', JSON.stringify(apis));
+    }
+
+    // Muat Data Enterprise API Demo
+    function seedEnterpriseApis() {
+      const samples = [
+        {
+          id: 'API-901',
+          name: 'Payment Gateway Webhook Callback',
+          method: 'POST',
+          url: '/api/v1/payments/webhook-callback',
+          key: 'sw_live_pay_99812739',
+          latency: '34 ms',
+          requests: 21450,
+          limit: 2000,
+          status: 'ACTIVE',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 'API-902',
+          name: 'Courier GPS Live Tracking Sync',
+          method: 'PUT',
+          url: '/api/v1/logistics/gps-matrix-sync',
+          key: 'sw_live_geo_44109283',
+          latency: '58 ms',
+          requests: 48900,
+          limit: 5000,
+          status: 'ACTIVE',
+          created_at: new Date().toISOString()
+        }
+      ];
+      saveStoredApis(samples);
+      renderApiTable();
+    }
+
+    // Kosongkan Seluruh Data (Reset Bersih)
+    function clearAllApis() {
+      if (confirm("Hapus seluruh data endpoint API untuk kembali ke mode bersih (0 data)?")) {
+        localStorage.removeItem('swift_enterprise_apigateway_supreme');
+        renderApiTable();
+      }
+    }
+
+    // Tombol Refresh Responsif
+    function refreshApiData() {
+      const icon = document.getElementById('refresh-icon');
+      if(icon) icon.classList.add('fa-spin');
+      document.getElementById('filter-status').value = 'ALL';
+      renderApiTable();
+      setTimeout(() => { if(icon) icon.classList.remove('fa-spin'); }, 500);
+    }
+
+    function renderApiTable() {
+      const apis = getStoredApis();
+      const statusFilter = document.getElementById('filter-status').value;
+      const tbody = document.getElementById('apiTableBody');
+      tbody.innerHTML = '';
+
+      let totalRequests = 0;
+      let totalLatencyNum = 0;
+      let activeCount = 0;
+
+      apis.forEach(a => {
+        if (a.status === 'ACTIVE') {
+          activeCount++;
+          totalRequests += Number(a.requests || 0);
+          totalLatencyNum += parseInt((a.latency || '0').replace(/[^0-9]/g, ''));
+        }
+      });
+
+      const avgLatency = activeCount > 0 ? Math.round(totalLatencyNum / activeCount) + ' ms' : '0 ms';
+      const healthyPercent = apis.length > 0 ? Math.round((activeCount / apis.length) * 100) + '%' : '100%';
+
+      document.getElementById('stat-total-endpoints').innerText = apis.length;
+      document.getElementById('stat-healthy-status').innerText = healthyPercent;
+      document.getElementById('stat-avg-latency').innerText = avgLatency;
+      document.getElementById('stat-total-requests').innerText = totalRequests.toLocaleString('id-ID');
+
+      const filtered = apis.filter(a => statusFilter === 'ALL' || a.status === statusFilter);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 font-sans">Belum ada endpoint API terdaftar. Sistem siap mengelola integrasi gateway.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(a => {
+        let statusBadge = 'bg-emerald-950/60 text-emerald-400 border-emerald-800';
+        if (a.status === 'MAINTENANCE') statusBadge = 'bg-amber-950/60 text-amber-400 border-amber-800';
+        if (a.status === 'DEPRECATED') statusBadge = 'bg-red-950/60 text-red-400 border-red-800';
+
+        let methodColor = 'text-emerald-400 bg-emerald-950/50 border-emerald-800';
+        if (a.method === 'POST') methodColor = 'text-blue-400 bg-blue-950/50 border-blue-800';
+        if (a.method === 'PUT') methodColor = 'text-amber-400 bg-amber-950/50 border-amber-800';
+        if (a.method === 'DELETE') methodColor = 'text-red-400 bg-red-950/50 border-red-800';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-3">
+            <div class="font-bold text-white">${a.name}</div>
+            <div class="text-slate-400 text-[10px] font-mono">Key: ${a.key}</div>
+          </td>
+          <td class="p-3">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="px-2 py-0.5 rounded border text-[9px] font-bold ${methodColor}">${a.method}</span>
+              <span class="text-purple-400 font-mono">${a.url}</span>
+            </div>
+            <div class="text-slate-400 text-[10px]">ID: ${a.id}</div>
+          </td>
+          <td class="p-3">
+            <div class="font-bold text-blue-400">Latensi: ${a.latency}</div>
+            <div class="text-[10px] text-slate-400">Limit: ${Number(a.limit || 1000).toLocaleString('id-ID')} req/min</div>
+          </td>
+          <td class="p-3 text-center">
+            <span class="px-2.5 py-1 rounded border text-[10px] font-bold block w-max mx-auto ${statusBadge}">${a.status}</span>
+          </td>
+          <td class="p-3 text-center">
+            <div class="flex justify-center gap-1.5">
+              <button onclick="openSandboxModal('${a.id}')" class="px-2.5 py-1 bg-emerald-950 hover:bg-emerald-900 text-emerald-400 rounded border border-emerald-800 transition font-bold text-[10px]">Test</button>
+              <button onclick="toggleApiStatus('${a.id}')" class="px-2.5 py-1 bg-purple-950 hover:bg-purple-900 text-purple-400 rounded border border-purple-800 transition font-bold text-[10px]">Status</button>
+              <button onclick="deleteApi('${a.id}')" class="px-2.5 py-1 bg-red-950/60 hover:bg-red-900 text-red-400 rounded border border-red-800/50 transition font-bold text-[10px]">Hapus</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleCreateApi(event) {
+      event.preventDefault();
+      const name = document.getElementById('api-name').value;
+      const method = document.getElementById('api-method').value;
+      const url = document.getElementById('api-url').value;
+      const key = document.getElementById('api-key').value;
+      const limit = document.getElementById('api-limit').value;
+      const status = document.getElementById('api-status').value;
+
+      const newApi = {
+        id: 'API-' + Math.floor(100 + Math.random() * 900),
+        name,
+        method,
+        url,
+        key,
+        limit,
+        latency: Math.floor(20 + Math.random() * 40) + ' ms',
+        requests: Math.floor(150 + Math.random() * 1000),
+        status,
+        created_at: new Date().toISOString()
+      };
+
+      const apis = getStoredApis();
+      apis.unshift(newApi);
+      saveStoredApis(apis);
+
+      closeNewEndpointModal();
+      document.getElementById('apiForm').reset();
+      renderApiTable();
+    }
+
+    function toggleApiStatus(id) {
+      let apis = getStoredApis();
+      apis = apis.map(a => {
+        if (a.id === id) {
+          a.status = a.status === 'ACTIVE' ? 'MAINTENANCE' : 'ACTIVE';
+        }
+        return a;
+      });
+      saveStoredApis(apis);
+      renderApiTable();
+    }
+
+    function deleteApi(id) {
+      if (!confirm("Hapus endpoint API ini dari sistem gateway?")) return;
+      let apis = getStoredApis();
+      apis = apis.filter(a => a.id !== id);
+      saveStoredApis(apis);
+      renderApiTable();
+    }
+
+    // Sandbox Simulator Functions
+    let currentTestId = null;
+    function openSandboxModal(id) {
+      const apis = getStoredApis();
+      const a = apis.find(item => item.id === id);
+      if(!a) return;
+      currentTestId = id;
+      document.getElementById('sandbox-url').innerText = a.url;
+      document.getElementById('sandbox-meta').innerText = `${a.method} | Key: ${a.key}`;
+      document.getElementById('sandbox-response').innerText = '// Siap menguji endpoint ' + a.name;
+      document.getElementById('sandboxModal').classList.remove('hidden');
+    }
+    function closeSandboxModal() { document.getElementById('sandboxModal').classList.add('hidden'); }
+
+    function executeSandboxTest() {
+      const respPre = document.getElementById('sandbox-response');
+      respPre.innerText = "Mengirim request ke server...\nMenunggu respons latensi...";
+      setTimeout(() => {
+        const fakeResponse = {
+          status: "success",
+          code: 200,
+          message: "API Gateway successfully routed and processed payload.",
+          server_latency: "32ms",
+          timestamp: new Date().toISOString(),
+          data_received: JSON.parse(document.getElementById('sandbox-payload').value || "{}")
+        };
+        respPre.innerText = JSON.stringify(fakeResponse, null, 2);
+      }, 600);
+    }
+
+    function openNewEndpointModal() { document.getElementById('newEndpointModal').classList.remove('hidden'); }
+    function closeNewEndpointModal() { document.getElementById('newEndpointModal').classList.add('hidden'); }
+
+    window.onload = () => {
+      renderApiTable();
+    };
+  </script>
+</body>
+</html>

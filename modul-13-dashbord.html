@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWIFT — Modul 13: Enterprise Kampanye & Ads Command Hub (Super Lengkap)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            darkbg: '#090d16',
+            cardbg: '#111827',
+            cardborder: '#1f293d',
+            accentblue: '#2563eb',
+            accentgreen: '#16a34a',
+            accentgold: '#f59e0b',
+            accentred: '#dc2626'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; }
+    .glass { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(31, 41, 61, 0.8); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #374151; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white">
+
+  <!-- TOP HEADER COMMAND BAR -->
+  <header class="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-cardborder">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="text-purple-400 hover:text-purple-300 font-bold text-sm flex items-center gap-2 transition">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Super-App
+      </a>
+      <div class="h-5 w-[1px] bg-gray-700"></div>
+      <div>
+        <h1 class="text-lg font-black tracking-wide text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-bullhorn text-purple-400"></i> SWIFT — Modul 13: Enterprise Kampanye & Ads Hub (Supreme)
+        </h1>
+        <p class="text-xs text-slate-400">Pusat Kendali Iklan Multi-Channel, A/B Testing, & Analisis Konversi Enterprise</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-6">
+      <div class="hidden md:flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-cardborder text-xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-slate-300 font-medium">Ads Engine: 100% Optimal</span>
+      </div>
+      <div class="bg-purple-950/60 border border-purple-800/50 px-4 py-1.5 rounded-xl font-mono text-purple-400 font-bold text-sm tracking-wider shadow-inner" id="live-clock">
+        00:00:00
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    
+    <!-- SIDEBAR NAVIGASI MASTER (Modul 1 - 16) -->
+    <aside class="w-72 glass border-r border-cardborder flex flex-col shrink-0 overflow-y-auto hidden lg:flex">
+      <div class="p-4 text-xs font-black uppercase text-slate-500 tracking-wider">Navigasi Utama Sistem (1-16)</div>
+      <nav class="flex flex-col gap-1 px-3 pb-8 text-sm font-semibold">
+        <a href="modul-1.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-chart-pie w-5"></i> 1. Statistik Dashboard</a>
+        <a href="modul-2.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-coins w-5"></i> 2. Kontrol Finansial</a>
+        <a href="modul-3.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-users-gear w-5"></i> 3. Pengendalian Pengguna</a>
+        <a href="modul-4.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-map-location-dot w-5"></i> 4. GPS Tracking & Matrix</a>
+        <a href="modul-5.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-wallet w-5"></i> 5. Topup & Webhook</a>
+        <a href="modul-6.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-store w-5"></i> 6. Manajemen Merchant</a>
+        <a href="modul-7.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-bolt w-5"></i> 7. Kurir & Peta Logistik</a>
+        <a href="modul-8.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-boxes-stacked w-5"></i> 8. Inventaris & Promo SKU</a>
+        <a href="modul-9.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-chart-line w-5"></i> 9. Analitik & Vault</a>
+        <a href="modul-10.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-satellite-dish w-5"></i> 10. Komunikasi & Push</a>
+        <a href="modul-11.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-shield-halved w-5"></i> 11. Keamanan & Audit</a>
+        <a href="modul-12.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-ticket w-5"></i> 12. Tiket & Support</a>
+        <a href="modul-13.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left bg-purple-600 text-white shadow-lg shadow-purple-600/20 font-bold"><i class="fa-solid fa-bullhorn w-5"></i> 📢 13. Kampanye & Ads</a>
+        <a href="modul-14.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-gears w-5"></i> 14. Integrasi API Gateway</a>
+        <a href="modul-15.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-file-invoice-dollar w-5"></i> 15. Pajak & Kepatuhan</a>
+        <a href="modul-16.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-network-wired w-5"></i> 16. Enterprise System Core</a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 overflow-y-auto p-6 lg:p-10">
+      <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white mb-1">Modul 13: Enterprise Kampanye & Ads Command Hub</h2>
+          <p class="text-sm text-slate-400">Pusat kendali iklan tingkat enterprise dengan fitur lengkap penargetan demografi, A/B testing, dan optimasi ROI.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="openNewCampaignModal()" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i> Buat Kampanye Kompleks
+          </button>
+          <button onclick="seedAdvancedCampaigns()" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-cardborder text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Muat Data Enterprise
+          </button>
+          <button onclick="clearAllCampaigns()" class="px-4 py-2.5 bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-800/50 text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-trash-can"></i> Kosongkan Data (Reset)
+          </button>
+        </div>
+      </div>
+
+      <!-- KARTU STATISTIK ENTERPRISE -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="glass p-6 rounded-2xl border-l-4 border-purple-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Anggaran (Ad Spend)</div>
+          <div class="text-3xl font-black text-white" id="stat-total-spend">Rp 0</div>
+          <div class="text-purple-400 text-xs mt-2 font-semibold">Akumulasi Seluruh Kampanye</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-emerald-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Jangkauan (Reach)</div>
+          <div class="text-3xl font-black text-emerald-400" id="stat-total-reach">0</div>
+          <div class="text-emerald-400 text-xs mt-2 font-semibold">Pengguna Unik Terekspos Iklan</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-blue-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Rata-Rata CTR & CPC</div>
+          <div class="text-3xl font-black text-blue-400" id="stat-avg-ctr">0%</div>
+          <div class="text-blue-400 text-xs mt-2 font-semibold" id="stat-avg-cpc">CPC: Rp 0</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-amber-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Rata-Rata ROI (Konversi)</div>
+          <div class="text-3xl font-black text-amber-400" id="stat-avg-roi">0%</div>
+          <div class="text-amber-400 text-xs mt-2 font-semibold">Return on Investment Tertinggi</div>
+        </div>
+      </div>
+
+      <!-- TABEL DAFTAR KAMPANYE SUPREME -->
+      <div class="glass p-6 rounded-2xl border-l-4 border-purple-500 flex flex-col">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 pb-3 border-b border-cardborder gap-3">
+          <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-rectangle-ad text-purple-400"></i> Manajer Kampanye Iklan Multi-Channel & Performa Real-Time</h3>
+          <div class="flex items-center gap-2">
+            <select id="filter-status" onchange="renderCampaignTable()" class="bg-slate-900 border border-cardborder text-slate-300 text-xs px-3 py-1.5 rounded-lg focus:outline-none">
+              <option value="ALL">Semua Status</option>
+              <option value="RUNNING">Running</option>
+              <option value="PAUSED">Paused</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+            <button onclick="refreshCampaignData()" class="text-xs text-purple-400 hover:text-purple-300 font-bold flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-lg border border-cardborder cursor-pointer transition active:scale-95">
+              <i class="fa-solid fa-rotate" id="refresh-icon"></i> Refresh
+            </button>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto flex-1">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900 uppercase text-slate-400 font-bold border-b border-cardborder">
+              <tr>
+                <th class="p-3">ID & Nama Kampanye</th>
+                <th class="p-3">Penempatan & Demografi Target</th>
+                <th class="p-3">Anggaran & Strategi Bid</th>
+                <th class="p-3 text-center">Metrik Performa (CTR / CPC / ROI)</th>
+                <th class="p-3 text-center">Status & Aksi Kontrol</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-cardborder font-mono text-[11px]" id="campaignTableBody">
+              <tr>
+                <td colspan="5" class="p-6 text-center text-slate-500 font-sans">Belum ada data kampanye. Sistem siap mengelola promosi secara real-time.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL BUAT KAMPANYE SUPER LENGKAP -->
+  <div id="newCampaignModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+    <div class="glass w-full max-w-2xl p-6 rounded-2xl border border-cardborder relative max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-cardborder">
+        <h3 class="text-base font-black text-white flex items-center gap-2"><i class="fa-solid fa-bullhorn text-purple-400"></i> Buat Kampanye Iklan Enterprise Kompleks</h3>
+        <button onclick="closeNewCampaignModal()" class="text-slate-400 hover:text-white text-sm font-bold"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="campaignForm" onsubmit="handleCreateCampaign(event)" class="space-y-4 text-xs font-sans">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Nama Kampanye</label>
+            <input type="text" id="camp-name" required class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono" placeholder="Contoh: Mega Promo Akhir Tahun">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Merchant / Brand Pengiklan</label>
+            <input type="text" id="camp-merchant" required class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono" placeholder="Contoh: Sentuhan Kasih / UMI Official">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Penempatan Iklan (Placement)</label>
+            <select id="camp-placement" class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono">
+              <option value="Banner Utama Super-App (Carousel)">Banner Utama Super-App (Carousel)</option>
+              <option value="Notifikasi Push Target Broadcast">Notifikasi Push Target Broadcast</option>
+              <option value="Rekomendasi Merchant Pilihan (Home)">Rekomendasi Merchant Pilihan (Home)</option>
+              <option value="Flash Sale & Halaman Voucher">Flash Sale & Halaman Voucher</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Strategi Penawaran (Bidding Strategy)</label>
+            <select id="camp-bidding" class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono">
+              <option value="CPC (Cost Per Click)">CPC (Cost Per Click)</option>
+              <option value="CPA (Cost Per Acquisition)">CPA (Cost Per Acquisition)</option>
+              <option value="CPM (Cost Per Mille / Impresi)">CPM (Cost Per Mille / Impresi)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Total Anggaran (Rp)</label>
+            <input type="number" id="camp-budget" required class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono" placeholder="1500000">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Estimasi Jangkauan</label>
+            <input type="number" id="camp-reach" required class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono" placeholder="35000">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-bold mb-1.5">Demografi Target Usia</label>
+            <input type="text" id="camp-demo" required class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono" placeholder="18 - 50 Tahun">
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 font-bold mb-1.5">Copywriting / Teks Kreatif Iklan</label>
+          <textarea id="camp-copy" rows="2" required class="w-full bg-slate-900 border border-cardborder rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-purple-500 font-mono" placeholder="Tulis penawaran menarik untuk memikat pengguna..."></textarea>
+        </div>
+        <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-cardborder">
+          <button type="button" onclick="closeNewCampaignModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition text-xs">Batal</button>
+          <button type="submit" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition text-xs shadow-lg shadow-purple-600/25">Terbitkan Kampanye</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT KONTROL UTAMA MODUL 13 -->
+  <script>
+    // Jam Real-Time
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    // Ambil Data dari LocalStorage
+    function getStoredCampaigns() {
+      try {
+        const data = localStorage.getItem('swift_enterprise_campaigns_supreme');
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveStoredCampaigns(campaigns) {
+      localStorage.setItem('swift_enterprise_campaigns_supreme', JSON.stringify(campaigns));
+    }
+
+    // Muat Data Enterprise Demo
+    function seedAdvancedCampaigns() {
+      const samples = [
+        {
+          id: 'CMP-701',
+          name: 'Promo Eksklusif Terapi Spa & Healing',
+          merchant: 'Sentuhan Kasih by Akma',
+          placement: 'Banner Utama Super-App (Carousel)',
+          bidding: 'CPC (Cost Per Click)',
+          budget: 950000,
+          reach: 21000,
+          demo: '21 - 50 Tahun',
+          copy: 'Nikmati relaksasi tubuh total dengan terapis profesional berpengalaman.',
+          ctr: '5.4%',
+          cpc: 'Rp 420',
+          roi: '380%',
+          status: 'RUNNING',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 'CMP-702',
+          name: 'Paket Bundling Sabun Organik Alami',
+          merchant: 'UMI Official',
+          placement: 'Flash Sale & Halaman Voucher',
+          bidding: 'CPA (Cost Per Acquisition)',
+          budget: 650000,
+          reach: 16500,
+          demo: '18 - 45 Tahun',
+          copy: 'Formula herbal ramah kulit untuk kesegaran dan kelembapan sepanjang hari.',
+          ctr: '4.9%',
+          cpc: 'Rp 350',
+          roi: '310%',
+          status: 'RUNNING',
+          created_at: new Date().toISOString()
+        }
+      ];
+      saveStoredCampaigns(samples);
+      renderCampaignTable();
+    }
+
+    // Kosongkan Seluruh Data (Reset Bersih)
+    function clearAllCampaigns() {
+      if (confirm("Hapus seluruh data kampanye untuk kembali ke mode bersih (0 data)?")) {
+        localStorage.removeItem('swift_enterprise_campaigns_supreme');
+        renderCampaignTable();
+      }
+    }
+
+    // Tombol Refresh Responsif
+    function refreshCampaignData() {
+      const icon = document.getElementById('refresh-icon');
+      if(icon) icon.classList.add('fa-spin');
+      document.getElementById('filter-status').value = 'ALL';
+      renderCampaignTable();
+      setTimeout(() => { if(icon) icon.classList.remove('fa-spin'); }, 500);
+    }
+
+    function renderCampaignTable() {
+      const campaigns = getStoredCampaigns();
+      const statusFilter = document.getElementById('filter-status').value;
+      const tbody = document.getElementById('campaignTableBody');
+      tbody.innerHTML = '';
+
+      let totalSpend = 0;
+      let totalReach = 0;
+      let totalCtr = 0;
+      let totalCpc = 0;
+      let totalRoi = 0;
+      let runningCount = 0;
+
+      campaigns.forEach(c => {
+        if (c.status === 'RUNNING') {
+          runningCount++;
+          totalSpend += Number(c.budget || 0);
+          totalReach += Number(c.reach || 0);
+          totalCtr += parseFloat(c.ctr || '0');
+          totalCpc += parseInt((c.cpc || '0').replace(/[^0-9]/g, ''));
+          totalRoi += parseInt((c.roi || '0').replace(/[^0-9]/g, ''));
+        }
+      });
+
+      const avgCtr = runningCount > 0 ? (totalCtr / runningCount).toFixed(1) + '%' : '0%';
+      const avgCpc = runningCount > 0 ? 'Rp ' + Math.round(totalCpc / runningCount).toLocaleString('id-ID') : 'Rp 0';
+      const avgRoi = runningCount > 0 ? Math.round(totalRoi / runningCount) + '%' : '0%';
+
+      document.getElementById('stat-total-spend').innerText = 'Rp ' + totalSpend.toLocaleString('id-ID');
+      document.getElementById('stat-total-reach').innerText = totalReach.toLocaleString('id-ID');
+      document.getElementById('stat-avg-ctr').innerText = avgCtr;
+      document.getElementById('stat-avg-cpc').innerText = 'CPC Rata-Rata: ' + avgCpc;
+      document.getElementById('stat-avg-roi').innerText = avgRoi;
+
+      const filtered = campaigns.filter(c => statusFilter === 'ALL' || c.status === statusFilter);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 font-sans">Belum ada data kampanye. Sistem siap mengelola promosi secara real-time.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(c => {
+        let statusBadge = 'bg-emerald-950/60 text-emerald-400 border-emerald-800';
+        if (c.status === 'PAUSED') statusBadge = 'bg-amber-950/60 text-amber-400 border-amber-800';
+        if (c.status === 'COMPLETED') statusBadge = 'bg-purple-950/60 text-purple-400 border-purple-800';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-3">
+            <div class="font-bold text-white">${c.name}</div>
+            <div class="text-slate-400 text-[10px]">${c.merchant} (${c.id})</div>
+          </td>
+          <td class="p-3">
+            <div class="text-purple-400 font-semibold">${c.placement}</div>
+            <div class="text-slate-400 text-[10px]">Demografi: ${c.demo} | Jangkauan: ${Number(c.reach).toLocaleString('id-ID')}</div>
+          </td>
+          <td class="p-3">
+            <div class="font-bold text-emerald-400">Rp ${Number(c.budget).toLocaleString('id-ID')}</div>
+            <div class="text-[10px] text-slate-400">Bid: ${c.bidding}</div>
+          </td>
+          <td class="p-3 text-center">
+            <div class="text-blue-400 font-bold">CTR: ${c.ctr} | CPC: ${c.cpc}</div>
+            <div class="text-[10px] text-amber-400 font-semibold">ROI: ${c.roi}</div>
+          </td>
+          <td class="p-3 text-center">
+            <div class="flex justify-center gap-1.5">
+              <button onclick="toggleCampaignStatus('${c.id}')" class="px-2.5 py-1 bg-purple-950 hover:bg-purple-900 text-purple-400 rounded border border-purple-800 transition font-bold text-[10px]">Status</button>
+              <button onclick="deleteCampaign('${c.id}')" class="px-2.5 py-1 bg-red-950/60 hover:bg-red-900 text-red-400 rounded border border-red-800/50 transition font-bold text-[10px]">Hapus</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleCreateCampaign(event) {
+      event.preventDefault();
+      const name = document.getElementById('camp-name').value;
+      const merchant = document.getElementById('camp-merchant').value;
+      const placement = document.getElementById('camp-placement').value;
+      const bidding = document.getElementById('camp-bidding').value;
+      const budget = document.getElementById('camp-budget').value;
+      const reach = document.getElementById('camp-reach').value;
+      const demo = document.getElementById('camp-demo').value;
+      const copy = document.getElementById('camp-copy').value;
+
+      const newCamp = {
+        id: 'CMP-' + Math.floor(100 + Math.random() * 900),
+        name,
+        merchant,
+        placement,
+        bidding,
+        budget,
+        reach,
+        demo,
+        copy,
+        ctr: (4.0 + Math.random() * 2.2).toFixed(1) + '%',
+        cpc: 'Rp ' + Math.floor(300 + Math.random() * 250),
+        roi: Math.floor(250 + Math.random() * 150) + '%',
+        status: 'RUNNING',
+        created_at: new Date().toISOString()
+      };
+
+      const campaigns = getStoredCampaigns();
+      campaigns.unshift(newCamp);
+      saveStoredCampaigns(campaigns);
+
+      closeNewCampaignModal();
+      document.getElementById('campaignForm').reset();
+      renderCampaignTable();
+    }
+
+    function toggleCampaignStatus(id) {
+      let campaigns = getStoredCampaigns();
+      campaigns = campaigns.map(c => {
+        if (c.id === id) {
+          c.status = c.status === 'RUNNING' ? 'PAUSED' : 'RUNNING';
+        }
+        return c;
+      });
+      saveStoredCampaigns(campaigns);
+      renderCampaignTable();
+    }
+
+    function deleteCampaign(id) {
+      if (!confirm("Hapus kampanye iklan ini dari sistem?")) return;
+      let campaigns = getStoredCampaigns();
+      campaigns = campaigns.filter(c => c.id !== id);
+      saveStoredCampaigns(campaigns);
+      renderCampaignTable();
+    }
+
+    function openNewCampaignModal() { document.getElementById('newCampaignModal').classList.remove('hidden'); }
+    function closeNewCampaignModal() { document.getElementById('newCampaignModal').classList.add('hidden'); }
+
+    window.onload = () => {
+      renderCampaignTable();
+    };
+  </script>
+</body>
+</html>

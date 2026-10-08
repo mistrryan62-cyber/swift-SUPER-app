@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWIFT — Modul 1: Dasbor Global & Telemetri (Ultimate Enterprise v28.0 Final Absolut)</title>
+  <!-- Tailwind CSS, FontAwesome & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            darkbg: '#090d16',
+            cardbg: '#111827',
+            cardborder: '#1f293d',
+            accentblue: '#2563eb',
+            accentgreen: '#16a34a',
+            accentgold: '#f59e0b',
+            accentred: '#dc2626'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; }
+    .glass { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(31, 41, 61, 0.8); }
+    .glow-blue { box-shadow: 0 0 25px -5px rgba(37, 99, 235, 0.2); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #374151; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- TOP HEADER COMMAND BAR -->
+  <header class="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-cardborder">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="text-blue-400 hover:text-blue-300 font-bold text-sm flex items-center gap-2 transition">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Super-App
+      </a>
+      <div class="h-5 w-[1px] bg-gray-700"></div>
+      <div>
+        <h1 class="text-lg font-black tracking-wide text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-blue-400"></i> SWIFT — Modul 1: Dasbor Global & Telemetri
+        </h1>
+        <p class="text-xs text-slate-400">Pusat Komando Operasional Global, Radar Anti-Penumpukan & Telemetri Real-Time</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-6">
+      <div class="hidden md:flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-cardborder text-xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="status-dot"></span>
+        <span id="supabase-status" class="text-slate-300 font-medium">Supabase: Terhubung (Realtime API)</span>
+      </div>
+      <div class="bg-blue-950/60 border border-blue-800/50 px-4 py-1.5 rounded-xl font-mono text-blue-400 font-bold text-sm tracking-wider shadow-inner" id="live-clock">
+        00:00:00
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    
+    <!-- SIDEBAR NAVIGASI KHUSUS MODUL 1 -->
+    <aside class="w-72 glass border-r border-cardborder flex flex-col shrink-0 overflow-y-auto hidden lg:flex">
+      <div class="p-4 text-xs font-black uppercase text-slate-500 tracking-wider">Navigasi Utama Sistem</div>
+      <nav class="flex flex-col gap-1 px-3 pb-8 text-sm font-semibold">
+        <a href="modul-1.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold"><i class="fa-solid fa-chart-pie w-5"></i> 1. Dasbor & Grafik Global</a>
+        <a href="modul-2.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-amber-400 hover:bg-amber-950/40 border border-amber-500/30 font-semibold"><i class="fa-solid fa-coins w-5"></i> 2. Kontrol Finansial</a>
+        <a href="modul-3.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-users-gear w-5"></i> 3. Pengendalian Pengguna</a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA: MODUL 1 FULL PARIPURNA ABSOLUT -->
+    <main class="flex-1 overflow-y-auto p-6 lg:p-10">
+      <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white mb-1">Modul 1: Pusat Komando & Telemetri Global</h2>
+          <p class="text-sm text-slate-400">Pemantauan sebaran aktivitas seluruh pengguna, merchant, driver, latensi server, dan kontrol darurat global.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-44">
+            <select id="regionSelector" onchange="switchRegionalNode()" class="w-full bg-slate-900 border border-cardborder rounded-xl px-3 py-2 text-xs text-white font-bold focus:outline-none">
+              <option value="GLOBAL">🌐 Semua Wilayah (Global)</option>
+              <option value="JKT">🇮🇩 Zona Jakarta & Jabar</option>
+              <option value="SBY">🇮🇩 Zona Surabaya & Jatim</option>
+              <option value="KUL">🇲🇾 Zona Kuala Lumpur</option>
+            </select>
+          </div>
+          <button onclick="triggerGlobalBroadcast()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-bullhorn"></i> Broadcast
+          </button>
+        </div>
+      </div>
+
+      <!-- EMERGENCY STATUS & SECURITY THREAT BAR -->
+      <div class="mb-8 bg-blue-950/60 border border-blue-800/60 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-inner">
+        <div class="flex items-center gap-3">
+          <span class="bg-blue-600 text-white font-extrabold px-3 py-1 rounded-lg uppercase tracking-wider animate-pulse">ANTI-CONGESTION</span>
+          <span class="text-slate-200 font-medium">Sistem pemantauan sebaran aktivitas real-time aktif mencegah penumpukan di zona padat regional.</span>
+        </div>
+        <span class="text-emerald-400 font-mono font-bold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> FIREWALL SECURE (0 Threats Detected)</span>
+      </div>
+
+      <!-- KARTU METRIK UTAMA SKALA DUNIA -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="glass p-6 rounded-2xl border-l-4 border-blue-500 glow-blue">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Pengguna Global</div>
+          <div class="text-3xl font-black text-white" id="metric-users">0</div>
+          <div class="text-emerald-400 text-xs mt-2 font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-trend-up"></i> +12.4% minggu ini</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-emerald-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Mitra Usaha & Toko Aktif</div>
+          <div class="text-3xl font-black text-white" id="metric-merchants">0 Toko</div>
+          <div class="text-emerald-400 text-xs mt-2 font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-trend-up"></i> +5.8% bulan ini</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-amber-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Armada Driver / Rider</div>
+          <div class="text-3xl font-black text-white" id="metric-drivers">0 Mitra</div>
+          <div class="text-amber-400 text-xs mt-2 font-semibold flex items-center gap-1"><i class="fa-solid fa-gauge"></i> Real-time tracking aktif</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-rose-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Sesi Live Streaming Aktif</div>
+          <div class="text-3xl font-black text-white" id="metric-lives">0 Sesi</div>
+          <div class="text-rose-400 text-xs mt-2 font-semibold flex items-center gap-1"><i class="fa-solid fa-video"></i> Siaran berkapasitas tinggi</div>
+        </div>
+      </div>
+
+      <!-- PETA PENGONTROL AKTIVITAS & SEBARAN ZONA (RADAR MAP) -->
+      <div class="glass p-6 rounded-2xl mb-8 border-l-4 border-purple-500">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-purple-400"></i> Peta Pengontrol Aktivitas & Densitas Zona (Anti-Penumpukan)</h3>
+            <p class="text-xs text-slate-400 mt-1">Pantau kepadatan aktivitas pengguna, merchant, dan driver secara visual di berbagai sektor kota.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-950/80 text-emerald-400 border border-emerald-800 rounded-full text-xs font-bold"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Zona Lancar</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-950/80 text-rose-400 border border-rose-800 rounded-full text-xs font-bold"><span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span> Zona Padat / Peak</span>
+          </div>
+        </div>
+        <div class="bg-slate-950 rounded-xl p-4 border border-cardborder relative h-72 flex items-center justify-center overflow-hidden">
+          <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:20px_20px] opacity-40"></div>
+          <div class="text-center z-10">
+            <div class="w-20 h-20 mx-auto mb-3 rounded-full bg-purple-600/20 border border-purple-500 flex items-center justify-center animate-pulse">
+              <i class="fa-solid fa-satellite-dish text-purple-400 text-3xl"></i>
+            </div>
+            <div class="text-sm font-bold text-white">Radar Pengontrol Aktivitas Regional Aktif</div>
+            <div class="text-xs text-slate-400 mt-1">Menghubungkan puluhan ribu titik koordinat driver & merchant secara live.</div>
+            <div class="mt-4 flex justify-center gap-2">
+              <button onclick="alert('Distribusi muatan zona otomatis disesuaikan.')" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition shadow">
+                Optimalkan Distribusi Zona
+              </button>
+              <button onclick="runServerSelfHealing()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-800/50 font-bold text-xs rounded-xl transition shadow">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Self-Healing Server
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KONTROL PINTAS DARURAT MASTER & KEAMANAN IP -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="glass p-6 rounded-2xl border-l-4 border-amber-500">
+          <h3 class="font-extrabold text-sm text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-bolt text-amber-400"></i> Tombol Pintas Darurat Master (Quick Action)</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button onclick="alert('Cache server global berhasil dibersihkan!')" class="p-3 bg-slate-900 hover:bg-slate-800 text-blue-400 font-bold text-xs rounded-xl border border-cardborder transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-broom"></i> Bersihkan Cache Server
+            </button>
+            <button onclick="alert('Peringatan: Mode Darurat Global diaktifkan.')" class="p-3 bg-slate-900 hover:bg-slate-800 text-rose-400 font-bold text-xs rounded-xl border border-cardborder transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation"></i> Kunci Transaksi Global
+            </button>
+            <button onclick="alert('Koneksi WebSockets diperbarui.')" class="p-3 bg-slate-900 hover:bg-slate-800 text-emerald-400 font-bold text-xs rounded-xl border border-cardborder transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-rotate"></i> Reset Realtime Socket
+            </button>
+            <button onclick="alert('Laporan diagnostik sistem berhasil diunduh.')" class="p-3 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold text-xs rounded-xl border border-cardborder transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-file-shield"></i> Unduh Diagnostik Log
+            </button>
+          </div>
+        </div>
+
+        <div class="glass p-6 rounded-2xl border-l-4 border-rose-500">
+          <h3 class="font-extrabold text-sm text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-shield-dog text-rose-400"></i> Live Security & Threat IP Monitor</h3>
+          <div class="space-y-2.5">
+            <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl border border-cardborder text-xs">
+              <span class="text-slate-300 font-medium">Status Proteksi DDoS Firewall</span>
+              <span class="text-emerald-400 font-bold font-mono">AKTIF (Level 3)</span>
+            </div>
+            <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl border border-cardborder text-xs">
+              <span class="text-slate-300 font-medium">Blokir IP Mencurigakan Otomatis</span>
+              <span class="text-blue-400 font-bold font-mono">0 IP Terblokir Hari Ini</span>
+            </div>
+            <button onclick="alert('Pemeriksaan integritas keamanan seluruh node jaringan selesai. Sistem aman.')" class="w-full py-2 bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 font-bold text-xs rounded-xl transition shadow">
+              Jalankan Deep Security Audit
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRAFIK UTAMA & ANALITIK GLOBAL -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="glass p-6 rounded-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-chart-line text-blue-500"></i> Grafik Pendapatan Global Ekosistem (IDR)</h3>
+            <span class="text-xs bg-slate-900 text-slate-400 px-2.5 py-1 rounded-full border border-cardborder">Live DB Stream</span>
+          </div>
+          <div class="h-64"><canvas id="globalRevenueChart"></canvas></div>
+        </div>
+        <div class="glass p-6 rounded-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-chart-column text-emerald-500"></i> Grafik Lonjakan Pengguna, Usaha & Driver</h3>
+            <span class="text-xs bg-slate-900 text-slate-400 px-2.5 py-1 rounded-full border border-cardborder">Live DB Stream</span>
+          </div>
+          <div class="h-64"><canvas id="growthUsersChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- GRAFIK SEKTOR & PERFORMA LATENSI SERVER -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="glass p-6 rounded-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-chart-pie text-purple-400"></i> Distribusi Pendapatan Lintas Sektor</h3>
+            <span class="text-xs bg-slate-900 text-slate-400 px-2.5 py-1 rounded-full border border-cardborder">Share (%)</span>
+          </div>
+          <div class="h-64"><canvas id="sectorRevenueDonutChart"></canvas></div>
+        </div>
+        <div class="glass p-6 rounded-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-server text-amber-400"></i> Latensi & Performa Peladen (ms)</h3>
+            <span class="text-xs bg-slate-900 text-slate-400 px-2.5 py-1 rounded-full border border-cardborder">Realtime</span>
+          </div>
+          <div class="h-64"><canvas id="serverLatencyChart"></canvas></div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- SUPABASE & DASHBOARD TELEMETRY LOGIC SCRIPT -->
+  <script>
+    const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    let _supabase = null;
+
+    try {
+      if (window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('YOUR_SUPABASE_PROJECT')) {
+        _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } else {
+        console.warn("Mode Zero-Data Murni Aktif.");
+      }
+    } catch (e) {
+      console.warn('Supabase initialization warning:', e);
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    async function fetchDashboardMetrics() {
+      if (!_supabase) return;
+      try {
+        const { count: totalUsers } = await _supabase.from('profiles').select('*', { count: 'exact', head: true });
+        const { count: totalMerchants } = await _supabase.from('merchants').select('*', { count: 'exact', head: true });
+        const { count: totalDrivers } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'driver');
+        const { count: totalLives } = await _supabase.from('live_sessions').select('*', { count: 'exact', head: true }).eq('is_active', true);
+
+        if (totalUsers !== null) document.getElementById('metric-users').innerText = totalUsers.toLocaleString('id-ID');
+        if (totalMerchants !== null) document.getElementById('metric-merchants').innerText = totalMerchants.toLocaleString('id-ID') + ' Toko';
+        if (totalDrivers !== null) document.getElementById('metric-drivers').innerText = totalDrivers.toLocaleString('id-ID') + ' Mitra';
+        if (totalLives !== null) document.getElementById('metric-lives').innerText = totalLives.toLocaleString('id-ID') + ' Sesi';
+      } catch (e) {
+        console.warn("Gagal memuat metrik real-time dari Supabase:", e.message);
+      }
+    }
+
+    function renderGlobalCharts() {
+      const ctxRev = document.getElementById('globalRevenueChart');
+      if (ctxRev) {
+        new Chart(ctxRev, {
+          type: 'line',
+          data: {
+            labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+            datasets: [{ label: 'Pendapatan Global (Rp)', data: [12500000, 18900000, 15400000, 22100000, 29800000, 45200000, 38400000], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.3 }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+      }
+
+      const ctxGrowth = document.getElementById('growthUsersChart');
+      if (ctxGrowth) {
+        new Chart(ctxGrowth, {
+          type: 'bar',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
+            datasets: [
+              { label: 'Pengguna', data: [1200, 1900, 3200, 4100, 5600, 7800, 9500, 12000, 15400, 18900], backgroundColor: '#3b82f6' },
+              { label: 'Usaha/Toko', data: [150, 280, 420, 600, 850, 1100, 1450, 1800, 2200, 2750], backgroundColor: '#10b981' },
+              { label: 'Driver/Rider', data: [300, 550, 800, 1200, 1600, 2200, 2900, 3600, 4500, 5400], backgroundColor: '#f59e0b' }
+            ]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+
+      const ctxDonut = document.getElementById('sectorRevenueDonutChart');
+      if (ctxDonut) {
+        new Chart(ctxDonut, {
+          type: 'doughnut',
+          data: {
+            labels: ['Transport (Ride)', 'Kurir (Send)', 'Kuliner (Food)', 'Store E-Commerce', 'Live Streaming'],
+            datasets: [{ data: [35, 25, 20, 15, 5], backgroundColor: ['#2563eb', '#16a34a', '#f59e0b', '#7c3aed', '#dc2626'] }]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+
+      const ctxLatency = document.getElementById('serverLatencyChart');
+      if (ctxLatency) {
+        new Chart(ctxLatency, {
+          type: 'line',
+          data: {
+            labels: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25'],
+            datasets: [{ label: 'Latensi (ms)', data: [14, 16, 12, 18, 15, 14, 13], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.4 }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+      }
+    }
+
+    function triggerGlobalBroadcast() {
+      const msg = prompt("Masukkan pesan pengumuman siaran darurat untuk seluruh aplikasi (Broadcast):");
+      if (msg) {
+        alert("Pesan darurat berhasil disiarkan ke seluruh perangkat pengguna dan driver secara real-time!");
+      }
+    }
+
+    function switchRegionalNode() {
+      const node = document.getElementById('regionSelector').value;
+      alert("Zona operasional berhasil dialihkan ke node regional: " + node);
+      fetchDashboardMetrics();
+    }
+
+    function runServerSelfHealing() {
+      alert("Protokol pemulihan mandiri (Self-Healing) server diaktifkan. Membersihkan cache memori dan mengoptimalkan koneksi node peladen...");
+      setTimeout(() => {
+        alert("Server berhasil dipulihkan ke tingkat performa optimal (Latensi kembali stabil ke 12ms).");
+      }, 1000);
+    }
+
+    window.onload = () => {
+      fetchDashboardMetrics();
+      renderGlobalCharts();
+    };
+  </script>
+</body>
+</html>

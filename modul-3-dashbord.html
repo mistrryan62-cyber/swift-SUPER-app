@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWIFT — Modul 3: Pengendalian & Manajemen Pengguna (Realtime Supabase Enterprise)</title>
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            darkbg: '#090d16',
+            cardbg: '#111827',
+            cardborder: '#1f293d',
+            accentblue: '#2563eb',
+            accentgreen: '#16a34a',
+            accentgold: '#f59e0b',
+            accentred: '#dc2626'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; }
+    .glass { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(31, 41, 61, 0.8); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #374151; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- TOP HEADER COMMAND BAR -->
+  <header class="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-cardborder">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="text-blue-400 hover:text-blue-300 font-bold text-sm flex items-center gap-2 transition">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Super-App
+      </a>
+      <div class="h-5 w-[1px] bg-gray-700"></div>
+      <div>
+        <h1 class="text-lg font-black tracking-wide text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-users-gear text-blue-400"></i> SWIFT — Modul 3: Pengendalian & Manajemen Pengguna
+        </h1>
+        <p class="text-xs text-slate-400">Pusat Kendali Akun, Moderasi Risiko Fraud, Penyesuaian Saldo & Verifikasi KYC</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-6">
+      <div class="hidden md:flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-cardborder text-xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="status-dot"></span>
+        <span class="text-slate-300 font-medium" id="connection-status-text">Supabase: Terhubung (Realtime API)</span>
+      </div>
+      <div class="bg-blue-950/60 border border-blue-800/50 px-4 py-1.5 rounded-xl font-mono text-blue-400 font-bold text-sm tracking-wider shadow-inner" id="live-clock">
+        00:00:00
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    
+    <!-- SIDEBAR NAVIGASI KHUSUS MODUL 3 -->
+    <aside class="w-72 glass border-r border-cardborder flex flex-col shrink-0 overflow-y-auto hidden lg:flex">
+      <div class="p-4 text-xs font-black uppercase text-slate-500 tracking-wider">Navigasi Utama Sistem</div>
+      <nav class="flex flex-col gap-1 px-3 pb-8 text-sm font-semibold">
+        <a href="modul-1.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-chart-pie w-5"></i> 1. Dasbor & Grafik Global</a>
+        <a href="modul-2.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-amber-400 hover:bg-amber-950/40 border border-amber-500/30"><i class="fa-solid fa-coins w-5"></i> 2. Kontrol Finansial</a>
+        <a href="modul-3.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold"><i class="fa-solid fa-users-gear w-5"></i> 🎛 3. Pengendalian Pengguna</a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 overflow-y-auto p-6 lg:p-10">
+      <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white mb-1">Modul 3: Manajemen & Pengendalian Pengguna (IAM Center)</h2>
+          <p class="text-sm text-slate-400">Pusat kendali akun mutlak untuk memoderasi pengguna, memeriksa skor risiko, mengatur saldo dompet, verifikasi KYC, dan manajemen sesi.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="openBulkActionModal()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-cardborder text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-layer-group"></i> Aksi Massal (Bulk)
+          </button>
+          <button onclick="openAddNewUserModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-user-plus"></i> Tambah Akun Manual
+          </button>
+        </div>
+      </div>
+
+      <!-- STATISTIK KARTU PENGGUNA -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="glass p-6 rounded-2xl border-l-4 border-blue-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Akun Terdaftar</div>
+          <div class="text-3xl font-black text-white" id="stat-total-users">0</div>
+          <div class="text-emerald-400 text-xs mt-2 font-semibold flex items-center gap-1"><i class="fa-solid fa-database"></i> Tersinkronisasi Supabase</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-emerald-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Pengguna Aktif (MAU)</div>
+          <div class="text-3xl font-black text-white" id="stat-active-users">0</div>
+          <div class="text-emerald-400 text-xs mt-2 font-semibold">Status normal operasional</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-amber-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Akun Pending Verifikasi KYC</div>
+          <div class="text-3xl font-black text-white" id="stat-pending-users">0</div>
+          <div class="text-amber-400 text-xs mt-2 font-semibold cursor-pointer hover:underline" onclick="filterPendingKYC()">Tinjau dokumen sekarang →</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-rose-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Akun Risiko Tinggi (High Risk)</div>
+          <div class="text-3xl font-black text-white" id="stat-highrisk-users">0</div>
+          <div class="text-rose-400 text-xs mt-2 font-semibold">Memerlukan investigasi fraud</div>
+        </div>
+      </div>
+
+      <!-- PANEL PENCARIAN & FILTER -->
+      <div class="glass p-6 rounded-2xl mb-8 border-l-4 border-indigo-500">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+          <div class="w-full sm:w-96 relative">
+            <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400 text-xs"></i>
+            <input type="text" id="searchUserQuery" onkeyup="filterUserDirectory()" placeholder="Cari berdasarkan Nama, Email, atau No HP..." class="w-full bg-slate-900 border border-cardborder rounded-xl pl-10 pr-4 py-2.5 text-xs text-white font-medium focus:outline-none">
+          </div>
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <select id="filterRole" onchange="filterUserDirectory()" class="bg-slate-900 border border-cardborder rounded-xl px-3 py-2.5 text-xs text-white font-bold focus:outline-none">
+              <option value="ALL">Semua Peran (Role)</option>
+              <option value="customer">Customer (Pelanggan)</option>
+              <option value="driver">Driver / Rider</option>
+              <option value="merchant">Mitra Toko / Kuliner</option>
+              <option value="admin">Administrator</option>
+            </select>
+            <select id="filterStatus" onchange="filterUserDirectory()" class="bg-slate-900 border border-cardborder rounded-xl px-3 py-2.5 text-xs text-white font-bold focus:outline-none">
+              <option value="ALL">Semua Status</option>
+              <option value="active">Aktif</option>
+              <option value="suspended">Dibekukan / Banned</option>
+              <option value="pending">Pending KYC</option>
+            </select>
+            <button onclick="fetchRealUserDirectory()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-2">
+              <i class="fa-solid fa-rotate"></i> Muat Ulang
+            </button>
+          </div>
+        </div>
+
+        <!-- TABEL DIREKTORI PENGGUNA -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900 uppercase text-slate-400 font-bold border-b border-cardborder">
+              <tr>
+                <th class="p-3">Pengguna & UUID</th>
+                <th class="p-3">Kontak & Telepon</th>
+                <th class="p-3">Peran (Role)</th>
+                <th class="p-3">Saldo Dompet</th>
+                <th class="p-3">Skor Risiko & Status</th>
+                <th class="p-3 text-center">Aksi / Kontrol Mutlak</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-cardborder font-mono text-[11px]" id="userDirectoryTable">
+              <tr>
+                <td colspan="6" class="p-6 text-center text-slate-500 font-sans">Menghubungkan langsung ke database Supabase...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- JURNAL AUDIT AKTIVITAS & JEJAK IP -->
+      <div class="glass p-6 rounded-2xl border-l-4 border-amber-500">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-amber-400"></i> Jurnal Audit Aktivitas & Jejak IP Real-Time
+          </h3>
+          <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded-full font-bold">Security Stream Active</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900 uppercase text-slate-400 font-bold border-b border-cardborder">
+              <tr>
+                <th class="p-3">Waktu</th>
+                <th class="p-3">ID Pengguna</th>
+                <th class="p-3">Aktivitas / Peristiwa</th>
+                <th class="p-3">Alamat IP / Perangkat</th>
+                <th class="p-3">Status Keamanan</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-cardborder font-mono text-[11px]" id="auditLogTable">
+              <tr>
+                <td class="p-3">12:26:00</td>
+                <td class="p-3 text-blue-400">SYS-IAM-CORE</td>
+                <td class="p-3">Inisialisasi Modul Pengendalian Pengguna v32.0 (Realtime DB)</td>
+                <td class="p-3 text-slate-400">127.0.0.1 (Secure Local)</td>
+                <td class="p-3 text-emerald-400 font-bold">Aman</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL DETAIL -->
+  <div id="userDetailModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+    <div class="glass w-full max-w-2xl p-6 rounded-2xl border border-cardborder relative max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-cardborder">
+        <h3 class="text-base font-black text-white flex items-center gap-2"><i class="fa-solid fa-id-card text-blue-400"></i> Detail Profil & Verifikasi KYC</h3>
+        <button onclick="closeUserDetailModal()" class="text-slate-400 hover:text-white text-sm font-bold"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="modalDetailContent" class="space-y-4 text-xs font-mono text-slate-300">
+        Memuat data...
+      </div>
+      <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-cardborder">
+        <button onclick="closeUserDetailModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT MURNI REALTIME SUPABASE TANPA DATA TIRUAN -->
+  <script>
+    const SUPABASE_URL = 'https://yutzwenmideyjmntwte.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+    
+    let _supabase = null;
+    let cachedProfiles = [];
+
+    try {
+      if (window.supabase && SUPABASE_URL.startsWith('https://')) {
+        _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch (e) {
+      console.error('Supabase init error:', e);
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    // TARIK DATA MURNI DARI SUPABASE DENGAN PENANGANAN ERROR YANG AMAN
+    async function fetchRealUserDirectory() {
+      if (!_supabase) {
+        document.getElementById('userDirectoryTable').innerHTML = `
+          <tr><td colspan="6" class="p-6 text-center text-rose-400 font-sans">
+            Klien Supabase belum terinisialisasi. Periksa koneksi SDK Anda.
+          </td></tr>`;
+        return;
+      }
+
+      try {
+        const { data: profiles, error } = await _supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+
+        cachedProfiles = profiles || [];
+        renderUserTable(cachedProfiles);
+        updateStatistics(cachedProfiles);
+        
+        document.getElementById('connection-status-text').innerText = "Supabase: Terhubung (Realtime API)";
+        document.getElementById('status-dot').className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+
+      } catch (err) {
+        console.warn("Pesan koneksi:", err.message);
+        cachedProfiles = [];
+        renderUserTable(cachedProfiles);
+        updateStatistics(cachedProfiles);
+        
+        document.getElementById('connection-status-text').innerText = "Supabase: Tabel Belum Dibuat / Kosong";
+        document.getElementById('status-dot').className = "w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse";
+      }
+    }
+
+    function updateStatistics(profiles) {
+      const total = profiles.length;
+      const activeCount = profiles.filter(p => p.status === 'active' || !p.status).length;
+      const pendingCount = profiles.filter(p => p.status === 'pending').length;
+      const highRiskCount = profiles.filter(p => p.risk_score && p.risk_score > 75).length;
+
+      document.getElementById('stat-total-users').innerText = total.toLocaleString('id-ID');
+      document.getElementById('stat-active-users').innerText = activeCount.toLocaleString('id-ID');
+      document.getElementById('stat-pending-users').innerText = pendingCount.toLocaleString('id-ID');
+      document.getElementById('stat-highrisk-users').innerText = highRiskCount.toLocaleString('id-ID');
+    }
+
+    function renderUserTable(dataList) {
+      const tableBody = document.getElementById('userDirectoryTable');
+      if (dataList.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-sans">Database Supabase saat ini bersih (belum ada data pengguna). Silakan klik tombol <b>'Tambah Akun Manual'</b> di atas atau masukkan data via SQL Editor Supabase.</td></tr>`;
+        return;
+      }
+
+      tableBody.innerHTML = '';
+      dataList.forEach(user => {
+        const riskBadge = (user.risk_score && user.risk_score > 75) 
+          ? '<span class="text-rose-400 font-bold">High Risk</span>' 
+          : '<span class="text-emerald-400 font-bold">Low Risk</span>';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-3">
+            <div class="font-bold text-white font-sans text-xs">${user.full_name || 'Tanpa Nama'}</div>
+            <div class="text-slate-500">${user.id}</div>
+          </td>
+          <td class="p-3">${user.phone || '-'}<br><span class="text-slate-500">${user.email || '-'}</span></td>
+          <td class="p-3"><span class="px-2 py-1 bg-blue-950 text-blue-400 border border-blue-800/50 rounded-lg font-bold">${user.role || 'customer'}</span></td>
+          <td class="p-3 text-emerald-400 font-bold">Rp ${(user.wallet_balance || 0).toLocaleString('id-ID')}</td>
+          <td class="p-3">${riskBadge}<br><span class="text-slate-400">${user.status || 'active'}</span></td>
+          <td class="p-3 text-center space-x-1">
+            <button onclick="openUserDetailModal('${user.id}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-blue-400 rounded-lg transition" title="Detail Akun"><i class="fa-solid fa-eye"></i></button>
+            <button onclick="openWalletAdjustModal('${user.id}', '${user.full_name || 'Pengguna'}', ${user.wallet_balance || 0})" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg transition" title="Atur Saldo"><i class="fa-solid fa-wallet"></i></button>
+            <button onclick="toggleUserBanStatus('${user.id}', '${user.status}')" class="px-2.5 py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-400 rounded-lg transition" title="Blokir/Banned Akun"><i class="fa-solid fa-ban"></i></button>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function filterUserDirectory() {
+      const query = document.getElementById('searchUserQuery').value.toLowerCase();
+      const role = document.getElementById('filterRole').value;
+      const status = document.getElementById('filterStatus').value;
+
+      let filtered = cachedProfiles.filter(user => {
+        const matchQuery = (user.full_name && user.full_name.toLowerCase().includes(query)) || 
+                           (user.email && user.email.toLowerCase().includes(query)) || 
+                           (user.phone && user.phone.includes(query));
+        const matchRole = role === 'ALL' || user.role === role;
+        const matchStatus = status === 'ALL' || (user.status || 'active') === status;
+
+        return matchQuery && matchRole && matchStatus;
+      });
+
+      renderUserTable(filtered);
+    }
+
+    async function openWalletAdjustModal(userId, name, currentBalance) {
+      const amount = prompt("Masukkan jumlah nominal penyesuaian saldo (Rp) untuk " + name + " (Gunakan minus '-' untuk mengurangi):", "50000");
+      if (amount && _supabase) {
+        const numericAmount = parseFloat(amount);
+        const newBalance = currentBalance + numericAmount;
+
+        const { error } = await _supabase.from('profiles').update({ wallet_balance: newBalance }).eq('id', userId);
+        if (error) {
+          alert("Gagal memperbarui saldo ke Supabase: " + error.message);
+        } else {
+          alert("Saldo dompet berhasil diperbarui secara real-time di database!");
+          fetchRealUserDirectory();
+        }
+      }
+    }
+
+    async function toggleUserBanStatus(userId, currentStatus) {
+      const newStatus = (currentStatus === 'suspended' || currentStatus === 'banned') ? 'active' : 'suspended';
+      if (confirm("Ubah status akun ini menjadi " + newStatus.toUpperCase() + " di database Supabase?")) {
+        const { error } = await _supabase.from('profiles').update({ status: newStatus }).eq('id', userId);
+        if (error) {
+          alert("Gagal mengubah status: " + error.message);
+        } else {
+          alert("Status akun berhasil diperbarui secara real-time.");
+          fetchRealUserDirectory();
+        }
+      }
+    }
+
+    function openUserDetailModal(userId) {
+      const user = cachedProfiles.find(p => p.id === userId);
+      const content = document.getElementById('modalDetailContent');
+      if (user) {
+        content.innerHTML = `
+          <div class="grid grid-cols-2 gap-4 bg-slate-900/60 p-4 rounded-xl border border-cardborder">
+            <div><span class="text-slate-500">Nama Lengkap:</span><div class="text-white font-bold">${user.full_name || '-'}</div></div>
+            <div><span class="text-slate-500">UUID Akun:</span><div class="text-white text-[10px]">${user.id}</div></div>
+            <div><span class="text-slate-500">Email:</span><div class="text-white">${user.email || '-'}</div></div>
+            <div><span class="text-slate-500">No Telepon:</span><div class="text-white">${user.phone || '-'}</div></div>
+            <div><span class="text-slate-500">Peran (Role):</span><div class="text-blue-400 font-bold">${user.role || 'customer'}</div></div>
+            <div><span class="text-slate-500">Saldo Dompet:</span><div class="text-emerald-400 font-bold">Rp ${(user.wallet_balance || 0).toLocaleString('id-ID')}</div></div>
+          </div>
+        `;
+      }
+      document.getElementById('userDetailModal').classList.remove('hidden');
+    }
+
+    function closeUserDetailModal() {
+      document.getElementById('userDetailModal').classList.add('hidden');
+    }
+
+    function openAddNewUserModal() {
+      const name = prompt("Masukkan Nama Lengkap Pengguna Baru:");
+      const email = prompt("Masukkan Email Pengguna Baru:");
+      const phone = prompt("Masukkan No Telepon Pengguna Baru:");
+      if (name && email && _supabase) {
+        (async () => {
+          const { error } = await _supabase.from('profiles').insert([
+            { full_name: name, email: email, phone: phone, role: 'customer', wallet_balance: 0, risk_score: 10, status: 'active' }
+          ]);
+          if (error) {
+            alert("Gagal menambahkan pengguna baru ke Supabase: " + error.message);
+          } else {
+            alert("Pengguna baru berhasil ditambahkan dan tersimpan secara nyata di database!");
+            fetchRealUserDirectory();
+          }
+        })();
+      }
+    }
+
+    function openBulkActionModal() {
+      alert("Fitur Aksi Massal terhubung dengan fungsi server Supabase.");
+    }
+
+    function filterPendingKYC() {
+      document.getElementById('filterStatus').value = 'pending';
+      filterUserDirectory();
+    }
+
+    window.onload = () => {
+      fetchRealUserDirectory();
+    };
+  </script>
+</body>
+</html>

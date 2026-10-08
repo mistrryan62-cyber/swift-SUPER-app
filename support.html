@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIFT — Pusat Bantuan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { darkbg: '#030712', cardbg: '#0f172a', cardborder: '#1e293b' } } } }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body { background-color: #030712; color: #f8fafc; font-family: system-ui, sans-serif; padding-bottom: 40px; }
+        .swift-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 28px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        @media (min-width: 768px) {
+            body { background: radial-gradient(circle at center, #1e1b4b 0%, #030712 100%); padding: 24px 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+            .app-wrapper { width: 100%; max-width: 480px; background: #030712; border-radius: 36px; border: 1px solid #1e293b; overflow: hidden; position: relative; }
+        }
+        @media (max-width: 767px) { .app-wrapper { width: 100%; } }
+    </style>
+</head>
+<body class="antialiased">
+<div class="app-wrapper">
+    <header class="bg-[#0b0f19] border-b border-[#1e293b] p-4 flex items-center justify-between sticky top-0 z-50">
+        <a href="index.html" class="text-slate-400 hover:text-white text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
+        <h1 class="text-sm font-black text-white uppercase tracking-wider">Pusat Bantuan</h1>
+        <div class="w-10"></div>
+    </header>
+
+    <main class="p-4 flex flex-col gap-4">
+        <div class="swift-card text-center space-y-3 bg-gradient-to-br from-slate-900 to-emerald-950/40">
+            <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                <i class="fa-solid fa-headset"></i>
+            </div>
+            <h3 class="font-extrabold text-white text-base">Butuh Bantuan Langsung?</h3>
+            <p class="text-xs text-slate-300">Tim dukungan pelanggan enterprise SWIFT siap melayani Anda 24/7 secara real-time.</p>
+            <button onclick="alert('Menghubungkan ke agen dukungan pusat...')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-extrabold py-2.5 px-6 rounded-full transition shadow">Live Chat Dukungan</button>
+        </div>
+
+        <div class="swift-card space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pertanyaan Populer (FAQ)</h3>
+            <div class="space-y-2 text-xs">
+                <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800">
+                    <div class="font-bold text-white mb-1">Bagaimana cara top up saldo SWIFT Pay?</div>
+                    <p class="text-slate-400">Anda dapat melakukan top up instan langsung melalui tombol Top Up di beranda atau menu Dompet.</p>
+                </div>
+                <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800">
+                    <div class="font-bold text-white mb-1">Bagaimana sistem Master Admin terhubung?</div>
+                    <p class="text-slate-400">Semua aktivitas dan transaksi otomatis tersinkronisasi lewat state engine aman di latar belakang.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

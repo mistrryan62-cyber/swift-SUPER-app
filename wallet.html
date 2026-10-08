@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIFT — Dompet & Keuangan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { darkbg: '#030712', cardbg: '#0f172a', cardborder: '#1e293b' } } } }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body { background-color: #030712; color: #f8fafc; font-family: system-ui, sans-serif; padding-bottom: 40px; }
+        .swift-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 28px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        @media (min-width: 768px) {
+            body { background: radial-gradient(circle at center, #1e1b4b 0%, #030712 100%); padding: 24px 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+            .app-wrapper { width: 100%; max-width: 480px; background: #030712; border-radius: 36px; border: 1px solid #1e293b; overflow: hidden; position: relative; }
+        }
+        @media (max-width: 767px) { .app-wrapper { width: 100%; } }
+    </style>
+</head>
+<body class="antialiased">
+<div class="app-wrapper">
+    <header class="bg-[#0b0f19] border-b border-[#1e293b] p-4 flex items-center justify-between sticky top-0 z-50">
+        <a href="index.html" class="text-slate-400 hover:text-white text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
+        <h1 class="text-sm font-black text-white uppercase tracking-wider">Dompet SWIFT Pay</h1>
+        <div class="w-10"></div>
+    </header>
+
+    <main class="p-4 flex flex-col gap-4">
+        <!-- Kartu Saldo Utama -->
+        <div class="swift-card bg-gradient-to-br from-emerald-950/60 to-slate-900 border-l-4 border-emerald-500">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Saldo Aktif</span>
+            <h2 class="text-3xl font-black text-white mt-1 mb-3">RM <span id="wallet-balance">150.00</span></h2>
+            <div class="flex gap-2">
+                <button onclick="topUpWallet()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-xs py-2.5 rounded-full transition shadow">Top Up Instan</button>
+                <button onclick="withdrawWallet()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2.5 rounded-full transition border border-slate-700">Tarik Tunai</button>
+            </div>
+        </div>
+
+        <!-- Riwayat Transaksi -->
+        <div class="swift-card space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mutasi Transaksi Real-Time</h3>
+            <div id="transaction-list" class="space-y-2 text-xs">
+                <div class="flex justify-between items-center p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
+                    <div>
+                        <div class="font-bold text-white">Top Up Saldo SWIFT</div>
+                        <div class="text-[10px] text-slate-400">Hari ini, 12:30 MYR</div>
+                    </div>
+                    <span class="font-black text-emerald-400">+RM 50.00</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
+                    <div>
+                        <div class="font-bold text-white">Pembelian Burger King</div>
+                        <div class="text-[10px] text-slate-400">Kemarin, 19:15 MYR</div>
+                    </div>
+                    <span class="font-black text-red-400">-RM 10.50</span>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function updateBalanceView() {
+        const bal = localStorage.getItem('swift_user_balance') || '150.00';
+        document.getElementById('wallet-balance').innerText = parseFloat(bal).toFixed(2);
+    }
+    function topUpWallet() {
+        let bal = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
+        bal += 100.00;
+        localStorage.setItem('swift_user_balance', bal.toFixed(2));
+        updateBalanceView();
+        alert('Top Up berhasil +RM 100.00!');
+    }
+    function withdrawWallet() {
+        alert('Fitur penarikan tunai terhubung dengan gerbang pembayaran pusat.');
+    }
+    window.onload = updateBalanceView;
+</script>
+</body>
+</html>

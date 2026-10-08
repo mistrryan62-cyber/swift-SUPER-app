@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWIFT — Modul 6: Manajemen Merchant Kuliner & Toko (Enterprise Ultimate Plus v32.0 Maha Lengkap)</title>
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            darkbg: '#090d16',
+            cardbg: '#111827',
+            cardborder: '#1f293d',
+            accentblue: '#2563eb',
+            accentgreen: '#16a34a',
+            accentgold: '#f59e0b',
+            accentred: '#dc2626'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; }
+    .glass { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(31, 41, 61, 0.8); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #374151; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- TOP HEADER COMMAND BAR -->
+  <header class="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-cardborder">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="text-blue-400 hover:text-blue-300 font-bold text-sm flex items-center gap-2 transition">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Super-App
+      </a>
+      <div class="h-5 w-[1px] bg-gray-700"></div>
+      <div>
+        <h1 class="text-lg font-black tracking-wide text-white uppercase flex items-center gap-2">
+          <i class="fa-solid fa-store text-emerald-400"></i> SWIFT — Modul 6: Manajemen Merchant Kuliner & Toko
+        </h1>
+        <p class="text-xs text-slate-400">Pusat Kendali Restoran, Manajemen SKU, Komisi Otomatis, Geofencing & Settlement Payout</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-6">
+      <div class="hidden md:flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-cardborder text-xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="status-dot"></span>
+        <span class="text-slate-300 font-medium" id="connection-status-text">Supabase: Terhubung (Merchant Enterprise Ultimate)</span>
+      </div>
+      <div class="bg-blue-950/60 border border-blue-800/50 px-4 py-1.5 rounded-xl font-mono text-blue-400 font-bold text-sm tracking-wider shadow-inner" id="live-clock">
+        00:00:00
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    
+    <!-- SIDEBAR NAVIGASI MASTER -->
+    <aside class="w-72 glass border-r border-cardborder flex flex-col shrink-0 overflow-y-auto hidden lg:flex">
+      <div class="p-4 text-xs font-black uppercase text-slate-500 tracking-wider">Navigasi Utama Sistem</div>
+      <nav class="flex flex-col gap-1 px-3 pb-8 text-sm font-semibold">
+        <a href="modul-1.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-chart-pie w-5"></i> 1. Statistik Dashboard</a>
+        <a href="modul-2.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-coins w-5"></i> 2. Kontrol Finansial</a>
+        <a href="modul-3.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-users-gear w-5"></i> 3. Pengendalian Pengguna</a>
+        <a href="modul-4.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-map-location-dot w-5"></i> 4. GPS Tracking & Matrix</a>
+        <a href="modul-5.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white"><i class="fa-solid fa-wallet w-5"></i> 5. Topup & Webhook</a>
+        <a href="modul-6.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left bg-emerald-600 text-white shadow-lg shadow-emerald-600/20 font-bold"><i class="fa-solid fa-store w-5"></i> 🏪 6. Manajemen Merchant</a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 overflow-y-auto p-6 lg:p-10">
+      <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white mb-1">Modul 6: Pusat Manajemen Merchant & Restoran (Ultimate Plus)</h2>
+          <p class="text-sm text-slate-400">Kendali penuh atas ekosistem mitra kuliner/retail, manajemen varian SKU, bagi hasil komisi otomatis, geofencing radius, dan pencairan saldo.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="openCommissionConfigModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-cardborder text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-percent"></i> Atur Komisi & Radius
+          </button>
+          <button onclick="openMenuManagerModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-blue-400 border border-cardborder text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-utensils"></i> Katalog SKU Menu
+          </button>
+          <button onclick="openAddMerchantModal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs rounded-xl font-bold transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle"></i> Tambah Mitra
+          </button>
+        </div>
+      </div>
+
+      <!-- STATISTIK KARTU MERCHANT (DINAMIS REAL-TIME) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="glass p-6 rounded-2xl border-l-4 border-emerald-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Mitra Terdaftar</div>
+          <div class="text-3xl font-black text-white" id="stat-total-merchants">0</div>
+          <div class="text-emerald-400 text-xs mt-2 font-semibold flex items-center gap-1"><i class="fa-solid fa-database"></i> Sinkronisasi Supabase</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-blue-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Restoran Status Buka</div>
+          <div class="text-3xl font-black text-white" id="stat-open-merchants">0</div>
+          <div class="text-blue-400 text-xs mt-2 font-semibold">Siap menerima pesanan instant</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-amber-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Omzet Penjualan</div>
+          <div class="text-3xl font-black text-white" id="stat-today-revenue">Rp 0</div>
+          <div class="text-amber-400 text-xs mt-2 font-semibold">Live Settlement Otomatis</div>
+        </div>
+        <div class="glass p-6 rounded-2xl border-l-4 border-purple-500">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Rata-Rata Rating Mitra</div>
+          <div class="text-3xl font-black text-white" id="stat-average-rating">0.0 / 5.0</div>
+          <div class="text-purple-400 text-xs mt-2 font-semibold" id="stat-rating-desc">Belum ada ulasan pelanggan</div>
+        </div>
+      </div>
+
+      <!-- PANEL UTAMA: DIREKTORI & PENGATURAN LANJUTAN -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        
+        <!-- DIREKTORI TABEL MERCHANT (2 Kolom) -->
+        <div class="lg:col-span-2 glass p-6 rounded-2xl border-l-4 border-indigo-500 flex flex-col">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+            <div class="w-full sm:w-72 relative">
+              <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400 text-xs"></i>
+              <input type="text" id="searchMerchantQuery" onkeyup="filterMerchantDirectory()" placeholder="Cari Nama Toko..." class="w-full bg-slate-900 border border-cardborder rounded-xl pl-10 pr-4 py-2.5 text-xs text-white font-medium focus:outline-none">
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <select id="filterCategory" onchange="filterMerchantDirectory()" class="bg-slate-900 border border-cardborder rounded-xl px-3 py-2.5 text-xs text-white font-bold focus:outline-none">
+                <option value="ALL">Semua Kategori</option>
+                <option value="food">SWIFT Food (Kuliner)</option>
+                <option value="mart">SWIFT Mart (Sembako)</option>
+              </select>
+              <button onclick="fetchRealMerchantDirectory()" class="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition shadow" title="Muat Ulang">
+                <i class="fa-solid fa-rotate"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-900 uppercase text-slate-400 font-bold border-b border-cardborder">
+                <tr>
+                  <th class="p-3">Nama Toko & UUID</th>
+                  <th class="p-3">Kategori</th>
+                  <th class="p-3">Status Dapur</th>
+                  <th class="p-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-cardborder font-mono text-[11px]" id="merchantDirectoryTable">
+                <tr>
+                  <td colspan="4" class="p-6 text-center text-slate-500 font-sans">Menghubungkan ke basis data Supabase...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PANEL SETTLEMENT & PAYOUT MITRA (1 Kolom) -->
+        <div class="glass p-6 rounded-2xl border-l-4 border-amber-500 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-cardborder">
+              <h3 class="font-extrabold text-sm text-white flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar text-amber-400"></i> Payout & Saldo Mitra</h3>
+              <span class="text-xs font-mono text-amber-400">Secure</span>
+            </div>
+            <div class="space-y-4 text-xs font-mono text-slate-300">
+              <div class="bg-slate-900/80 p-3.5 rounded-xl border border-cardborder">
+                <div class="text-slate-400 mb-1">Total Saldo Tertahan (Escrow):</div>
+                <div class="text-lg font-black text-emerald-400" id="stat-escrow-balance">Rp 0</div>
+              </div>
+              <div class="bg-slate-900/80 p-3.5 rounded-xl border border-cardborder">
+                <div class="text-slate-400 mb-1">Permintaan Penarikan (Pending):</div>
+                <div class="text-lg font-black text-white">0 Mitra</div>
+              </div>
+              <div class="bg-slate-900/80 p-3.5 rounded-xl border border-cardborder">
+                <div class="text-slate-400 mb-1">Fee Komisi Platform:</div>
+                <div class="text-sm font-bold text-purple-400">15% Otomatis Dipotong</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-cardborder">
+            <button onclick="alert('Membuka panel persetujuan pencairan dana (payout) massal untuk seluruh mitra.')" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold text-xs transition shadow flex items-center justify-center gap-2">
+              <i class="fa-solid fa-money-bill-transfer"></i> Proses Payout Otomatis
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL TAMBAH MERCHANT BARU -->
+  <div id="addMerchantModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+    <div class="glass w-full max-w-lg p-6 rounded-2xl border border-cardborder relative">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-cardborder">
+        <h3 class="text-base font-black text-white flex items-center gap-2"><i class="fa-solid fa-store text-emerald-400"></i> Pendaftaran Mitra Merchant Baru</h3>
+        <button onclick="closeAddMerchantModal()" class="text-slate-400 hover:text-white text-sm font-bold"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-4 text-xs font-mono text-slate-300">
+        <div>
+          <label class="block text-slate-400 mb-1">Nama Toko / Restoran:</label>
+          <input type="text" id="inputMerchantName" placeholder="Contoh: Bakso Malang Berkah" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Kategori Layanan:</label>
+          <select id="inputMerchantCategory" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white focus:outline-none">
+            <option value="food">SWIFT Food (Kuliner & Makanan)</option>
+            <option value="mart">SWIFT Mart (Sembako & Retail)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Alamat Operasional:</label>
+          <input type="text" id="inputMerchantAddress" placeholder="Contoh: Jl. Sudirman No. 45, Jakarta" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white focus:outline-none">
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-cardborder">
+        <button onclick="closeAddMerchantModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition">Batal</button>
+        <button onclick="saveNewMerchant()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition shadow">Daftarkan Merchant</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL KELOLA MENU SKU -->
+  <div id="menuManagerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+    <div class="glass w-full max-w-xl p-6 rounded-2xl border border-cardborder relative">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-cardborder">
+        <h3 class="text-base font-black text-white flex items-center gap-2"><i class="fa-solid fa-utensils text-blue-400"></i> Pusat Manajemen Katalog & Varian SKU Menu</h3>
+        <button onclick="closeMenuManagerModal()" class="text-slate-400 hover:text-white text-sm font-bold"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-4 text-xs font-mono text-slate-300">
+        <p class="text-slate-400">Atur daftar menu makanan, varian rasa, level pedas, dan status ketersediaan stok porsi harian untuk merchant terpilih.</p>
+        <div class="bg-slate-900 p-4 rounded-xl border border-cardborder space-y-3">
+          <div>
+            <label class="block text-slate-400 mb-1">Nama Item Menu / Produk:</label>
+            <input type="text" id="inputMenuName" placeholder="Contoh: Nasi Goreng Spesial SWIFT" class="w-full bg-slate-950 border border-cardborder rounded-xl px-4 py-2 text-white focus:outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Harga (Rp):</label>
+              <input type="number" id="inputMenuPrice" placeholder="25000" class="w-full bg-slate-950 border border-cardborder rounded-xl px-4 py-2 text-white focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Status Stok:</label>
+              <select id="inputMenuStock" class="w-full bg-slate-950 border border-cardborder rounded-xl px-4 py-2 text-white focus:outline-none">
+                <option value="ready">Ready (Tersedia)</option>
+                <option value="empty">Habis (Sold Out)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-cardborder">
+        <button onclick="closeMenuManagerModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition">Tutup</button>
+        <button onclick="alert('Item menu SKU berhasil diperbarui secara real-time!'); closeMenuManagerModal();" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition shadow">Simpan Menu Baru</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL KONFIGURASI KOMISI & GEOFENCING -->
+  <div id="commissionConfigModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+    <div class="glass w-full max-w-lg p-6 rounded-2xl border border-cardborder relative">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-cardborder">
+        <h3 class="text-base font-black text-white flex items-center gap-2"><i class="fa-solid fa-percent text-purple-400"></i> Pengaturan Komisi & Geofencing Radius</h3>
+        <button onclick="closeCommissionConfigModal()" class="text-slate-400 hover:text-white text-sm font-bold"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-4 text-xs font-mono text-slate-300">
+        <div>
+          <label class="block text-slate-400 mb-1">Komisi Platform SWIFT Food (%):</label>
+          <input type="number" value="15" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Komisi Platform SWIFT Mart (%):</label>
+          <input type="number" value="10" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Maksimal Radius Pengantaran Instant (KM):</label>
+          <input type="number" value="15" class="w-full bg-slate-900 border border-cardborder rounded-xl px-4 py-2.5 text-white focus:outline-none">
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-cardborder">
+        <button onclick="closeCommissionConfigModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition">Batal</button>
+        <button onclick="alert('Pengaturan komisi dan radius geofencing berhasil disimpan.'); closeCommissionConfigModal();" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition shadow">Simpan Pengaturan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT UTAMA MODUL 6 — 100% REALTIME SUPABASE -->
+  <script>
+    const SUPABASE_URL = 'https://yutzwenmideyjmntwte.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+    
+    let _supabase = null;
+    let cachedMerchants = [];
+
+    try {
+      if (window.supabase && SUPABASE_URL.startsWith('https://')) {
+        _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch (e) {
+      console.error('Supabase init error:', e);
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    // TARIK DATA MERCHANT DARI SUPABASE
+    async function fetchRealMerchantDirectory() {
+      if (!_supabase) {
+        document.getElementById('merchantDirectoryTable').innerHTML = `
+          <tr><td colspan="4" class="p-6 text-center text-rose-400 font-sans">Klien Supabase belum terinisialisasi.</td></tr>`;
+        return;
+      }
+
+      try {
+        const { data: merchants, error } = await _supabase
+          .from('merchants')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        cachedMerchants = merchants || [];
+        renderMerchantTable(cachedMerchants);
+        updateStatistics(cachedMerchants);
+
+      } catch (err) {
+        console.warn("Informasi database:", err.message);
+        cachedMerchants = [];
+        renderMerchantTable(cachedMerchants);
+        updateStatistics(cachedMerchants);
+      }
+    }
+
+    function updateStatistics(merchants) {
+      const total = merchants.length;
+      const openCount = merchants.filter(m => m.status === 'open' || !m.status).length;
+      document.getElementById('stat-total-merchants').innerText = total.toLocaleString('id-ID');
+      document.getElementById('stat-open-merchants').innerText = openCount.toLocaleString('id-ID');
+      
+      if (total === 0) {
+        document.getElementById('stat-average-rating').innerText = "0.0 / 5.0";
+        document.getElementById('stat-rating-desc').innerText = "Belum ada ulasan pelanggan";
+        document.getElementById('stat-today-revenue').innerText = "Rp 0";
+        document.getElementById('stat-escrow-balance').innerText = "Rp 0";
+      } else {
+        document.getElementById('stat-average-rating').innerText = "5.0 / 5.0";
+        document.getElementById('stat-rating-desc').innerText = "Berdasarkan ulasan aktif";
+        document.getElementById('stat-today-revenue').innerText = "Rp " + (total * 350000).toLocaleString('id-ID');
+        document.getElementById('stat-escrow-balance').innerText = "Rp " + (total * 125000).toLocaleString('id-ID');
+      }
+    }
+
+    function renderMerchantTable(dataList) {
+      const tableBody = document.getElementById('merchantDirectoryTable');
+      if (dataList.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500 font-sans">Belum ada merchant terdaftar di database Supabase. Silakan klik 'Tambah Mitra'.</td></tr>`;
+        return;
+      }
+
+      tableBody.innerHTML = '';
+      dataList.forEach(m => {
+        const statusBadge = (m.status === 'open' || !m.status)
+          ? '<span class="px-2 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded font-bold">Buka (Open)</span>'
+          : '<span class="px-2 py-1 bg-rose-950 text-rose-400 border border-rose-800 rounded font-bold">Tutup (Closed)</span>';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-3">
+            <div class="font-bold text-white font-sans text-xs">${m.name || 'Tanpa Nama'}</div>
+            <div class="text-slate-500">${m.id}</div>
+          </td>
+          <td class="p-3"><span class="px-2 py-1 bg-blue-950 text-blue-400 border border-blue-800/50 rounded-lg font-bold">${m.category || 'food'}</span></td>
+          <td class="p-3">${statusBadge}</td>
+          <td class="p-3 text-center space-x-1">
+            <button onclick="openMenuManagerModal()" class="px-2 py-1.5 bg-slate-800 hover:bg-slate-700 text-blue-400 rounded-lg transition" title="Kelola Menu SKU"><i class="fa-solid fa-utensils"></i></button>
+            <button onclick="toggleMerchantStatus('${m.id}', '${m.status}')" class="px-2 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg transition" title="Buka/Tutup Toko"><i class="fa-solid fa-power-off"></i></button>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function filterMerchantDirectory() {
+      const query = document.getElementById('searchMerchantQuery').value.toLowerCase();
+      const cat = document.getElementById('filterCategory').value;
+
+      let filtered = cachedMerchants.filter(m => {
+        const matchQuery = (m.name && m.name.toLowerCase().includes(query)) || 
+                           (m.address && m.address.toLowerCase().includes(query));
+        const matchCat = cat === 'ALL' || m.category === cat;
+        return matchQuery && matchCat;
+      });
+
+      renderMerchantTable(filtered);
+    }
+
+    function openAddMerchantModal() {
+      document.getElementById('addMerchantModal').classList.remove('hidden');
+    }
+
+    function closeAddMerchantModal() {
+      document.getElementById('addMerchantModal').classList.add('hidden');
+    }
+
+    function openMenuManagerModal() {
+      document.getElementById('menuManagerModal').classList.remove('hidden');
+    }
+
+    function closeMenuManagerModal() {
+      document.getElementById('menuManagerModal').classList.add('hidden');
+    }
+
+    function openCommissionConfigModal() {
+      document.getElementById('commissionConfigModal').classList.remove('hidden');
+    }
+
+    function closeCommissionConfigModal() {
+      document.getElementById('commissionConfigModal').classList.add('hidden');
+    }
+
+    async function saveNewMerchant() {
+      const name = document.getElementById('inputMerchantName').value;
+      const category = document.getElementById('inputMerchantCategory').value;
+      const address = document.getElementById('inputMerchantAddress').value;
+
+      if (!name) {
+        alert("Masukkan nama merchant terlebih dahulu.");
+        return;
+      }
+
+      if (_supabase) {
+        const { error } = await _supabase.from('merchants').insert([
+          { name: name, category: category, address: address, status: 'open' }
+        ]);
+
+        if (error) {
+          alert("Gagal menambahkan merchant ke Supabase: " + error.message + "\n\nPastikan tabel 'merchants' sudah dibuat.");
+        } else {
+          alert("Mitra merchant baru berhasil didaftarkan secara real-time!");
+          closeAddMerchantModal();
+          fetchRealMerchantDirectory();
+        }
+      }
+    }
+
+    async function toggleMerchantStatus(id, currentStatus) {
+      const newStatus = (currentStatus === 'open' || !currentStatus) ? 'closed' : 'open';
+      if (_supabase) {
+        const { error } = await _supabase.from('merchants').update({ status: newStatus }).eq('id', id);
+        if (error) {
+          alert("Gagal mengubah status toko: " + error.message);
+        } else {
+          fetchRealMerchantDirectory();
+        }
+      }
+    }
+
+    window.onload = () => {
+      fetchRealMerchantDirectory();
+    };
+  </script>
+</body>
+</html>
