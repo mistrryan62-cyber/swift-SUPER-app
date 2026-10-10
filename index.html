@@ -103,19 +103,6 @@
             border: 1px solid #1e293b; padding: 24px; box-shadow: 0 -20px 50px rgba(0,0,0,0.8);
         }
 
-        .radar-map-simulation {
-            position: relative; width: 100%; height: 160px; background: #070a12; border-radius: 20px;
-            overflow: hidden; border: 1px solid #1e293b; display: flex; align-items: center; justify-content: center;
-        }
-        .radar-ping {
-            position: absolute; width: 12px; height: 12px; background: #10b981; border-radius: 50%;
-            box-shadow: 0 0 10px #10b981; animation: radarWave 2s infinite;
-        }
-        @keyframes radarWave {
-            0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(3.5); opacity: 0; }
-        }
-
         .app-page { display: none; }
         .app-page.active { display: flex; flex-direction: column; gap: 16px; }
 
@@ -129,6 +116,63 @@
     </style>
 </head>
 <body class="antialiased">
+
+<div id="global-announcement-banner"></div>
+
+<!-- ================= MODAL AUTH / LOGIN & REGISTER (SINKRON SUPABASE) ================= -->
+<div id="auth-modal" class="fixed inset-0 z-50 bg-[#030712] flex items-center justify-center p-3 sm:p-4">
+    <div class="w-full max-w-[420px] max-h-[90vh] bg-[#0f172a] border border-[#1e293b] rounded-[32px] p-5 shadow-2xl flex flex-col space-y-4 overflow-hidden">
+        
+        <div class="text-center space-y-1 flex-shrink-0">
+            <div class="w-12 h-12 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center text-emerald-400 text-xl mx-auto font-black shadow-lg">
+                <i class="fa-solid fa-motorcycle"></i>
+            </div>
+            <h2 class="text-lg font-black text-white tracking-wide">SWIFT Enterprise Ecosystem</h2>
+            <p id="auth-subtitle" class="text-[11px] text-slate-400">Silakan masuk atau daftar akun mitra mandiri Anda.</p>
+        </div>
+
+        <div class="flex bg-slate-900 p-1 rounded-full border border-slate-800 flex-shrink-0">
+            <button id="tab-login-btn" onclick="switchAuthTab('login')" class="flex-1 py-1.5 text-xs font-bold rounded-full text-white bg-emerald-500 transition cursor-pointer border-none">Masuk (Login)</button>
+            <button id="tab-register-btn" onclick="switchAuthTab('register')" class="flex-1 py-1.5 text-xs font-bold rounded-full text-slate-400 transition cursor-pointer border-none bg-transparent">Daftar Akun</button>
+        </div>
+
+        <div id="form-login" class="space-y-3 overflow-y-auto pr-1">
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Email / Username / No. HP</label>
+                <input type="text" id="login-identifier" placeholder="Contoh: papah atau email@domain.com" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Password</label>
+                <input type="password" id="login-password" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+            </div>
+            <button onclick="handleSupabaseLogin()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">LOGIN SEKARANG 🚀</button>
+        </div>
+
+        <div id="form-register" class="space-y-2.5 overflow-y-auto pr-1 hidden">
+            <div>
+                <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Nama Lengkap</label>
+                <input type="text" id="reg-nama" placeholder="Nama Lengkap Mitra" class="w-full bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Username / ID</label>
+                <input type="text" id="reg-username" placeholder="Username unik" class="w-full bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Email Aktif</label>
+                <input type="email" id="reg-email" placeholder="email@domain.com" class="w-full bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Nomor HP / WhatsApp</label>
+                <input type="tel" id="reg-phone" placeholder="08123456789" class="w-full bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Password</label>
+                <input type="password" id="reg-password" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+            </div>
+            <button onclick="handleSupabaseRegister()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">REGISTRASI MITRA BARU 📝</button>
+        </div>
+    </div>
+</div>
 
 <div class="app-wrapper">
     <header class="bg-[#0b0f19]/95 backdrop-blur border-b border-[#1e293b] py-3 px-4 sticky top-0 z-50">
@@ -170,7 +214,7 @@
             <div id="location-status-box" class="bg-[#1e293b]/80 backdrop-blur border border-slate-700/80 py-2.5 px-4 text-xs text-emerald-400 font-bold flex items-center justify-between rounded-pill-soft shadow-sm">
                 <div class="flex items-center gap-2">
                     <span class="pulse-dot"></span>
-                    <span id="location-status-text">Sistem Aktif & Terhubung Real-Time</span>
+                    <span id="location-status-text">Sistem Aktif & Terhubung Real-Time Supabase</span>
                 </div>
                 <span id="sync-mode-badge" class="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-pill-soft uppercase tracking-wider font-extrabold">LIVE ENGINE</span>
             </div>
@@ -226,13 +270,6 @@
                 <div id="service-panel-content" class="text-xs text-slate-300 space-y-3"></div>
             </div>
 
-            <div id="synced-public-modules-section" class="swift-card hidden border-purple-500/40">
-                <div class="text-[11px] font-black uppercase text-purple-400 tracking-wider mb-3 flex items-center gap-1.5">
-                    <i class="fa-solid fa-cube"></i> Modul Publik Ekosistem Aktif
-                </div>
-                <div id="public-menu-container" class="space-y-2"></div>
-            </div>
-
             <div class="swift-card">
                 <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Semua Layanan Utama</h3>
                 <div class="grid grid-cols-4 gap-2.5">
@@ -267,6 +304,10 @@
                     <div onclick="openLiveStreamModal()" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition border-none cursor-pointer">
                         <span class="text-xl mb-1 text-red-500 animate-pulse">📡</span>
                         <span class="text-[10px] font-semibold text-slate-200">Live</span>
+                    </div>
+                    <div onclick="openVideoUploadModal()" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer border border-purple-500/40 bg-purple-950/20">
+                        <span class="text-xl mb-1 text-purple-400">📹</span>
+                        <span class="text-[10px] font-semibold text-slate-200">Upload Video</span>
                     </div>
                 </div>
             </div>
@@ -384,11 +425,21 @@
         <!-- ================= HALAMAN 8: PROFIL ================= -->
         <div id="page-profil" class="app-page">
             <div class="swift-card flex items-center gap-4">
-                <div class="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center text-emerald-400 text-2xl font-black">SW</div>
+                <!-- Foto Profil Interaktif / Upload File -->
+                <div class="relative group cursor-pointer" onclick="document.getElementById('profile-avatar-file').click()" title="Klik untuk ganti Foto Profil">
+                    <div id="profile-avatar-container" class="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center text-emerald-400 text-2xl font-black overflow-hidden bg-cover bg-center">
+                        <span id="profile-initials">SW</span>
+                    </div>
+                    <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center text-white text-xs opacity-0 group-hover:opacity-100 transition">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <input type="file" id="profile-avatar-file" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+                </div>
+
                 <div>
-                    <h3 class="font-extrabold text-white text-base">Master Enterprise User</h3>
-                    <p class="text-xs text-slate-400">user@swift-ecosystem.com</p>
-                    <span class="inline-block mt-1 text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2.5 py-0.5 rounded-pill-soft border border-emerald-500/30">Verified Member</span>
+                    <h3 id="profile-name-label" class="font-extrabold text-white text-base">Master Enterprise User</h3>
+                    <p id="profile-email-label" class="text-xs text-slate-400">user@swift-ecosystem.com</p>
+                    <span id="profile-status-badge" class="inline-block mt-1 text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2.5 py-0.5 rounded-pill-soft border border-emerald-500/30 cursor-pointer" onclick="openProfileModal('Verifikasi')">Verified Member ✓</span>
                 </div>
             </div>
 
@@ -410,16 +461,17 @@
                     <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
                 </div>
 
-                <div onclick="alert('Sesi Anda ditutup. Keluar dari akun berhasil.'); logUserAction('Keluar dari Akun');" class="p-3 bg-red-950/30 hover:bg-red-900/30 rounded-2xl border border-red-900/40 flex justify-between items-center transition cursor-pointer">
+                <div onclick="handleLogout()" class="p-3 bg-red-950/30 hover:bg-red-900/30 rounded-2xl border border-red-900/40 flex justify-between items-center transition cursor-pointer">
                     <span class="text-xs font-semibold text-red-400 flex items-center gap-2"><i class="fa-solid fa-right-from-bracket"></i> Keluar Akun</span>
                     <i class="fa-solid fa-chevron-right text-xs text-red-500"></i>
                 </div>
             </div>
 
+            <!-- Panel Dinamis Profil Interaktif -->
             <div id="profile-dynamic-panel" class="swift-card hidden space-y-3 border-emerald-500/40">
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                     <h4 id="profile-panel-title" class="text-xs font-bold text-emerald-400 uppercase tracking-wider"></h4>
-                    <button onclick="document.getElementById('profile-panel-title').closest('.swift-card').classList.add('hidden')" class="text-slate-400 hover:text-white text-sm cursor-pointer">&times;</button>
+                    <button onclick="document.getElementById('profile-dynamic-panel').classList.add('hidden')" class="text-slate-400 hover:text-white text-sm cursor-pointer border-none bg-transparent">&times;</button>
                 </div>
                 <div id="profile-panel-content" class="text-xs text-slate-300"></div>
             </div>
@@ -483,13 +535,13 @@
             <p class="text-xs text-slate-400">Bagikan tautan referral Anda ke media sosial & dapatkan bonus saldo instan saat teman bergabung!</p>
             
             <div class="grid grid-cols-4 gap-2 text-center text-xs">
-                <a href="https://api.whatsapp.com/send?text=Gabung%20di%20SWIFT%20Super-App%20sekarang%20dan%20nikmati%20kemudahannya!%20 https://swift-app.com/ref/USER123" target="_blank" onclick="logUserAction('Bagikan via WhatsApp')" class="p-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded-2xl border border-emerald-500/30 flex flex-col items-center gap-1 transition">
+                <a href="https://api.whatsapp.com/send?text=Gabung%20di%20SWIFT%20Super-App%20sekarang%20dan%20nikmati%20kemudahannya!%20 https://swift-app.com/ref/USER123" target="_blank" onclick="triggerReferralReward('WhatsApp')" class="p-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded-2xl border border-emerald-500/30 flex flex-col items-center gap-1 transition">
                     <i class="fa-brands fa-whatsapp text-lg"></i><span>WhatsApp</span>
                 </a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=https://swift-app.com/ref/USER123" target="_blank" onclick="logUserAction('Bagikan via Facebook')" class="p-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-2xl border border-blue-500/30 flex flex-col items-center gap-1 transition">
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://swift-app.com/ref/USER123" target="_blank" onclick="triggerReferralReward('Facebook')" class="p-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-2xl border border-blue-500/30 flex flex-col items-center gap-1 transition">
                     <i class="fa-brands fa-facebook text-lg"></i><span>Facebook</span>
                 </a>
-                <a href="https://t.me/share/url?url=https://swift-app.com/ref/USER123&text=Gabung%20di%20SWIFT%20Super-App!" target="_blank" onclick="logUserAction('Bagikan via Telegram')" class="p-3 bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 rounded-2xl border border-sky-500/30 flex flex-col items-center gap-1 transition">
+                <a href="https://t.me/share/url?url=https://swift-app.com/ref/USER123&text=Gabung%20di%20SWIFT%20Super-App!" target="_blank" onclick="triggerReferralReward('Telegram')" class="p-3 bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 rounded-2xl border border-sky-500/30 flex flex-col items-center gap-1 transition">
                     <i class="fa-brands fa-telegram text-lg"></i><span>Telegram</span>
                 </a>
                 <button onclick="triggerNativeShare()" class="p-3 bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 rounded-2xl border border-purple-500/30 flex flex-col items-center gap-1 transition cursor-pointer border-none">
@@ -500,6 +552,38 @@
             <div class="bg-slate-800/80 rounded-pill-soft p-3 flex items-center gap-2 border border-slate-700">
                 <input id="share-link" type="text" value="https://swift-app.com/ref/USER123" readonly class="flex-1 bg-transparent text-xs text-slate-200 outline-none">
                 <button onclick="copyShareLink()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-bold py-1.5 px-4 rounded-pill-soft shadow cursor-pointer border-none">Salin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Upload Video Pendek Produk -->
+    <div id="video-upload-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-[420px] bg-[#0f172a] border border-[#1e293b] rounded-[32px] p-6 shadow-2xl space-y-4 relative">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-extrabold text-white text-xs flex items-center gap-2">
+                    <i class="fa-solid fa-video text-purple-400"></i> Upload Video Pendek Produk
+                </h3>
+                <button onclick="closeVideoUploadModal()" class="text-slate-400 hover:text-white text-sm cursor-pointer border-none bg-transparent">&times;</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Judul / Deskripsi Video</label>
+                    <input type="text" id="video-title-input" placeholder="Contoh: Review Rasa Whopper Burger" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-purple-500">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Pilih File Video (.mp4 / max 30s)</label>
+                    <input type="file" id="video-file-input" accept="video/*" class="w-full text-slate-400 text-xs bg-slate-900 p-2 rounded-xl border border-slate-800 cursor-pointer">
+                </div>
+
+                <div class="p-3 bg-purple-950/30 border border-purple-800/40 rounded-xl text-[11px] text-purple-300">
+                    <i class="fa-solid fa-coins text-amber-400 mr-1"></i> <strong>Bonus Mitra:</strong> Dapatkan royalti instan sebesar <strong>+RM 2.50</strong> secara real-time untuk setiap video produk yang diunggah!
+                </div>
+
+                <button onclick="handleProcessVideoUpload()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-extrabold py-3 rounded-xl transition shadow-lg cursor-pointer border-none mt-2">
+                    UNGGAH VIDEO SEKARANG 🚀
+                </button>
             </div>
         </div>
     </div>
@@ -587,716 +671,805 @@
     </nav>
 </div>
 
-    <script>
-        // Pendaftaran Service Worker untuk PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker terdaftar!', reg))
-                    .catch(err => console.log('Gagal mendaftarkan Service Worker', err));
-            });
-        }
+<script>
+    // Inisialisasi Supabase Client Real
+    const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co'; 
+    const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco'; 
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-        let currentCurrency = 'MYR';
-        let currencySymbol = 'RM';
-        let conversionRates = { MYR: 1, IDR: 3500, SGD: 0.30 };
+    let currentUserId = localStorage.getItem('swift_user_uuid') || null;
 
-        let promotionalBanners = [
-            {
-                title: "Diskon Spesial Kuliner Partner SWIFT hingga 50%!",
-                badge: "PROMO KULINER",
-                image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                title: "Layanan Kurir & Logistik Cepat Tanpa Batas Wilayah",
-                badge: "MITRA EKSPRES",
-                image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                title: "Belanja Kebutuhan Mart Harian Lebih Hemat & Praktis",
-                badge: "SWIFT MART",
-                image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80"
-            }
-        ];
-        let currentBannerIndex = 0;
+    // FUNGSI UTAMA: KALKULASI & DISTRIBUSI ROYALTY OTOMATIS REAL-TIME
+    async function addRealtimeRoyalty(sourceType, amount, description) {
+        let currentBalance = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
+        currentBalance += amount;
+        localStorage.setItem('swift_user_balance', currentBalance.toFixed(2));
+        updateBalanceDisplay();
 
-        function initAutoSlideBanner() {
-            setInterval(() => {
-                currentBannerIndex = (currentBannerIndex + 1) % promotionalBanners.length;
-                let currentData = promotionalBanners[currentBannerIndex];
+        logUserAction(`Royalti Real-Time [${sourceType}]: +RM ${amount.toFixed(2)} (${description})`);
 
-                const bannerBg = document.getElementById('promo-banner-container');
-                const bannerTitle = document.getElementById('promo-title');
-                const bannerBadge = document.getElementById('promo-badge');
-                const bannerDots = document.getElementById('banner-dots');
-
-                if (bannerBg && bannerTitle && bannerBadge) {
-                    bannerBg.style.backgroundImage = `linear-gradient(to top, rgba(3,7,18,0.95), rgba(3,7,18,0.3)), url('${currentData.image}')`;
-                    bannerTitle.innerText = currentData.title;
-                    bannerBadge.innerHTML = `<i class="fa-solid fa-fire mr-1"></i> ${currentData.badge}`;
-                }
-
-                if (bannerDots) {
-                    bannerDots.innerHTML = promotionalBanners.map((_, i) => `
-                        <span class="w-1.5 h-1.5 rounded-full ${i === currentBannerIndex ? 'bg-emerald-400' : 'bg-slate-500'}"></span>
-                    `).join('');
-                }
-            }, 5000);
-        }
-
-        let serviceProviders = [
-            { 
-                id: 1, 
-                name: "Burger King Master", 
-                type: "Food", 
-                openTime: "08:00 - 22:00", 
-                isOpen: true, 
-                distanceKm: 1.2, 
-                basePrice: 10.50, 
-                img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=300&q=80", 
-                menu: [
-                    {name: "Whopper Burger", price: 12.50, stock: "Stok Tersedia (15 Porsi)", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=150&q=80"}, 
-                    {name: "French Fries", price: 5.00, stock: "Stok Tersedia (30 Porsi)", img: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=150&q=80"}
-                ] 
-            },
-            { 
-                id: 2, 
-                name: "SWIFT Mart Admin", 
-                type: "Mart", 
-                openTime: "24 Jam", 
-                isOpen: true, 
-                distanceKm: 0.8, 
-                basePrice: 7.50, 
-                img: "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=300&q=80", 
-                menu: [
-                    {name: "Mineral Water 1.5L", price: 2.50, stock: "Stok Tersedia (50 Botol)", img: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=150&q=80"}, 
-                    {name: "Instant Noodles", price: 4.00, stock: "Stok Tersedia (42 Pack)", img: "https://images.unsplash.com/photo-1612927601601-6638404738c6?auto=format&fit=crop&w=150&q=80"}
-                ] 
-            },
-            { 
-                id: 3, 
-                name: "Pizza Italia Express", 
-                type: "Food", 
-                openTime: "10:00 - 23:00", 
-                isOpen: true, 
-                distanceKm: 2.5, 
-                basePrice: 19.90, 
-                img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=300&q=80", 
-                menu: [
-                    {name: "Pepperoni Pizza", price: 22.00, stock: "Stok Tersedia (8 Loyang)", img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=150&q=80"}, 
-                    {name: "Garlic Bread", price: 6.50, stock: "Stok Tersedia (20 Porsi)", img: "https://images.unsplash.com/photo-1619531003657-3475d65609b4?auto=format&fit=crop&w=150&q=80"}
-                ] 
-            }
-        ];
-
-        let isVoiceActive = true;
-        let recognition = null;
-        let activeNavigationInterval = null;
-
-        if (!localStorage.getItem('swift_user_balance')) {
-            localStorage.setItem('swift_user_balance', '150.00');
-        }
-
-        function syncCountryAndCurrency() {
-            const countrySelect = document.getElementById('country-select');
-            const currencySelect = document.getElementById('currency-select');
-            
-            if (!countrySelect || !currencySelect) return;
-
-            const country = countrySelect.value;
-            if (country === 'ID') {
-                currencySelect.value = 'IDR';
-            } else if (country === 'SG') {
-                currencySelect.value = 'SGD';
-            } else {
-                currencySelect.value = 'MYR';
-            }
-
-            changeCurrency();
-            logUserAction(`Mengubah wilayah otomatis ke: ${country}`);
-        }
-
-        function switchPage(pageId, element) {
-            stopVoiceGuidance();
-            document.querySelectorAll('.app-page').forEach(p => p.classList.remove('active'));
-            document.getElementById(`page-${pageId}`).classList.add('active');
-
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active', 'text-emerald-400');
-                btn.classList.add('text-slate-400');
-            });
-            if(element) {
-                element.classList.add('active', 'text-emerald-400');
-                element.classList.remove('text-slate-400');
-            }
-
-            updateBalanceDisplay();
-            loadLogsToUI();
-            loadAnnouncementToUI();
-            logUserAction(`Navigasi ke menu: ${pageId}`);
-        }
-
-        function openWalletModule(moduleName) {
-            logUserAction(`Membuka modul dompet: ${moduleName}`);
-            const panel = document.getElementById('wallet-dynamic-panel');
-            const titleEl = document.getElementById('wallet-panel-title');
-            const contentEl = document.getElementById('wallet-panel-content');
-            
-            panel.classList.remove('hidden');
-            titleEl.innerText = `Panel Layanan: ${moduleName}`;
-
-            if (moduleName === 'Top Up') {
-                contentEl.innerHTML = `
-                    <p class="mb-2">Masukkan nominal saldo yang ingin Anda tambahkan:</p>
-                    <input type="number" id="custom-topup-amount" placeholder="Contoh: 100" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
-                    <button onclick="processCustomTopUp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl cursor-pointer border-none transition shadow">Konfirmasi Top Up (+)</button>
-                `;
-            } else if (moduleName === 'Tarik Tunai') {
-                contentEl.innerHTML = `
-                    <p class="mb-2">Masukkan nominal penarikan dana ke rekening bank:</p>
-                    <input type="number" id="custom-withdraw-amount" placeholder="Contoh: 50" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
-                    <button onclick="processCustomWithdraw()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl cursor-pointer border border-slate-700 transition">Proses Penarikan 🏦</button>
-                `;
-            } else if (moduleName === 'Kirim') {
-                contentEl.innerHTML = `
-                    <p class="mb-2">Kirim saldo SWIFT Pay secara instan ke sesama pengguna:</p>
-                    <input type="text" placeholder="Nomor Akun / Email Tujuan" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-2 outline-none">
-                    <input type="number" placeholder="Nominal" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
-                    <button onclick="alert('Dana berhasil ditransfer!'); document.getElementById('wallet-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2 rounded-xl cursor-pointer border-none transition">Kirim Sekarang 🚀</button>
-                `;
-            } else if (moduleName === 'QRIS') {
-                contentEl.innerHTML = `
-                    <div class="text-center py-4 space-y-2">
-                        <div class="bg-white p-4 inline-block rounded-2xl"><i class="fa-solid fa-qrcode text-5xl text-slate-950"></i></div>
-                        <p class="text-slate-400">Scan QR Code ini di merchant rekanan SWIFT untuk melakukan pembayaran instan.</p>
-                    </div>
-                `;
-            } else if (moduleName === 'Tagihan') {
-                contentEl.innerHTML = `
-                    <div class="space-y-2">
-                        <div class="p-3 bg-slate-900 rounded-xl flex justify-between items-center">
-                            <span>Listrik & Air</span>
-                            <span class="text-emerald-400 font-bold">Lunas</span>
-                        </div>
-                        <div class="p-3 bg-slate-900 rounded-xl flex justify-between items-center">
-                            <span>Internet & Data</span>
-                            <button onclick="alert('Tagihan dibayar!'); document.getElementById('wallet-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 px-3 py-1 rounded-lg font-bold cursor-pointer border-none transition">Bayar</button>
-                        </div>
-                    </div>
-                `;
-            } else if (moduleName === 'Bonus') {
-                contentEl.innerHTML = `
-                    <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-center space-y-1">
-                        <div class="font-bold text-amber-400">Bonus Referral & Cashback Aktif</div>
-                        <p class="text-slate-300">Total bonus terkumpul: <span class="font-black text-white">RM 25.00</span></p>
-                    </div>
-                `;
+        if (supabaseClient && currentUserId) {
+            try {
+                await supabaseClient.rpc('distribute_royalty', {
+                    p_user_id: currentUserId,
+                    p_source_type: sourceType,
+                    p_amount: amount,
+                    p_description: description
+                });
+            } catch (err) {
+                console.error('Supabase RPC Error:', err);
             }
         }
+    }
 
-        function speakGuidance(text) {
-            if (!isVoiceActive || !('speechSynthesis' in window)) return;
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'id-ID';
-            utterance.rate = 1.0;
-            window.speechSynthesis.speak(utterance);
+    // Pemicu Berbagai Sumber Pendapatan / Royalti
+    function triggerVideoUploadReward() {
+        addRealtimeRoyalty('video_upload', 2.50, 'Upload video pendek produk baru');
+        alert('🎉 Berhasil upload video! Royalti +RM 2.50 ditambahkan secara real-time.');
+    }
+
+    function triggerVideoWatchReward() {
+        addRealtimeRoyalty('video_watch', 0.50, 'Menonton video produk mitra');
+        alert('📺 Selesai menonton video! Royalti +RM 0.50 masuk ke dompet.');
+    }
+
+    function triggerProductCheckout(productName, price) {
+        let commission = price * 0.10;
+        addRealtimeRoyalty('transaction', commission, `Penjualan produk ${productName}`);
+        alert(`🛒 Transaksi sukses untuk ${productName}! Komisi penjual +RM ${commission.toFixed(2)} tercatat.`);
+    }
+
+    function triggerShippingReward(serviceType) {
+        let fee = serviceType === 'Box' ? 5.00 : 2.00;
+        addRealtimeRoyalty('shipping', fee, `Pengiriman logistik via ${serviceType}`);
+        alert(`📦 Pengiriman ${serviceType} selesai! Royalti kurir +RM ${fee.toFixed(2)} ditambahkan.`);
+    }
+
+    function triggerReferralReward(platform) {
+        addRealtimeRoyalty('referral', 5.00, `Berbagi aplikasi via ${platform}`);
+        alert(`🤝 Teman bergabung melalui tautan Anda! Bonus referral +RM 5.00 dikreditkan.`);
+    }
+
+    function triggerBannerAdReward() {
+        addRealtimeRoyalty('banner_ad', 10.00, 'Pemasangan iklan banner sponsor');
+        alert('📢 Iklan banner aktif! Royalti penayang +RM 10.00 masuk secara real-time.');
+    }
+
+    function triggerAppDownloadBonus() {
+        if (!localStorage.getItem('swift_download_bonus_claimed')) {
+            addRealtimeRoyalty('app_download', 15.00, 'Bonus unduhan pertama aplikasi PWA');
+            localStorage.setItem('swift_download_bonus_claimed', 'true');
         }
+    }
 
-        function stopVoiceGuidance() {
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-            if (activeNavigationInterval) clearInterval(activeNavigationInterval);
-        }
+    function triggerLiveStreamReward() {
+        addRealtimeRoyalty('livestream', 3.00, 'Partisipasi & interaksi live streaming');
+        alert('📡 Sesi live streaming aktif! Bonus partisipasi +RM 3.00 ditambahkan.');
+    }
 
-        function triggerServiceAction(serviceName) {
-            stopVoiceGuidance();
-            logUserAction(`Mengakses Modul Layanan: ${serviceName}`);
-            const panel = document.getElementById('service-dynamic-panel');
-            const titleEl = document.getElementById('service-panel-title');
-            const contentEl = document.getElementById('service-panel-content');
-            
-            if (!panel || !titleEl || !contentEl) return;
-            panel.classList.remove('hidden');
+    // PENGELOLAAN PANEL MODUL DOMPET (DENGAN API GENERATOR QR CODE OTOMATIS)
+    function openWalletModule(moduleName) {
+        const panel = document.getElementById('wallet-dynamic-panel');
+        const titleEl = document.getElementById('wallet-panel-title');
+        const contentEl = document.getElementById('wallet-panel-content');
+        panel.classList.remove('hidden');
+        titleEl.innerText = `Panel Layanan: ${moduleName}`;
 
-            const rate = conversionRates[currentCurrency] || 1;
-
-            if (serviceName === 'Food' || serviceName === 'Mart') {
-                titleEl.innerText = `Modul Kuliner & Toko: ${serviceName}`;
-                let filteredVendors = serviceProviders.filter(v => v.type.toLowerCase() === serviceName.toLowerCase() || serviceName === 'Food' && v.type === 'Food');
-                if(filteredVendors.length === 0) filteredVendors = serviceProviders;
-
-                contentEl.innerHTML = `
-                    <p class="text-slate-300 mb-2">Pilih kedai atau toko terdekat beserta foto produk dan stok real-time:</p>
-                    <div class="radar-map-simulation mb-3">
-                        <div class="radar-ping" style="top:40%; left:50%;"></div>
-                        <div class="absolute bottom-2 left-3 bg-black/60 px-2 py-1 rounded text-[10px] text-emerald-400 font-mono"><i class="fa-solid fa-satellite-dish animate-pulse"></i> GPS Map Radar Aktif (Kedai Terdekat)</div>
+        if (moduleName === 'Top Up') {
+            contentEl.innerHTML = `
+                <p class="mb-2">Masukkan nominal saldo yang ingin Anda tambahkan:</p>
+                <input type="number" id="custom-topup-amount" placeholder="Contoh: 100" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
+                <button onclick="processCustomTopUp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl cursor-pointer border-none transition shadow">Konfirmasi Top Up (+)</button>
+            `;
+        } else if (moduleName === 'Tarik Tunai') {
+            contentEl.innerHTML = `
+                <p class="mb-2">Masukkan nominal penarikan dana ke rekening bank:</p>
+                <input type="number" id="custom-withdraw-amount" placeholder="Contoh: 50" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
+                <button onclick="processCustomWithdraw()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl cursor-pointer border border-slate-700 transition">Proses Penarikan 🏦</button>
+            `;
+        } else if (moduleName === 'Kirim') {
+            contentEl.innerHTML = `
+                <div class="space-y-2.5">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nomor Tujuan / No. HP / Rekening</label>
+                        <input type="text" id="transfer-target" placeholder="Contoh: 08123456789 atau SWIFT-992" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
                     </div>
-                    <div class="space-y-3 max-h-[320px] overflow-y-auto pr-1">
-                        ${filteredVendors.map(v => `
-                            <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 space-y-2.5">
-                                <div class="flex items-center gap-3">
-                                    <img src="${v.img}" alt="${v.name}" class="w-14 h-14 rounded-xl object-cover border border-slate-700">
-                                    <div class="flex-1">
-                                        <h5 class="font-bold text-white text-xs">${v.name}</h5>
-                                        <p class="text-[10px] text-slate-400">🕒 Buka: <span class="text-emerald-400 font-semibold">${v.openTime}</span> (${v.isOpen ? 'Buka Sekarang' : 'Tutup'})</p>
-                                        <span class="inline-block mt-1 text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold"><i class="fa-solid fa-location-dot"></i> ${v.distanceKm} km dari lokasi Anda</span>
-                                    </div>
-                                </div>
-                                <div class="border-t border-slate-800 pt-2">
-                                    <p class="text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Rekomendasi & Stok Produk:</p>
-                                    <div class="space-y-2">
-                                        ${v.menu.map(m => `
-                                            <div class="flex items-center justify-between bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
-                                                <div class="flex items-center gap-2.5">
-                                                    <img src="${m.img}" alt="${m.name}" class="w-10 h-10 rounded-lg object-cover">
-                                                    <div>
-                                                        <div class="text-[11px] font-bold text-slate-200">${m.name}</div>
-                                                        <div class="text-[9px] text-emerald-400 font-medium"><i class="fa-solid fa-box-open mr-1"></i>${m.stock}</div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-right">
-                                                    <div class="text-xs font-black text-emerald-400">${currencySymbol} ${(m.price * rate).toFixed(2)}</div>
-                                                    <button onclick="alert('Menambahkan ${m.name} ke keranjang belanja!');" class="mt-1 text-[9px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-0.5 rounded-lg cursor-pointer border border-slate-700">Pilih +</button>
-                                                </div>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                                <button onclick="alert('Pesanan di ${v.name} berhasil diproses ke kasir!'); document.getElementById('service-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2 rounded-xl cursor-pointer border-none transition text-xs mt-1">Checkout / Pesan dari Kedai Ini 🛒</button>
-                            </div>
-                        `).join('')}
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nominal Kirim (Mandiri)</label>
+                        <input type="number" id="transfer-amount" placeholder="Contoh: 25.00" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
                     </div>
-                `;
-            } else {
-                titleEl.innerText = `Modul Navigasi Mitra: ${serviceName}`;
-                let baseFarePerKm = serviceName === 'Car' ? 3.50 : (serviceName === 'Box' ? 5.00 : 1.80);
-                
-                contentEl.innerHTML = `
-                    <div class="space-y-3">
-                        <div class="radar-map-simulation">
-                            <div class="radar-ping" style="top:50%; left:50%;"></div>
-                            <div class="absolute top-2 left-3 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-xl text-[10px] text-emerald-300 font-bold flex items-center gap-1.5">
-                                <i class="fa-solid fa-route animate-pulse"></i> Peta Pemandu Rute GPS Aktif
-                            </div>
-                            <div id="nav-instruction-badge" class="absolute bottom-2 left-3 right-3 bg-black/80 backdrop-blur border border-slate-700 px-3 py-1.5 rounded-xl text-[10px] text-white font-mono flex items-center justify-between">
-                                <span><i class="fa-solid fa-location-arrow text-emerald-400 mr-1"></i> Siap Melacak Rute...</span>
-                                <span class="text-emerald-400 font-bold">GPS 3D</span>
-                            </div>
+                    <button onclick="processCustomTransfer()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">KIRIM DANA SEKARANG 🚀</button>
+                </div>
+            `;
+        } else if (moduleName === 'QRIS') {
+            const qrData = encodeURIComponent(`00020101021126580014ID.CO.QRIS.WWW01189360091400000000005204599953033605802ID5911SWIFT-PAY6013KUALA_LUMPUR6304ABCD`);
+            contentEl.innerHTML = `
+                <div class="text-center space-y-3 p-1">
+                    <p class="text-slate-300 text-xs">Scan atau tunjukkan QRIS merchant SWIFT untuk pembayaran instan:</p>
+                    <div class="p-4 bg-white rounded-2xl w-48 mx-auto flex flex-col items-center justify-center shadow-lg border-2 border-emerald-500/30">
+                        <div class="text-[10px] font-black tracking-widest text-slate-800 uppercase mb-2 flex items-center gap-1">
+                            <i class="fa-solid fa-qrcode text-emerald-600"></i> SWIFT PAY QRIS
                         </div>
-                        <div>
-                            <label class="block text-[10px] text-slate-400 mb-1">Titik Jemput Mitra:</label>
-                            <input type="text" id="pickup-loc" value="Jl. Sultan Ismail, Kuala Lumpur (GPS Aktif)" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none text-xs mb-2">
-                            <label class="block text-[10px] text-slate-400 mb-1">Titik Tujuan Pengantaran:</label>
-                            <input type="text" id="dest-loc" value="KLCC Petronas Twin Towers" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none text-xs mb-2">
-                        </div>
-                        <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1 text-xs">
-                            <div class="flex justify-between"><span>Jarak Tempuh:</span><span id="est-distance" class="font-bold text-white">4.2 km</span></div>
-                            <div class="flex justify-between"><span>Estimasi Waktu:</span><span id="est-time" class="font-bold text-white">10 Menit</span></div>
-                            <div class="flex justify-between border-t border-slate-800 pt-1 mt-1"><span>Tarif Layanan:</span><span id="est-price" class="font-black text-emerald-400">${currencySymbol} ${(4.2 * baseFarePerKm * rate).toFixed(2)}</span></div>
-                        </div>
-                        <button onclick="startAdvancedNavigation('${serviceName}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl cursor-pointer border-none transition text-xs flex items-center justify-center gap-1.5 shadow-lg">
-                            <i class="fa-solid fa-compass"></i> Aktifkan Pemandu Suara & Map Real-Time 🎙️
+                        <img src="https://quickchart.io/qr?text=${qrData}&size=160&margin=1" alt="QRIS Code" class="w-36 h-36 rounded-lg shadow-sm">
+                        <span class="text-[9px] font-mono text-slate-500 mt-2 font-bold">NMID: ID1020039182390</span>
+                    </div>
+                    
+                    <div class="space-y-2 mt-2">
+                        <input type="number" id="qris-pay-amount" placeholder="Masukkan Nominal Belanja (RM)" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500 text-center font-bold">
+                        <button onclick="processQRTransaction()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs cursor-pointer border-none shadow-md transition">
+                            BAYAR BELANJA QRIS 📲
                         </button>
                     </div>
-                `;
-            }
-        }
-
-        function startAdvancedNavigation(serviceName) {
-            logUserAction(`Memulai pemandu navigasi rute real-time untuk ${serviceName}`);
-            alert(`✅ Pemandu Navigasi GPS & Suara Real-Time diaktifkan untuk ${serviceName}. Perhatikan instruksi suara di perangkat Anda!`);
-            
-            const steps = [
-                "Navigasi dimulai. Silakan lurus sejauh 200 meter.",
-                "Belok kanan ke Jalan Ampang dalam 50 meter.",
-                "Terus ikuti jalan utama selama 2 kilometer.",
-                "Anda telah mendekati titik tujuan penjemputan. Bersiaplah."
-            ];
-
-            let stepIndex = 0;
-            speakGuidance(steps[0]);
-
-            const badge = document.getElementById('nav-instruction-badge');
-            if (badge) badge.innerHTML = `<span><i class="fa-solid fa-volume-high text-emerald-400 mr-1"></i> ${steps[0]}</span>`;
-
-            activeNavigationInterval = setInterval(() => {
-                stepIndex++;
-                if (stepIndex < steps.length) {
-                    speakGuidance(steps[stepIndex]);
-                    if (badge) badge.innerHTML = `<span><i class="fa-solid fa-volume-high text-emerald-400 mr-1"></i> ${steps[stepIndex]}</span>`;
-                } else {
-                    clearInterval(activeNavigationInterval);
-                }
-            }, 6000);
-        }
-
-        function openProfileModal(menuType) {
-            logUserAction(`Mengakses menu profil: ${menuType}`);
-            const panel = document.getElementById('profile-dynamic-panel');
-            const titleEl = document.getElementById('profile-panel-title');
-            const contentEl = document.getElementById('profile-panel-content');
-            
-            panel.classList.remove('hidden');
-            titleEl.innerText = `Pengaturan: ${menuType}`;
-
-            if (menuType === 'Edit Profil') {
-                contentEl.innerHTML = `
-                    <p class="mb-2">Perbarui nama atau email akun Anda:</p>
-                    <input type="text" value="Master Enterprise User" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-2 outline-none">
-                    <input type="email" value="user@swift-ecosystem.com" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
-                    <button onclick="alert('Informasi profil berhasil diperbarui!'); document.getElementById('profile-panel-title').closest('.swift-card').classList.add('hidden');" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2 rounded-xl cursor-pointer border-none transition">Simpan Perubahan</button>
-                `;
-            } else if (menuType === 'Keamanan') {
-                contentEl.innerHTML = `
-                    <p class="mb-2">Masukkan kata sandi baru untuk mengamankan akun:</p>
-                    <input type="password" placeholder="Kata Sandi Baru" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-2 outline-none">
-                    <input type="password" placeholder="Konfirmasi Kata Sandi" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
-                    <button onclick="alert('Kata sandi berhasil diperbarui!'); document.getElementById('profile-panel-title').closest('.swift-card').classList.add('hidden');" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2 rounded-xl cursor-pointer border-none transition">Perbarui Kata Sandi</button>
-                `;
-            } else if (menuType === 'Notifikasi') {
-                contentEl.innerHTML = `
-                    <div class="space-y-2">
-                        <label class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl cursor-pointer">
-                            <span>Notifikasi Transaksi</span>
-                            <input type="checkbox" checked class="accent-emerald-500">
-                        </label>
-                        <label class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl cursor-pointer">
-                            <span>Promo & Diskon Admin</span>
-                            <input type="checkbox" checked class="accent-emerald-500">
-                        </label>
-                    </div>
-                `;
-            }
-        }
-
-        function processCustomTopUp() {
-            const input = document.getElementById('custom-topup-amount');
-            const amount = parseFloat(input.value);
-            if (!amount || amount <= 0) {
-                alert('Masukkan nominal top up yang valid!');
-                return;
-            }
-            let current = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
-            current += amount;
-            localStorage.setItem('swift_user_balance', current.toFixed(2));
-            updateBalanceDisplay();
-            logUserAction(`Top Up Saldo Kustom sebesar +${amount.toFixed(2)}`);
-            alert(`✅ Berhasil Top Up saldo sebesar +${amount.toFixed(2)}!`);
-            document.getElementById('wallet-dynamic-panel').classList.add('hidden');
-        }
-
-        function processCustomWithdraw() {
-            const input = document.getElementById('custom-withdraw-amount');
-            const amount = parseFloat(input.value);
-            if (!amount || amount <= 0) {
-                alert('Masukkan nominal penarikan yang valid!');
-                return;
-            }
-            let current = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
-            if (amount > current) {
-                alert('Saldo dompet tidak mencukupi untuk penarikan ini!');
-                return;
-            }
-            current -= amount;
-            localStorage.setItem('swift_user_balance', current.toFixed(2));
-            updateBalanceDisplay();
-            logUserAction(`Tarik Tunai Kustom sebesar -${amount.toFixed(2)}`);
-            alert(`✅ Berhasil menarik tunai sebesar -${amount.toFixed(2)}! Saldo diperbarui.`);
-            document.getElementById('wallet-dynamic-panel').classList.add('hidden');
-        }
-
-        function logUserAction(actionName) {
-            const logs = JSON.parse(localStorage.getItem('swift_user_activity_logs') || '[]');
-            const timeStr = new Date().toTimeString().split(' ')[0] + ' ' + new Date().toLocaleDateString();
-            logs.unshift(`[${timeStr}] Pengguna melakukan: ${actionName}`);
-            if (logs.length > 50) logs.pop();
-            localStorage.setItem('swift_user_activity_logs', JSON.stringify(logs));
-            loadLogsToUI();
-        }
-
-        function loadLogsToUI() {
-            const container = document.getElementById('activity-log-container');
-            if(!container) return;
-            const logs = JSON.parse(localStorage.getItem('swift_user_activity_logs') || '[]');
-            if (logs.length === 0) {
-                container.innerHTML = `<div class="text-slate-500 text-center py-4 italic">// Belum ada riwayat aktivitas tercatat.</div>`;
-                return;
-            }
-            container.innerHTML = logs.map(l => `
-                <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 text-slate-300 flex items-start gap-2.5 shadow-sm">
-                    <i class="fa-solid fa-circle-check text-emerald-400 mt-0.5"></i>
-                    <div class="flex-1 break-all">${l}</div>
                 </div>
-            `).join('');
+            `;
+        } else if (moduleName === 'Tagihan') {
+            contentEl.innerHTML = `
+                <div class="space-y-2">
+                    <p class="text-slate-300">Pilih jenis pembayaran tagihan:</p>
+                    <select id="bill-type" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none">
+                        <option value="Listrik">Listrik PLN / Utilities</option>
+                        <option value="Air">Air PDAM</option>
+                        <option value="Internet">Internet & Telkom</option>
+                    </select>
+                    <input type="text" id="bill-number" placeholder="Nomor Pelanggan" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none">
+                    <button onclick="alert('Tagihan berhasil dibayarkan!'); document.getElementById('wallet-dynamic-panel').classList.add('hidden');" class="w-full bg-purple-600 text-white font-bold py-2 rounded-xl text-xs cursor-pointer border-none">Bayar Tagihan</button>
+                </div>
+            `;
+        } else if (moduleName === 'Bonus') {
+            contentEl.innerHTML = `
+                <div class="text-center space-y-2">
+                    <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs font-bold">
+                        🎁 Klaim Bonus Voucher Harian Mitra SWIFT (+RM 5.00)
+                    </div>
+                    <button onclick="addRealtimeRoyalty('bonus_voucher', 5.00, 'Klaim Bonus Harian Mitra'); document.getElementById('wallet-dynamic-panel').classList.add('hidden');" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer border-none shadow">Klaim Bonus Sekarang</button>
+                </div>
+            `;
+        } else {
+            contentEl.innerHTML = `<p class="text-slate-400">Modul ${moduleName} siap digunakan secara real-time.</p>`;
+        }
+    }
+
+    function processQRTransaction() {
+        const amountInput = document.getElementById('qris-pay-amount');
+        const amount = parseFloat(amountInput.value);
+        let currentBalance = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
+
+        if (!amount || amount <= 0) {
+            alert('Mohon masukkan nominal belanja QRIS yang valid!');
+            return;
+        }
+        if (amount > currentBalance) {
+            alert('Saldo dompet Anda tidak mencukupi untuk pembayaran QRIS ini!');
+            return;
         }
 
-        function loadAnnouncementToUI() {
-            const annText = document.getElementById('announcement-text');
-            if(!annText) return;
-            const ann = localStorage.getItem('swift_global_announcement');
-            annText.innerText = ann ? ann : "Tidak ada pengumuman darurat atau siaran aktif saat ini dari Master Admin.";
+        currentBalance -= amount;
+        localStorage.setItem('swift_user_balance', currentBalance.toFixed(2));
+        updateBalanceDisplay();
+
+        let adminFee = amount * 0.01;
+        logUserAction(`Pembayaran QRIS Merchant: -RM ${amount.toFixed(2)} (Fee Admin +RM ${adminFee.toFixed(2)})`);
+
+        alert(`✅ Pembayaran QRIS sebesar RM ${amount.toFixed(2)} Berhasil!\nLog transaksi telah dicatat ke riwayat.`);
+        document.getElementById('wallet-dynamic-panel').classList.add('hidden');
+    }
+
+    function processCustomTransfer() {
+        const target = document.getElementById('transfer-target').value.trim();
+        const amount = parseFloat(document.getElementById('transfer-amount').value);
+        let currentBalance = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
+
+        if (!target) {
+            alert('Mohon masukkan nomor tujuan pengiriman!');
+            return;
+        }
+        if (!amount || amount <= 0) {
+            alert('Mohon masukkan nominal kirim yang valid!');
+            return;
+        }
+        if (amount > currentBalance) {
+            alert('Saldo dompet Anda tidak mencukupi untuk melakukan transfer ini!');
+            return;
         }
 
-        function openShareModal() { document.getElementById('share-modal').classList.remove('hidden'); }
-        function closeShareModal() { document.getElementById('share-modal').classList.add('hidden'); }
+        currentBalance -= amount;
+        localStorage.setItem('swift_user_balance', currentBalance.toFixed(2));
+        updateBalanceDisplay();
+
+        logUserAction(`Kirim Dana Mandiri: -RM ${amount.toFixed(2)} ke tujuan [${target}]`);
+        alert(`✅ Berhasil mengirim dana sebesar RM ${amount.toFixed(2)} ke ${target}!`);
         
-        function copyShareLink() {
-            const link = document.getElementById('share-link');
-            link.select();
-            navigator.clipboard.writeText(link.value).then(() => {
-                alert('✅ Tautan referral berhasil disalin!');
-                logUserAction('Menyalin Tautan Referral');
+        document.getElementById('wallet-dynamic-panel').classList.add('hidden');
+    }
+
+    function processCustomTopUp() {
+        const input = document.getElementById('custom-topup-amount');
+        const amount = parseFloat(input.value);
+        if (!amount || amount <= 0) return;
+        addRealtimeRoyalty('topup', amount, 'Top Up Saldo Dompet');
+        alert(`✅ Berhasil Top Up sebesar +${amount.toFixed(2)}!`);
+        document.getElementById('wallet-dynamic-panel').classList.add('hidden');
+    }
+
+    function processCustomWithdraw() {
+        const input = document.getElementById('custom-withdraw-amount');
+        const amount = parseFloat(input.value);
+        let current = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
+        if (!amount || amount > current) {
+            alert('Saldo tidak mencukupi atau nominal tidak valid!');
+            return;
+        }
+        addRealtimeRoyalty('withdraw', -amount, 'Penarikan Tunai Rekening');
+        alert(`✅ Berhasil menarik tunai sebesar -${amount.toFixed(2)}!`);
+        document.getElementById('wallet-dynamic-panel').classList.add('hidden');
+    }
+
+    // ================= PENGELOLAAN FITUR PROFIL & PENGATURAN AKUN LENGKAP =================
+    function openProfileModal(featureName) {
+        const panel = document.getElementById('profile-dynamic-panel');
+        const titleEl = document.getElementById('profile-panel-title');
+        const contentEl = document.getElementById('profile-panel-content');
+        panel.classList.remove('hidden');
+        titleEl.innerText = `Pengaturan: ${featureName}`;
+
+        const currName = localStorage.getItem('swift_logged_user_name') || 'Master Enterprise User';
+        const currEmail = localStorage.getItem('swift_logged_user') || 'user@swift-ecosystem.com';
+        const currPhone = localStorage.getItem('swift_logged_user_phone') || '08123456789';
+
+        if (featureName === 'Edit Profil') {
+            contentEl.innerHTML = `
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nama Lengkap</label>
+                        <input type="text" id="edit-profile-name" value="${currName}" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Email Aktif</label>
+                        <input type="email" id="edit-profile-email" value="${currEmail}" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nomor WhatsApp</label>
+                        <input type="tel" id="edit-profile-phone" value="${currPhone}" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                    </div>
+                    <button onclick="saveProfileChanges()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">SIMPAN PERUBAHAN PROFIL 💾</button>
+                </div>
+            `;
+        } else if (featureName === 'Keamanan') {
+            contentEl.innerHTML = `
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Kata Sandi Lama</label>
+                        <input type="password" id="old-pass" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Kata Sandi Baru</label>
+                        <input type="password" id="new-pass" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-blue-500">
+                    </div>
+                    <button onclick="savePasswordChanges()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">PERBARUI KATA SANDI 🔒</button>
+                </div>
+            `;
+        } else if (featureName === 'Notifikasi') {
+            contentEl.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded-xl border border-slate-800">
+                        <span>Notifikasi Transaksi Real-Time</span>
+                        <input type="checkbox" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded-xl border border-slate-800">
+                        <span>Info Promo & Diskon Partner</span>
+                        <input type="checkbox" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded-xl border border-slate-800">
+                        <span>Suara Alert Masuk Saldo</span>
+                        <input type="checkbox" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                    </div>
+                    <button onclick="alert('Preferensi notifikasi berhasil disimpan!'); document.getElementById('profile-dynamic-panel').classList.add('hidden');" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold py-2 rounded-xl text-xs cursor-pointer border-none">SIMPAN PREFERENSI 🔔</button>
+                </div>
+            `;
+        } else if (featureName === 'Verifikasi') {
+            contentEl.innerHTML = `
+                <div class="text-center space-y-2 p-2">
+                    <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <h4 class="font-bold text-white">Status Akun: Verified Enterprise Member</h4>
+                    <p class="text-slate-400 text-[11px]">Akun Anda telah terverifikasi penuh dan siap bertransaksi tanpa batas harian di ekosistem SWIFT.</p>
+                </div>
+            `;
+        }
+    }
+
+    function saveProfileChanges() {
+        const name = document.getElementById('edit-profile-name').value.trim();
+        const email = document.getElementById('edit-profile-email').value.trim();
+        const phone = document.getElementById('edit-profile-phone').value.trim();
+
+        if(!name || !email) {
+            alert('Nama dan Email tidak boleh kosong!');
+            return;
+        }
+
+        localStorage.setItem('swift_logged_user_name', name);
+        localStorage.setItem('swift_logged_user', email);
+        localStorage.setItem('swift_logged_user_phone', phone);
+
+        updateProfileDisplayUI();
+        logUserAction(`Memperbarui Informasi Profil: ${name}`);
+        alert('✅ Informasi profil berhasil diperbarui!');
+        document.getElementById('profile-dynamic-panel').classList.add('hidden');
+    }
+
+    function savePasswordChanges() {
+        const oldP = document.getElementById('old-pass').value;
+        const newP = document.getElementById('new-pass').value;
+
+        if(!oldP || !newP) {
+            alert('Mohon isi kata sandi lama dan baru Anda!');
+            return;
+        }
+
+        logUserAction('Mengubah Kata Sandi Akun');
+        alert('✅ Kata sandi berhasil diperbarui secara aman!');
+        document.getElementById('profile-dynamic-panel').classList.add('hidden');
+    }
+
+    function handleAvatarUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgData = e.target.result;
+                localStorage.setItem('swift_user_avatar', imgData);
+                updateProfileDisplayUI();
+                logUserAction('Mengunggah Foto Profil Baru');
+                alert('📸 Foto profil berhasil diperbarui!');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function updateProfileDisplayUI() {
+        const savedName = localStorage.getItem('swift_logged_user_name') || 'Master Enterprise User';
+        const savedEmail = localStorage.getItem('swift_logged_user') || 'user@swift-ecosystem.com';
+        const savedAvatar = localStorage.getItem('swift_user_avatar');
+
+        const nameLabel = document.getElementById('profile-name-label');
+        const emailLabel = document.getElementById('profile-email-label');
+        const avatarContainer = document.getElementById('profile-avatar-container');
+        const initialsEl = document.getElementById('profile-initials');
+
+        if(nameLabel) nameLabel.innerText = savedName;
+        if(emailLabel) emailLabel.innerText = savedEmail;
+
+        if (savedAvatar && avatarContainer) {
+            avatarContainer.style.backgroundImage = `url('${savedAvatar}')`;
+            if(initialsEl) initialsEl.style.display = 'none';
+        } else if (nameLabel && initialsEl) {
+            const initials = savedName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+            initialsEl.innerText = initials || 'SW';
+        }
+    }
+
+    // Fungsi Pengelolaan Modal Upload Video Pendek
+    function openVideoUploadModal() {
+        document.getElementById('video-upload-modal').classList.remove('hidden');
+        logUserAction('Membuka Modal Upload Video Pendek Produk');
+    }
+
+    function closeVideoUploadModal() {
+        document.getElementById('video-upload-modal').classList.add('hidden');
+    }
+
+    function handleProcessVideoUpload() {
+        const titleInput = document.getElementById('video-title-input');
+        const fileInput = document.getElementById('video-file-input');
+
+        if (!titleInput.value.trim()) {
+            alert('Mohon isi judul atau deskripsi video produk Anda!');
+            return;
+        }
+
+        if (fileInput.files.length === 0) {
+            alert('Silakan pilih file video produk terlebih dahulu!');
+            return;
+        }
+
+        triggerVideoUploadReward();
+
+        titleInput.value = '';
+        fileInput.value = '';
+        closeVideoUploadModal();
+    }
+
+    // Autentikasi & Auth Switch
+    function switchAuthTab(tab) {
+        const loginBtn = document.getElementById('tab-login-btn');
+        const regBtn = document.getElementById('tab-register-btn');
+        const formLogin = document.getElementById('form-login');
+        const formReg = document.getElementById('form-register');
+        const subtitle = document.getElementById('auth-subtitle');
+
+        if (tab === 'login') {
+            loginBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-full text-white bg-emerald-500 transition cursor-pointer border-none";
+            regBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-full text-slate-400 transition cursor-pointer border-none bg-transparent";
+            formLogin.classList.remove('hidden');
+            formReg.classList.add('hidden');
+            subtitle.innerText = "Silakan masuk kembali ke ekosistem SWIFT.";
+        } else {
+            regBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-full text-white bg-blue-600 transition cursor-pointer border-none";
+            loginBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-full text-slate-400 transition cursor-pointer border-none bg-transparent";
+            formReg.classList.remove('hidden');
+            formLogin.classList.add('hidden');
+            subtitle.innerText = "Daftar akun mitra baru secara mandiri.";
+        }
+    }
+
+    async function handleSupabaseLogin() {
+        const identifier = document.getElementById('login-identifier').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+
+        if (!identifier || !password) {
+            alert('Mohon isi email/username dan password Anda!');
+            return;
+        }
+
+        if (supabaseClient) {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: identifier.includes('@') ? identifier : `${identifier}@swift.com`,
+                password: password
+            });
+            if (error) {
+                alert('Gagal Masuk: ' + error.message);
+                return;
+            }
+            if (data.user) {
+                currentUserId = data.user.id;
+                localStorage.setItem('swift_user_uuid', currentUserId);
+            }
+        }
+
+        localStorage.setItem('swift_logged_user', identifier);
+        localStorage.setItem('swift_logged_user_name', identifier.split('@')[0]);
+        document.getElementById('auth-modal').classList.add('hidden');
+        updateProfileDisplayUI();
+        alert(`✅ Selamat datang kembali, ${identifier}!`);
+        logUserAction(`Login Berhasil: ${identifier}`);
+    }
+
+    async function handleSupabaseRegister() {
+        const nama = document.getElementById('reg-nama').value.trim();
+        const username = document.getElementById('reg-username').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
+        const password = document.getElementById('reg-password').value.trim();
+
+        if (!nama || !username || !email || !phone || !password) {
+            alert('Semua kolom formulir registrasi harus diisi!');
+            return;
+        }
+
+        if (supabaseClient) {
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+                options: { data: { full_name: nama, username: username, phone: phone } }
+            });
+            if (error) {
+                alert('Registrasi Gagal: ' + error.message);
+                return;
+            }
+        }
+
+        localStorage.setItem('swift_logged_user_name', nama);
+        localStorage.setItem('swift_logged_user_phone', phone);
+        triggerAppDownloadBonus();
+
+        alert('🎉 Registrasi Mitra Berhasil! Bonus unduhan pertama telah dikreditkan.');
+        logUserAction(`Registrasi Mitra Baru: ${username} (${email})`);
+        switchAuthTab('login');
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('swift_logged_user');
+        localStorage.removeItem('swift_user_uuid');
+        alert('Sesi Anda ditutup. Berhasil keluar akun.');
+        location.reload();
+    }
+
+    // PWA Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
+        });
+    }
+
+    let currentCurrency = 'MYR';
+    let currencySymbol = 'RM';
+    let conversionRates = { MYR: 1, IDR: 3500, SGD: 0.30 };
+
+    let promotionalBanners = [
+        { title: "Diskon Spesial Kuliner Partner SWIFT hingga 50%!", badge: "PROMO KULINER", image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80" },
+        { title: "Layanan Kurir & Logistik Cepat Tanpa Batas Wilayah", badge: "MITRA EKSPRES", image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80" },
+        { title: "Belanja Kebutuhan Mart Harian Lebih Hemat & Praktis", badge: "SWIFT MART", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80" }
+    ];
+    let currentBannerIndex = 0;
+
+    function initAutoSlideBanner() {
+        setInterval(() => {
+            currentBannerIndex = (currentBannerIndex + 1) % promotionalBanners.length;
+            let currentData = promotionalBanners[currentBannerIndex];
+            const bannerBg = document.getElementById('promo-banner-container');
+            const bannerTitle = document.getElementById('promo-title');
+            const bannerBadge = document.getElementById('promo-badge');
+            const bannerDots = document.getElementById('banner-dots');
+
+            if (bannerBg && bannerTitle && bannerBadge) {
+                bannerBg.style.backgroundImage = `linear-gradient(to top, rgba(3,7,18,0.95), rgba(3,7,18,0.3)), url('${currentData.image}')`;
+                bannerTitle.innerText = currentData.title;
+                bannerBadge.innerHTML = `<i class="fa-solid fa-fire mr-1"></i> ${currentData.badge}`;
+            }
+            if (bannerDots) {
+                bannerDots.innerHTML = promotionalBanners.map((_, i) => `
+                    <span class="w-1.5 h-1.5 rounded-full ${i === currentBannerIndex ? 'bg-emerald-400' : 'bg-slate-500'}"></span>
+                `).join('');
+            }
+        }, 5000);
+    }
+
+    let serviceProviders = [
+        { 
+            id: 1, name: "Burger King Master", type: "Food", openTime: "08:00 - 22:00", isOpen: true, distanceKm: 1.2, basePrice: 10.50, 
+            img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=300&q=80", 
+            menu: [
+                {name: "Whopper Burger", price: 12.50, stock: "Stok Tersedia (15 Porsi)", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=150&q=80"}, 
+                {name: "French Fries", price: 5.00, stock: "Stok Tersedia (30 Porsi)", img: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=150&q=80"}
+            ] 
+        },
+        { 
+            id: 2, name: "SWIFT Mart Admin", type: "Mart", openTime: "24 Jam", isOpen: true, distanceKm: 0.8, basePrice: 7.50, 
+            img: "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=300&q=80", 
+            menu: [
+                {name: "Mineral Water 1.5L", price: 2.50, stock: "Stok Tersedia (50 Botol)", img: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=150&q=80"}, 
+                {name: "Instant Noodles", price: 4.00, stock: "Stok Tersedia (42 Pack)", img: "https://images.unsplash.com/photo-1612927601601-6638404738c6?auto=format&fit=crop&w=150&q=80"}
+            ] 
+        }
+    ];
+
+    let isVoiceActive = true;
+    let recognition = null;
+    let activeNavigationInterval = null;
+
+    if (!localStorage.getItem('swift_user_balance')) {
+        localStorage.setItem('swift_user_balance', '150.00');
+    }
+
+    function syncCountryAndCurrency() {
+        const countrySelect = document.getElementById('country-select');
+        const currencySelect = document.getElementById('currency-select');
+        if (!countrySelect || !currencySelect) return;
+        const country = countrySelect.value;
+        if (country === 'ID') currencySelect.value = 'IDR';
+        else if (country === 'SG') currencySelect.value = 'SGD';
+        else currencySelect.value = 'MYR';
+        changeCurrency();
+    }
+
+    function switchPage(pageId, element) {
+        stopVoiceGuidance();
+        document.querySelectorAll('.app-page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page-${pageId}`).classList.add('active');
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active', 'text-emerald-400');
+            btn.classList.add('text-slate-400');
+        });
+        if(element) {
+            element.classList.add('active', 'text-emerald-400');
+            element.classList.remove('text-slate-400');
+        }
+
+        updateBalanceDisplay();
+        updateProfileDisplayUI();
+        loadLogsToUI();
+        loadAnnouncementToUI();
+    }
+
+    function stopVoiceGuidance() {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (activeNavigationInterval) clearInterval(activeNavigationInterval);
+    }
+
+    function triggerServiceAction(serviceName) {
+        stopVoiceGuidance();
+        const panel = document.getElementById('service-dynamic-panel');
+        const titleEl = document.getElementById('service-panel-title');
+        const contentEl = document.getElementById('service-panel-content');
+        panel.classList.remove('hidden');
+
+        if (serviceName === 'Food' || serviceName === 'Mart') {
+            titleEl.innerText = `Modul Kuliner & Toko: ${serviceName}`;
+            contentEl.innerHTML = `
+                <p class="text-slate-300 mb-2">Pilih kedai terdekat untuk memesan produk:</p>
+                <button onclick="triggerProductCheckout('Makanan Spesial', 25.00); document.getElementById('service-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer border-none">Checkout Pesanan (Otomatis Hitung Royalti 10%)</button>
+            `;
+        } else {
+            titleEl.innerText = `Modul Navigasi: ${serviceName}`;
+            contentEl.innerHTML = `
+                <button onclick="triggerShippingReward('${serviceName}'); document.getElementById('service-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer border-none">Selesaikan Pengiriman (${serviceName})</button>
+            `;
+        }
+    }
+
+    function logUserAction(actionName) {
+        const logs = JSON.parse(localStorage.getItem('swift_user_activity_logs') || '[]');
+        const timeStr = new Date().toTimeString().split(' ')[0] + ' ' + new Date().toLocaleDateString();
+        logs.unshift(`[${timeStr}] ${actionName}`);
+        if (logs.length > 50) logs.pop();
+        localStorage.setItem('swift_user_activity_logs', JSON.stringify(logs));
+        loadLogsToUI();
+    }
+
+    function loadLogsToUI() {
+        const container = document.getElementById('activity-log-container');
+        if(!container) return;
+        const logs = JSON.parse(localStorage.getItem('swift_user_activity_logs') || '[]');
+        if (logs.length === 0) {
+            container.innerHTML = `<div class="text-slate-500 text-center py-4 italic">// Belum ada riwayat aktivitas.</div>`;
+            return;
+        }
+        container.innerHTML = logs.map(l => `
+            <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 text-slate-300 flex items-start gap-2.5 shadow-sm">
+                <i class="fa-solid fa-circle-check text-emerald-400 mt-0.5"></i>
+                <div class="flex-1 break-all">${l}</div>
+            </div>
+        `).join('');
+    }
+
+    function loadAnnouncementToUI() {
+        const annText = document.getElementById('announcement-text');
+        if(!annText) return;
+        const ann = localStorage.getItem('swift_global_announcement');
+        annText.innerText = ann ? ann : "Tidak ada pengumuman darurat dari Master Admin.";
+    }
+
+    function openShareModal() { document.getElementById('share-modal').classList.remove('hidden'); }
+    function closeShareModal() { document.getElementById('share-modal').classList.add('hidden'); }
+    
+    function copyShareLink() {
+        const link = document.getElementById('share-link');
+        link.select();
+        navigator.clipboard.writeText(link.value).then(() => {
+            triggerReferralReward('Salin Tautan');
+        });
+    }
+
+    function changeCurrency() {
+        const select = document.getElementById('currency-select');
+        currentCurrency = select.value;
+        if(currentCurrency === 'IDR') currencySymbol = 'Rp';
+        else if(currentCurrency === 'SGD') currencySymbol = 'S\$';
+        else currencySymbol = 'RM';
+        document.getElementById('currency-symbol').innerText = currencySymbol;
+        const walletSymbolEl = document.getElementById('wallet-currency-symbol');
+        if(walletSymbolEl) walletSymbolEl.innerText = currencySymbol;
+        updateBalanceDisplay();
+        renderUI();
+    }
+
+    function updateBalanceDisplay() {
+        const rawBalance = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
+        const rate = conversionRates[currentCurrency] || 1;
+        const converted = rawBalance * rate;
+        const formatted = currentCurrency === 'IDR' ? converted.toLocaleString('id-ID') : converted.toFixed(2);
+        
+        const balEl = document.getElementById('balance-amount');
+        if(balEl) balEl.innerText = formatted;
+        const walletBalEl = document.getElementById('wallet-page-balance');
+        if(walletBalEl) walletBalEl.innerText = formatted;
+    }
+
+    function toggleUserVoicePreference() {
+        isVoiceActive = !isVoiceActive;
+        const btn = document.getElementById('user-voice-toggle');
+        btn.className = isVoiceActive ? "voice-toggle on" : "voice-toggle off";
+        btn.innerHTML = isVoiceActive ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-mute"></i>';
+    }
+
+    function initMasterAdminBridge() {
+        const isLocked = localStorage.getItem('swift_app_lockdown') === 'true';
+        if (isLocked) {
+            document.body.innerHTML = `
+                <div style="background:#030712; color:#f8fafc; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+                    <h1 style="font-size:20px; font-weight:800; color:#ef4444; margin-bottom:10px;">SISTEM DALAM PEMELIHARAAN (LOCKDOWN)</h1>
+                </div>
+            `;
+            return;
+        }
+        updateBalanceDisplay();
+        updateProfileDisplayUI();
+        renderUI();
+        loadLogsToUI();
+        loadAnnouncementToUI();
+    }
+
+    function openMasterAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
+    function closeMasterAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+    function saveAdminAnnouncement() {
+        const input = document.getElementById('admin-announcement-input');
+        if(!input || !input.value.trim()) return;
+        localStorage.setItem('swift_global_announcement', input.value.trim());
+        alert('✅ Pengumuman global disiarkan!');
+        loadAnnouncementToUI();
+    }
+    function setAdminLockdown(status) {
+        localStorage.setItem('swift_app_lockdown', status ? 'true' : 'false');
+        alert(`⚠️ Lockdown diubah ke: ${status}`);
+        if(status) location.reload();
+    }
+
+    function clickMasterBanner() { triggerBannerAdReward(); }
+    function openLiveStreamModal() {
+        triggerLiveStreamReward();
+        document.getElementById('live-modal').classList.remove('hidden');
+    }
+    function closeLiveStreamModal() { document.getElementById('live-modal').classList.add('hidden'); }
+
+    function sendLiveChat() {
+        const input = document.getElementById('live-chat-input');
+        if(!input || !input.value.trim()) return;
+        input.value = '';
+    }
+
+    function renderUI() {
+        const rate = conversionRates[currentCurrency] || 1;
+        const svcContainer = document.getElementById('nearby-services');
+        if(svcContainer) {
+            svcContainer.innerHTML = '';
+            serviceProviders.slice(0, 4).forEach(item => {
+                let div = document.createElement('div');
+                div.className = "service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer";
+                div.onclick = () => { triggerServiceAction(item.type); };
+                div.innerHTML = `<span class="text-lg mb-1">🏪</span><span class="text-[10px] font-bold text-slate-200 truncate w-full">${item.name}</span>`;
+                svcContainer.appendChild(div);
             });
         }
 
-        function triggerNativeShare() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'SWIFT Super-App',
-                    text: 'Gabung di SWIFT Super-App dan nikmati kemudahan layanannya!',
-                    url: 'https://swift-app.com/ref/USER123',
-                }).then(() => {
-                    logUserAction('Berhasil membagikan via Native Share');
-                }).catch(() => {});
-            } else {
-                alert('Fitur bagikan otomatis tidak didukung di peramban ini. Silakan gunakan tombol salin tautan.');
-            }
-        }
-
-        function changeCurrency() {
-            const select = document.getElementById('currency-select');
-            currentCurrency = select.value;
-            if(currentCurrency === 'IDR') currencySymbol = 'Rp';
-            else if(currentCurrency === 'SGD') currencySymbol = 'S$';
-            else currencySymbol = 'RM';
-
-            document.getElementById('currency-symbol').innerText = currencySymbol;
-            const walletSymbolEl = document.getElementById('wallet-currency-symbol');
-            if(walletSymbolEl) walletSymbolEl.innerText = currencySymbol;
-
-            updateBalanceDisplay();
-            renderUI();
-            logUserAction(`Mengubah mata uang ke ${currentCurrency}`);
-        }
-
-        function updateBalanceDisplay() {
-            const rawBalance = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
-            const rate = conversionRates[currentCurrency] || 1;
-            const converted = rawBalance * rate;
-            const formatted = currentCurrency === 'IDR' ? converted.toLocaleString('id-ID') : converted.toFixed(2);
-            
-            const balEl = document.getElementById('balance-amount');
-            if(balEl) balEl.innerText = formatted;
-            
-            const walletBalEl = document.getElementById('wallet-page-balance');
-            if(walletBalEl) walletBalEl.innerText = formatted;
-        }
-
-        function toggleUserVoicePreference() {
-            isVoiceActive = !isVoiceActive;
-            const btn = document.getElementById('user-voice-toggle');
-            btn.className = isVoiceActive ? "voice-toggle on" : "voice-toggle off";
-            btn.innerHTML = isVoiceActive ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-mute"></i>';
-            
-            logUserAction(`Mengubah preferensi suara ke: ${isVoiceActive ? 'ON' : 'OFF'}`);
-
-            if (isVoiceActive) {
-                startVoiceRecognition();
-                alert('🎙️ Panduan & Sensor Perintah Suara diaktifkan.');
-            } else {
-                stopVoiceGuidance();
-                if (recognition) recognition.stop();
-                alert('🔇 Sensor Perintah Suara dinonaktifkan.');
-            }
-        }
-
-        function startVoiceRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return;
-            
-            try {
-                recognition = new SpeechRecognition();
-                recognition.lang = 'id-ID';
-                recognition.continuous = true;
-                recognition.interimResults = false;
-
-                recognition.onresult = function(event) {
-                    if (!isVoiceActive) return;
-                    const speechResult = event.results[event.results.length - 1][0].transcript.toLowerCase();
-                    logUserAction(`Perintah suara diterima: "${speechResult}"`);
-                    
-                    if (speechResult.includes('beranda')) switchPage('beranda', document.querySelectorAll('.nav-btn')[0]);
-                    else if (speechResult.includes('dompet')) switchPage('dompet', document.querySelectorAll('.nav-btn')[1]);
-                    else if (speechResult.includes('riwayat')) switchPage('riwayat', document.querySelectorAll('.nav-btn')[2]);
-                    else if (speechResult.includes('profil')) switchPage('profil', document.querySelectorAll('.nav-btn')[7]);
-                    else if (speechResult.includes('food') || speechResult.includes('makanan')) triggerServiceAction('Food');
-                    else if (speechResult.includes('ride') || speechResult.includes('ojek')) triggerServiceAction('Ride');
-                    else if (speechResult.includes('car') || speechResult.includes('mobil')) triggerServiceAction('Car');
-                    else if (speechResult.includes('send') || speechResult.includes('kirim')) triggerServiceAction('Send');
-                    else if (speechResult.includes('box') || speechResult.includes('truk')) triggerServiceAction('Box');
-                    else if (speechResult.includes('express') || speechResult.includes('kilat')) triggerServiceAction('Express');
-                };
-
-                recognition.start();
-            } catch (e) {
-                console.log('Speech recognition error:', e);
-            }
-        }
-
-        async function initMasterAdminBridge() {
-            const isLocked = localStorage.getItem('swift_app_lockdown') === 'true';
-            if (isLocked) {
-                document.body.innerHTML = `
-                    <div style="background:#030712; color:#f8fafc; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; font-family:system-ui, sans-serif;">
-                        <div style="font-size: 52px; color: #ef4444; margin-bottom: 20px;"><i class="fa-solid fa-triangle-exclamation animate-bounce"></i></div>
-                        <h1 style="font-size:20px; font-weight:800; color:#ef4444; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Sistem Sedang Pemeliharaan (Lockdown)</h1>
-                        <p style="color:#94a3b8; font-size:13px; max-width:380px; line-height:1.5;">Akses aplikasi pengguna ditangguhkan sementara oleh Administrator Pusat melalui Master Command Tower.</p>
+        const prodContainer = document.getElementById('nearby-products');
+        if(prodContainer) {
+            prodContainer.innerHTML = '';
+            serviceProviders.forEach(item => {
+                const convertedPrice = (item.basePrice * rate);
+                const priceFormatted = currentCurrency === 'IDR' ? convertedPrice.toLocaleString('id-ID') : convertedPrice.toFixed(2);
+                let card = document.createElement('div');
+                card.className = "product-card min-w-[150px] max-w-[150px] flex-shrink-0 bg-[#1e293b]";
+                card.innerHTML = `
+                    <div class="h-28 bg-cover bg-center" style="background-image: url('${item.img}')"></div>
+                    <div class="card-body p-3">
+                        <h4 class="text-[11px] font-bold text-slate-100 truncate">${item.name}</h4>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs font-black text-emerald-400">${currencySymbol} ${priceFormatted}</span>
+                            <button onclick="triggerProductCheckout('${item.name}', ${item.basePrice})" class="text-[10px] bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-1 px-2.5 border-none cursor-pointer">Pesan →</button>
+                        </div>
                     </div>
                 `;
-                return;
-            }
-
-            const globalAnnouncement = localStorage.getItem('swift_global_announcement');
-            if (globalAnnouncement) {
-                const banner = document.createElement('div');
-                banner.style.cssText = 'background:linear-gradient(90deg, #9333ea, #3b82f6); color:white; padding:10px 16px; font-size:11px; font-weight:700; text-align:center; position:sticky; top:0; z-index:9999; display:flex; justify-content:center; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(0,0,0,0.4);';
-                banner.innerHTML = `<i class="fa-solid fa-bullhorn text-amber-300"></i> <span>PENGUMUMAN PUSAT: ${globalAnnouncement}</span>`;
-                document.body.insertBefore(banner, document.body.firstChild);
-            }
-
-            const syncedModules = JSON.parse(localStorage.getItem('swift_synced_public_modules') || '[]');
-            if (syncedModules.length > 0) {
-                const section = document.getElementById('synced-public-modules-section');
-                const menuContainer = document.getElementById('public-menu-container');
-                if (section && menuContainer) {
-                    section.classList.remove('hidden');
-                    menuContainer.innerHTML = syncedModules.map(m => `
-                        <a href="#" onclick="switchPage('beranda', null); logUserAction('Klik Modul Publik: ${m.name}')" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#070a12; border:1px solid #1e293b; border-radius:16px; color:white; text-decoration:none; font-weight:600; font-size:12px; transition:0.2s;">
-                            <span style="display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-cube text-purple-400"></i> ${m.name}</span>
-                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
-                        </a>
-                    `).join('');
-                }
-            }
-
-            updateBalanceDisplay();
-            renderUI();
-            loadLogsToUI();
-            loadAnnouncementToUI();
-            initAutoSlideBanner();
-            if (isVoiceActive) startVoiceRecognition();
+                prodContainer.appendChild(card);
+            });
         }
+    }
 
-        function openMasterAdminModal() {
-            logUserAction('Membuka Panel Master Admin');
-            document.getElementById('admin-modal').classList.remove('hidden');
+    function refreshLocation() {
+        logUserAction('Memperbarui Titik GPS');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const loggedUser = localStorage.getItem('swift_logged_user');
+        if (loggedUser) {
+            document.getElementById('auth-modal').classList.add('hidden');
         }
-        function closeMasterAdminModal() {
-            document.getElementById('admin-modal').classList.add('hidden');
-        }
-        function saveAdminAnnouncement() {
-            const input = document.getElementById('admin-announcement-input');
-            if(!input || !input.value.trim()) return;
-            const text = input.value.trim();
-            localStorage.setItem('swift_global_announcement', text);
-            logUserAction(`Mengubah siaran pengumuman pusat: "${text}"`);
-            alert('✅ Pengumuman global berhasil disiarkan ke seluruh ekosistem aplikasi!');
-            loadAnnouncementToUI();
-        }
-        function setAdminLockdown(status) {
-            localStorage.setItem('swift_app_lockdown', status ? 'true' : 'false');
-            logUserAction(`Mengubah status lockdown aplikasi ke: ${status}`);
-            alert(`⚠️ Status Lockdown aplikasi diubah menjadi: ${status ? 'AKTIF (Maintenance)' : 'NORMAL'}`);
-            if(status) location.reload();
-        }
-
-        function clickMasterBanner() {
-            logUserAction('Klik Banner Promosi Utama');
-            alert('Membuka detail penawaran promosi eksklusif SWIFT Master Admin.');
-        }
-
-        function openLiveStreamModal() {
-            logUserAction('Membuka Live Stream Broadcast Admin');
-            document.getElementById('live-modal').classList.remove('hidden');
-        }
-        function closeLiveStreamModal() { document.getElementById('live-modal').classList.add('hidden'); }
-
-        function sendLiveChat() {
-            const input = document.getElementById('live-chat-input');
-            if(!input || !input.value.trim()) return;
-            const text = input.value.trim();
-            logUserAction(`Mengirim pesan live chat: "${text}"`);
-            
-            const chatContainer = document.querySelector('#live-modal .overflow-y-auto');
-            if(chatContainer) {
-                const newMsg = document.createElement('div');
-                newMsg.className = "bg-black/60 backdrop-blur px-2.5 py-1 rounded-xl text-[10px] text-slate-200 border border-white/10";
-                newMsg.innerHTML = `<span class="font-bold text-emerald-400">Anda:</span> ${text}`;
-                chatContainer.appendChild(newMsg);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-            input.value = '';
-        }
-
-        function renderUI() {
-            const rate = conversionRates[currentCurrency] || 1;
-
-            const svcContainer = document.getElementById('nearby-services');
-            if(svcContainer) {
-                svcContainer.innerHTML = '';
-                serviceProviders.slice(0, 4).forEach(item => {
-                    let div = document.createElement('div');
-                    div.className = "service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer";
-                    div.onclick = () => { triggerServiceAction(item.type); };
-                    div.innerHTML = `<span class="text-lg mb-1">🏪</span><span class="text-[10px] font-bold text-slate-200 truncate w-full">${item.name}</span>`;
-                    svcContainer.appendChild(div);
-                });
-            }
-
-            const prodContainer = document.getElementById('nearby-products');
-            if(prodContainer) {
-                prodContainer.innerHTML = '';
-                serviceProviders.forEach(item => {
-                    const convertedPrice = (item.basePrice * rate);
-                    const priceFormatted = currentCurrency === 'IDR' ? convertedPrice.toLocaleString('id-ID') : convertedPrice.toFixed(2);
-
-                    let card = document.createElement('div');
-                    card.className = "product-card min-w-[150px] max-w-[150px] flex-shrink-0 bg-[#1e293b]";
-                    card.innerHTML = `
-                        <div class="h-28 bg-cover bg-center" style="background-image: url('${item.img}')"></div>
-                        <div class="card-body p-3">
-                            <h4 class="text-[11px] font-bold text-slate-100 truncate">${item.name}</h4>
-                            <div class="flex justify-between items-center mt-2">
-                                <span class="text-xs font-black text-emerald-400">${currencySymbol} ${priceFormatted}</span>
-                                <button onclick="logUserAction('Pesan Produk: ${item.name}'); alert('Pesanan ${item.name} berhasil dibuat!')" class="text-[10px] bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-1 px-2.5 border-none cursor-pointer">Pesan →</button>
-                            </div>
-                        </div>
-                    `;
-                    prodContainer.appendChild(card);
-                });
-            }
-        }
-
-        function refreshLocation() {
-            logUserAction('Memperbarui Titik Koordinat GPS & Telemetri');
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    pos => {
-                        document.getElementById('location-status-text').innerText = "GPS Aktif & Tersinkronisasi Nyata";
-                        initMasterAdminBridge();
-                    },
-                    () => {
-                        document.getElementById('location-status-text').innerText = "Sistem Live Engine Aktif";
-                        initMasterAdminBridge();
-                    }
-                );
-            } else {
-                document.getElementById('location-status-text').innerText = "Sistem Live Engine Aktif";
-                initMasterAdminBridge();
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', refreshLocation);
-    </script>
+        initMasterAdminBridge();
+        refreshLocation();
+        initAutoSlideBanner();
+    });
+</script>
 </body>
 </html>
