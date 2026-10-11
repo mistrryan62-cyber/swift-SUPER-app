@@ -178,10 +178,11 @@
     <header class="bg-[#0b0f19]/95 backdrop-blur border-b border-[#1e293b] py-3 px-4 sticky top-0 z-50">
         <div class="max-w-[480px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
+                <!-- AMAN DARI BUG TANDA TANYA: Menggunakan teks standar tanpa emoji bendera -->
                 <select id="country-select" onchange="syncCountryAndCurrency()" class="bg-[#1e293b] text-slate-100 text-xs py-1 px-2 border border-slate-700 outline-none cursor-pointer" aria-label="Pilih negara">
-                    <option value="MY" selected>🇲🇾 MY</option>
-                    <option value="ID">🇮🇩 ID</option>
-                    <option value="SG">🇸🇬 SG</option>
+                    <option value="MY" selected>Malaysia (MY)</option>
+                    <option value="ID">Indonesia (ID)</option>
+                    <option value="SG">Singapore (SG)</option>
                 </select>
                 <select id="currency-select" onchange="changeCurrency()" class="bg-[#1e293b] text-slate-100 text-xs py-1 px-2 border border-slate-700 outline-none cursor-pointer" aria-label="Pilih mata uang">
                     <option value="IDR">IDR</option>
@@ -273,40 +274,41 @@
             <div class="swift-card">
                 <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Semua Layanan Utama</h3>
                 <div class="grid grid-cols-4 gap-2.5">
+                    <!-- SEMUA EMOJI DIGANTI FONT AWESOME ICON (100% AMAN DI APK) -->
                     <div onclick="triggerServiceAction('Ride')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
-                        <span class="text-xl mb-1">🛵</span>
+                        <i class="fa-solid fa-motorcycle text-xl mb-1 text-emerald-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Ride</span>
                     </div>
                     <div onclick="triggerServiceAction('Send')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
-                        <span class="text-xl mb-1">📦</span>
+                        <i class="fa-solid fa-box text-xl mb-1 text-blue-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Send</span>
                     </div>
                     <div onclick="triggerServiceAction('Food')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
-                        <span class="text-xl mb-1">🍔</span>
+                        <i class="fa-solid fa-burger text-xl mb-1 text-amber-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Food</span>
                     </div>
                     <div onclick="triggerServiceAction('Mart')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
-                        <span class="text-xl mb-1">🏪</span>
+                        <i class="fa-solid fa-store text-xl mb-1 text-purple-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Mart</span>
                     </div>
                     <div onclick="triggerServiceAction('Express')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
-                        <span class="text-xl mb-1">⚡</span>
+                        <i class="fa-solid fa-bolt text-xl mb-1 text-yellow-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Express</span>
                     </div>
                     <div onclick="triggerServiceAction('Car')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
-                        <span class="text-xl mb-1">🚗</span>
+                        <i class="fa-solid fa-car text-xl mb-1 text-sky-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Car</span>
                     </div>
                     <div onclick="triggerServiceAction('Box')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
-                        <span class="text-xl mb-1">🚚</span>
+                        <i class="fa-solid fa-truck text-xl mb-1 text-emerald-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Box</span>
                     </div>
                     <div onclick="openLiveStreamModal()" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition border-none cursor-pointer">
-                        <span class="text-xl mb-1 text-red-500 animate-pulse">📡</span>
+                        <i class="fa-solid fa-tower-broadcast text-xl mb-1 text-red-500 animate-pulse"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Live</span>
                     </div>
                     <div onclick="openVideoUploadModal()" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer border border-purple-500/40 bg-purple-950/20">
-                        <span class="text-xl mb-1 text-purple-400">📹</span>
+                        <i class="fa-solid fa-video text-xl mb-1 text-purple-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Upload Video</span>
                     </div>
                 </div>
@@ -1429,7 +1431,8 @@
                 let div = document.createElement('div');
                 div.className = "service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer";
                 div.onclick = () => { triggerServiceAction(item.type); };
-                div.innerHTML = `<span class="text-lg mb-1">🏪</span><span class="text-[10px] font-bold text-slate-200 truncate w-full">${item.name}</span>`;
+                // AMAN DARI BUG TANDA TANYA: Menggunakan ikon Font Awesome
+                div.innerHTML = `<i class="fa-solid fa-store text-lg mb-1 text-emerald-400"></i><span class="text-[10px] font-bold text-slate-200 truncate w-full">${item.name}</span>`;
                 svcContainer.appendChild(div);
             });
         }
