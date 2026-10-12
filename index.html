@@ -75,8 +75,8 @@
         button:focus, a:focus, select:focus { outline: 2px solid rgba(16, 185, 129, 0.5); outline-offset: 2px; }
         
         .voice-toggle {
-            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-            border-radius: 9999px; transition: all 0.25s ease; border: none; cursor: pointer;
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            border-radius: 9999px; transition: all 0.25s ease; border: none; cursor: pointer; flex-shrink: 0;
         }
         .voice-toggle.on { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
         .voice-toggle.off { background: #334155; color: #94a3b8; }
@@ -175,32 +175,33 @@
 </div>
 
 <div class="app-wrapper">
-    <header class="bg-[#0b0f19]/95 backdrop-blur border-b border-[#1e293b] py-3 px-4 sticky top-0 z-50">
-        <div class="max-w-[480px] mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <select id="country-select" onchange="syncCountryAndCurrency()" class="bg-[#1e293b] text-slate-100 text-xs py-1 px-2 border border-slate-700 outline-none cursor-pointer" aria-label="Pilih negara">
-                    <option value="MY" selected>Malaysia (MY)</option>
-                    <option value="ID">Indonesia (ID)</option>
-                    <option value="SG">Singapore (SG)</option>
+    <!-- HEADER YANG TELAH DIRAPIKAN AGAR PRESISI DAN TIDAK TERPOTONG -->
+    <header class="bg-[#0b0f19]/95 backdrop-blur border-b border-[#1e293b] py-2.5 px-3 sticky top-0 z-50">
+        <div class="max-w-[480px] mx-auto flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5">
+                <select id="country-select" onchange="syncCountryAndCurrency()" class="bg-[#1e293b] text-slate-100 text-[11px] py-1 px-1.5 border border-slate-700 outline-none cursor-pointer" aria-label="Pilih negara">
+                    <option value="MY" selected>MY</option>
+                    <option value="ID">ID</option>
+                    <option value="SG">SG</option>
                 </select>
-                <select id="currency-select" onchange="changeCurrency()" class="bg-[#1e293b] text-slate-100 text-xs py-1 px-2 border border-slate-700 outline-none cursor-pointer" aria-label="Pilih mata uang">
+                <select id="currency-select" onchange="changeCurrency()" class="bg-[#1e293b] text-slate-100 text-[11px] py-1 px-1.5 border border-slate-700 outline-none cursor-pointer" aria-label="Pilih mata uang">
                     <option value="IDR">IDR</option>
                     <option value="MYR" selected>MYR</option>
                     <option value="SGD">SGD</option>
                 </select>
             </div>
             
-            <div class="flex items-center gap-2">
-                <button id="refresh-location-btn" onclick="refreshLocation()" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 transition rounded-full cursor-pointer" title="Perbarui lokasi">
-                    <i class="fa-solid fa-location-crosshairs text-emerald-400"></i>
+            <div class="flex items-center gap-1.5">
+                <button id="refresh-location-btn" onclick="refreshLocation()" class="text-xs bg-slate-800 hover:bg-slate-700 p-1.5 transition rounded-full cursor-pointer" title="Perbarui lokasi">
+                    <i class="fa-solid fa-location-crosshairs text-emerald-400 text-xs"></i>
                 </button>
                 <button onclick="toggleUserVoicePreference()" id="user-voice-toggle" class="voice-toggle on" title="Panduan Suara">
-                    <i class="fa-solid fa-volume-high"></i>
+                    <i class="fa-solid fa-volume-high text-xs"></i>
                 </button>
-                <button onclick="openShareModal()" class="text-xs bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 px-3 py-1.5 rounded-pill-soft font-bold transition flex items-center gap-1 cursor-pointer" title="Bagikan Aplikasi">
+                <button onclick="openShareModal()" class="text-[10px] bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 px-2.5 py-1.5 rounded-full font-bold transition flex items-center gap-1 cursor-pointer" title="Bagikan">
                     <i class="fa-solid fa-share-nodes"></i> Bagikan
                 </button>
-                <button onclick="openMasterAdminModal()" class="text-[10px] font-extrabold bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 transition shadow-md flex items-center gap-1 cursor-pointer border-none" title="Akses Panel Master Admin">
+                <button onclick="openMasterAdminModal()" class="text-[10px] font-extrabold bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-2.5 rounded-full transition shadow flex items-center gap-1 cursor-pointer border-none" title="Admin">
                     <i class="fa-solid fa-gear"></i> Admin
                 </button>
             </div>
@@ -1489,7 +1490,7 @@
         const btn = document.getElementById('user-voice-toggle');
         if(!btn) return;
         btn.className = isVoiceActive ? "voice-toggle on" : "voice-toggle off";
-        btn.innerHTML = isVoiceActive ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-mute"></i>';
+        btn.innerHTML = isVoiceActive ? '<i class="fa-solid fa-volume-high text-xs"></i>' : '<i class="fa-solid fa-volume-mute text-xs"></i>';
     }
 
     function initMasterAdminBridge() {
@@ -1530,7 +1531,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
         // PERSIAPAN AWAL: PAKSA SALDO KE 0.00 JIKA USER BELUM TERVERIFIKASI
-        localStorage.removeItem('swift_user_balance'); // Hapus kunci saldo lama jika ada
+        localStorage.removeItem('swift_user_balance');
         window.verifiedUserBalance = 0.00;
 
         const loggedUser = localStorage.getItem('swift_logged_user');
