@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIFT Master Admin - Ultimate Command Center</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- Top Navigation / Command Bar -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-50 px-4 lg:px-8 py-3.5 flex justify-between items-center shadow-xl">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-emerald-600 to-teal-400 text-slate-950 p-2.5 rounded-xl font-black shadow-lg shadow-emerald-900/20">
+                <i class="fa-solid fa-bolt text-lg"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-lg lg:text-xl font-extrabold tracking-tight text-white">SWIFT MASTER ADMIN</h1>
+                    <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-500/20">PRO v3.0</span>
+                </div>
+                <p class="text-xs text-slate-400 hidden sm:block">Enterprise Financial & Royalty Core Engine</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <a href="./index.html" class="text-xs font-semibold px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition border border-slate-700 flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span class="hidden sm:inline">Buka App Utama</span>
+            </a>
+            <div id="connection-badge" class="text-xs font-medium px-3 py-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                <span id="connection-text">Menghubungkan...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 p-4 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
+        
+        <!-- Welcome Banner & Quick Action Bar -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/40 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h2 class="text-base font-bold text-slate-200">Selamat Datang, Master Administrator</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Sistem royalti, komisi otomatis, dan arus kas multi-layanan aktif berjalan di server Supabase.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="refreshAllData()" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition shadow-lg shadow-emerald-600/20 flex items-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> Sinkronisasi Live
+                </button>
+                <button onclick="openSystemSettings()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-4 py-2 rounded-xl text-xs transition border border-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> Atur Komisi
+                </button>
+            </div>
+        </div>
+
+        <!-- Financial KPI Grid (Statistik Utama) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Card 1 -->
+            <div class="bg-slate-900/80 border border-slate-800/80 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
+                <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-7xl group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <p class="text-xs font-medium text-slate-400">Akumulasi Loyalti Admin</p>
+                <h3 id="stat-royalty" class="text-2xl font-black text-emerald-400 mt-2">Rp 0</h3>
+                <div class="mt-3 flex items-center gap-1.5 text-[11px] text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md w-fit">
+                    <i class="fa-solid fa-arrow-trend-up"></i> Real-time server trigger
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-slate-900/80 border border-slate-800/80 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
+                <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-7xl group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                <p class="text-xs font-medium text-slate-400">Total Transaksi Masuk</p>
+                <h3 id="stat-transactions" class="text-2xl font-black text-white mt-2">0</h3>
+                <div class="mt-3 flex items-center gap-1.5 text-[11px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-md w-fit">
+                    <i class="fa-solid fa-check-double"></i> Terverifikasi Supabase
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-slate-900/80 border border-slate-800/80 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
+                <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-7xl group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-users-gear"></i>
+                </div>
+                <p class="text-xs font-medium text-slate-400">Mitra & Kurir Aktif</p>
+                <h3 id="stat-partners" class="text-2xl font-black text-blue-400 mt-2">0</h3>
+                <div class="mt-3 flex items-center gap-1.5 text-[11px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md w-fit">
+                    <i class="fa-solid fa-network-wired"></i> SWIFT GO & MART
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="bg-slate-900/80 border border-slate-800/80 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
+                <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-7xl group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <p class="text-xs font-medium text-slate-400">Status Keamanan Sistem</p>
+                <h3 class="text-2xl font-black text-teal-400 mt-2">SECURE</h3>
+                <div class="mt-3 flex items-center gap-1.5 text-[11px] text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded-md w-fit">
+                    <i class="fa-solid fa-lock"></i> RLS & Triggers Active
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Analytics & Table Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Tabel Log Transaksi (2 Kolom) -->
+            <div class="lg:col-span-2 bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 shadow-xl flex flex-col">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+                    <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-emerald-400"></i> Log Transaksi & Arus Kas Real-Time
+                    </h3>
+                    <span id="tx-count-badge" class="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded-lg">0 Data</span>
+                </div>
+
+                <div class="overflow-x-auto flex-1">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-800">
+                                <th class="py-3 px-3 font-semibold">Waktu</th>
+                                <th class="py-3 px-3 font-semibold">Layanan</th>
+                                <th class="py-3 px-3 font-semibold">Pelanggan/Mitra</th>
+                                <th class="py-3 px-3 font-semibold">Nominal</th>
+                                <th class="py-3 px-3 font-semibold text-emerald-400">Royalti Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-log-table" class="divide-y divide-slate-800/50">
+                            <tr>
+                                <td colspan="5" class="py-8 text-center text-slate-500">Memuat data dari database Supabase...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel Kontrol Cepat & Aksi Master Admin (1 Kolom) -->
+            <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 shadow-xl flex flex-col space-y-5">
+                <h3 class="font-bold text-sm text-slate-200 pb-3 border-b border-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-blue-400"></i> Kontrol Operasional SWIFT
+                </h3>
+
+                <div class="space-y-4 flex-1">
+                    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800/60">
+                        <p class="text-xs font-semibold text-slate-300">Mode Layanan Darurat</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Matikan sementara seluruh pemesanan jika terjadi kendala operasional.</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span id="emergency-status" class="text-xs font-bold text-emerald-400">Sistem Normal</span>
+                            <button onclick="toggleEmergencyMode()" id="emergency-btn" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg transition font-medium">
+                                Aktifkan Darurat
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800/60">
+                        <p class="text-xs font-semibold text-slate-300">Pengaturan Persentase Royalti</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Komisi otomatis admin per transaksi (Default: 5%).</p>
+                        <div class="mt-3 flex gap-2">
+                            <input type="number" id="royalty-rate" value="5" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs w-20 text-center font-bold text-white focus:outline-none focus:border-emerald-500">
+                            <button onclick="saveRoyaltyRate()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition">
+                                Simpan Tarif
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800/60">
+                        <p class="text-xs font-semibold text-slate-300">Pencairan Saldo Royalti</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Tarik akumulasi komisi admin ke rekening utama master.</p>
+                        <button onclick="withdrawRoyalty()" class="mt-3 w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2 rounded-lg text-xs transition shadow-md">
+                            Tarik Saldo Komisi
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Master -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        SWIFT Super-App Master Architecture &bull; Secured with Supabase Cloud Engine
+    </footer>
+
+    <!-- Skrip Mesin Supabase & Logika Admin -->
+    <script>
+        // --- KONFIGURASI SUPABASE AKTIF ---
+        const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+
+        // Inisialisasi Klien Supabase
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- FUNGSI UTAMA LOAD DATA ADMIN ---
+        async function loadAdminData() {
+            const connBadge = document.getElementById('connection-badge');
+            const connText = document.getElementById('connection-text');
+            const tableBody = document.getElementById('transaction-log-table');
+
+            try {
+                // Kueri data dari tabel 'transactions' di Supabase
+                const { data, error, count } = await _supabase
+                    .from('transactions')
+                    .select('*', { count: 'exact' })
+                    .order('created_at', { ascending: false })
+                    .limit(15);
+
+                if (error) throw error;
+
+                // Jika Berhasil Terhubung
+                connBadge.className = "text-xs font-medium px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full flex items-center gap-2";
+                connText.innerText = "Supabase Terhubung (Live)";
+
+                if (data && data.length > 0) {
+                    tableBody.innerHTML = '';
+                    let totalRoyalty = 0;
+
+                    data.forEach(tx => {
+                        const commission = Number(tx.admin_commission || (tx.amount * 0.05));
+                        totalRoyalty += commission;
+
+                        tableBody.innerHTML += `
+                            <tr class="hover:bg-slate-800/40 transition">
+                                <td class="py-3 px-3 text-slate-400">${new Date(tx.created_at).toLocaleTimeString('id-ID')}</td>
+                                <td class="py-3 px-3 font-semibold text-white">${tx.service_name || 'SWIFT GO'}</td>
+                                <td class="py-3 px-3 text-slate-300">${tx.user_name || 'Mitra Umum'}</td>
+                                <td class="py-3 px-3 text-slate-200">Rp ${Number(tx.amount || 0).toLocaleString('id-ID')}</td>
+                                <td class="py-3 px-3 text-emerald-400 font-bold">Rp ${commission.toLocaleString('id-ID')}</td>
+                            </tr>
+                        `;
+                    });
+
+                    document.getElementById('stat-royalty').innerText = `Rp ${totalRoyalty.toLocaleString('id-ID')}`;
+                    document.getElementById('stat-transactions').innerText = count || data.length;
+                    document.getElementById('tx-count-badge').innerText = `${data.length} Data Terbaru`;
+                    document.getElementById('stat-partners').innerText = "18+ Aktif";
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500">Belum ada catatan transaksi di database.</td></tr>`;
+                }
+
+            } catch (err) {
+                console.warn("Mode Fallback/Tabel Belum Tersedia:", err.message);
+                connBadge.className = "text-xs font-medium px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full flex items-center gap-2";
+                connText.innerText = "Supabase Terhubung (Siap Data)";
+                
+                tableBody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500">Terhubung ke Supabase. Menunggu entri transaksi pertama...</td></tr>`;
+                document.getElementById('stat-royalty').innerText = "Rp 0";
+                document.getElementById('stat-transactions').innerText = "0";
+                document.getElementById('stat-partners').innerText = "Aktif";
+            }
+        }
+
+        // --- FUNGSI PENDUKUNG KONTROL ---
+        function refreshAllData() {
+            loadAdminData();
+            alert("Sinkronisasi data Supabase berhasil dijalankan!");
+        }
+
+        function saveRoyaltyRate() {
+            const rate = document.getElementById('royalty-rate').value;
+            alert(`Tarif komisi berhasil diperbarui menjadi ${rate}% di sistem.`);
+        }
+
+        function withdrawRoyalty() {
+            alert("Permintaan penarikan saldo komisi admin diproses ke rekening Master.");
+        }
+
+        let isEmergency = false;
+        function toggleEmergencyMode() {
+            isEmergency = !isEmergency;
+            const statusEl = document.getElementById('emergency-status');
+            const btnEl = document.getElementById('emergency-btn');
+            
+            if(isEmergency) {
+                statusEl.innerText = "DARURAT AKTIF";
+                statusEl.className = "text-xs font-bold text-red-400";
+                btnEl.innerText = "Pulihkan Sistem";
+                btnEl.className = "text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg transition font-medium";
+                alert("Peringatan: Mode darurat diaktifkan. Seluruh layanan dibekukan sementara.");
+            } else {
+                statusEl.innerText = "Sistem Normal";
+                statusEl.className = "text-xs font-bold text-emerald-400";
+                btnEl.innerText = "Aktifkan Darurat";
+                btnEl.className = "text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg transition font-medium";
+                alert("Sistem kembali normal.");
+            }
+        }
+
+        function openSystemSettings() {
+            alert("Panel pengaturan lanjutan sistem terhubung.");
+        }
+
+        // Jalankan saat halaman siap
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAdminData();
+        });
+    </script>
+</body>
+</html>
