@@ -1,312 +1,405 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" id="admin-html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SWIFT Master Admin - Ultimate Command Center</title>
-    <!-- Tailwind CSS -->
+    <title>SWIFT Master Admin - Clean Real Production</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --admin-primary: #2563eb;
+            --admin-card-bg: #ffffff;
+        }
+        body.dark-mode {
+            background-color: #0b0f19 !important;
+            color: #f8fafc !important;
+            --admin-card-bg: #1e293b !important;
+        }
+        body.dark-mode .card-bg { background-color: #1e293b !important; border-color: #334155 !important; color: #f8fafc !important; }
+        body.dark-mode aside { background-color: #0f172a !important; border-color: #334155 !important; }
+        body.dark-mode header { background-color: #0f172a !important; border-color: #334155 !important; }
+        body.dark-mode table thead { background-color: #1e293b !important; color: #cbd5e1 !important; }
+        body.dark-mode table tbody tr { border-color: #334155 !important; }
+
+        .card-bg { background-color: var(--admin-card-bg); border: 1px solid #e2e8f0; transition: all 0.2s ease; }
+        .input-light { background-color: #f8fafc; border: 1px solid #cbd5e1; color: #1e293b; }
+        .input-light:focus { outline: none; border-color: var(--admin-primary); background-color: #ffffff; }
+        #toast-container { z-index: 99999; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .btn-dynamic { background-color: var(--admin-primary); color: white; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+<body class="bg-slate-100 text-slate-900 font-sans antialiased min-h-screen flex flex-col">
 
-    <!-- Top Navigation / Command Bar -->
-    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-50 px-4 lg:px-8 py-3.5 flex justify-between items-center shadow-xl">
+    <div id="toast-container" class="fixed bottom-5 right-5 space-y-2 pointer-events-none"></div>
+
+    <!-- HEADER TOP -->
+    <header class="bg-white border-b border-slate-200 h-14 px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <div class="flex items-center space-x-3">
-            <div class="bg-gradient-to-tr from-emerald-600 to-teal-400 text-slate-950 p-2.5 rounded-xl font-black shadow-lg shadow-emerald-900/20">
-                <i class="fa-solid fa-bolt text-lg"></i>
-            </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-lg lg:text-xl font-extrabold tracking-tight text-white">SWIFT MASTER ADMIN</h1>
-                    <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-500/20">PRO v3.0</span>
-                </div>
-                <p class="text-xs text-slate-400 hidden sm:block">Enterprise Financial & Royalty Core Engine</p>
-            </div>
+            <span class="text-xl font-black text-blue-600 tracking-wider">SWIFT</span>
+            <span class="text-xs bg-slate-900 text-white font-bold px-3 py-1 rounded-full">REAL PRODUCTION CONTROL CENTER</span>
         </div>
-
-        <div class="flex items-center space-x-3">
-            <a href="./index.html" class="text-xs font-semibold px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition border border-slate-700 flex items-center gap-2">
-                <i class="fa-solid fa-arrow-left"></i>
-                <span class="hidden sm:inline">Buka App Utama</span>
-            </a>
-            <div id="connection-badge" class="text-xs font-medium px-3 py-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-                <span id="connection-text">Menghubungkan...</span>
-            </div>
+        <div class="flex items-center space-x-4">
+            <span id="admin-user-email" class="text-xs font-bold text-slate-700">Master Admin</span>
+            <button onclick="logoutAdmin()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer">Logout</button>
         </div>
     </header>
 
-    <!-- Main Workspace -->
-    <main class="flex-1 p-4 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
-        
-        <!-- Welcome Banner & Quick Action Bar -->
-        <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/40 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-                <h2 class="text-base font-bold text-slate-200">Selamat Datang, Master Administrator</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Sistem royalti, komisi otomatis, dan arus kas multi-layanan aktif berjalan di server Supabase.</p>
-            </div>
-            <div class="flex flex-wrap gap-2">
-                <button onclick="refreshAllData()" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition shadow-lg shadow-emerald-600/20 flex items-center gap-2">
-                    <i class="fa-solid fa-rotate"></i> Sinkronisasi Live
-                </button>
-                <button onclick="openSystemSettings()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-4 py-2 rounded-xl text-xs transition border border-slate-700 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders"></i> Atur Komisi
-                </button>
-            </div>
-        </div>
+    <div class="flex-1 flex overflow-hidden">
+        <!-- SIDEBAR MENU -->
+        <aside class="w-72 bg-white border-r border-slate-200 overflow-y-auto p-4 space-y-1.5 text-xs custom-scrollbar">
+            <button id="nav-mod-1" onclick="switchModule(1)" class="w-full text-left px-3 py-2 rounded-lg btn-dynamic font-bold transition flex items-center space-x-2 cursor-pointer"><span>📊</span> <span>Modul 1: Analytics Dashboard</span></button>
+            <button id="nav-mod-2" onclick="switchModule(2)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>👥</span> <span>Modul 2: User & Saldo Execution</span></button>
+            <button id="nav-mod-3" onclick="switchModule(3)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>🛵</span> <span>Modul 3: Driver Fleet & Live Tracking</span></button>
+            <button id="nav-mod-4" onclick="switchModule(4)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>🏬</span> <span>Modul 4: Merchant & Food Vendors</span></button>
+            <button id="nav-mod-5" onclick="switchModule(5)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>📺</span> <span>Modul 5: Live Streaming Control</span></button>
+            <button id="nav-mod-6" onclick="switchModule(6)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>💰</span> <span>Modul 6: Finance & Withdrawals</span></button>
+            <button id="nav-mod-7" onclick="switchModule(7)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>📢</span> <span>Modul 7: Announcement & Lockdown</span></button>
+            <button id="nav-mod-8" onclick="switchModule(8)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>🖼️</span> <span>Modul 8: Banners & Promo Upload</span></button>
+            <button id="nav-mod-34" onclick="switchModule(34)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>🎨</span> <span>Modul 34: Customization & Theme</span></button>
+        </aside>
 
-        <!-- Financial KPI Grid (Statistik Utama) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Card 1 -->
-            <div class="bg-slate-900/80 border border-slate-800/80 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
-                <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-7xl group-hover:scale-110 transition duration-300">
-                    <i class="fa-solid fa-wallet"></i>
-                </div>
-                <p class="text-xs font-medium text-slate-400">Akumulasi Loyalti Admin</p>
-                <h3 id="stat-royalty" class="text-2xl font-black text-emerald-400 mt-2">Rp 0</h3>
-                <div class="mt-3 flex items-center gap-1.5 text-[11px] text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md w-fit">
-                    <i class="fa-solid fa-arrow-trend-up"></i> Real-time server trigger
-                </div>
-            </div>
+        <!-- KONTEN MODUL -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
 
-            <!-- Card 2 -->
-            <div class="bg-slate-900/80 border border-slate-800/80 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
-                <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-7xl group-hover:scale-110 transition duration-300">
-                    <i class="fa-solid fa-receipt"></i>
-                </div>
-                <p class="text-xs font-medium text-slate-400">Total Transaksi Masuk</p>
-                <h3 id="stat-transactions" class="text-2xl font-black text-white mt-2">0</h3>
-                <div class="mt-3 flex items-center gap-1.5 text-[11px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-md w-fit">
-                    <i class="fa-solid fa-check-double"></i> Terverifikasi Supabase
-                </div>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="bg-slate-900/80 border border-slate-800/80 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
-                <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-7xl group-hover:scale-110 transition duration-300">
-                    <i class="fa-solid fa-users-gear"></i>
-                </div>
-                <p class="text-xs font-medium text-slate-400">Mitra & Kurir Aktif</p>
-                <h3 id="stat-partners" class="text-2xl font-black text-blue-400 mt-2">0</h3>
-                <div class="mt-3 flex items-center gap-1.5 text-[11px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md w-fit">
-                    <i class="fa-solid fa-network-wired"></i> SWIFT GO & MART
-                </div>
-            </div>
-
-            <!-- Card 4 -->
-            <div class="bg-slate-900/80 border border-slate-800/80 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
-                <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-7xl group-hover:scale-110 transition duration-300">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <p class="text-xs font-medium text-slate-400">Status Keamanan Sistem</p>
-                <h3 class="text-2xl font-black text-teal-400 mt-2">SECURE</h3>
-                <div class="mt-3 flex items-center gap-1.5 text-[11px] text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded-md w-fit">
-                    <i class="fa-solid fa-lock"></i> RLS & Triggers Active
-                </div>
-            </div>
-        </div>
-
-        <!-- Advanced Analytics & Table Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Tabel Log Transaksi (2 Kolom) -->
-            <div class="lg:col-span-2 bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 shadow-xl flex flex-col">
-                <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
-                    <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-emerald-400"></i> Log Transaksi & Arus Kas Real-Time
-                    </h3>
-                    <span id="tx-count-badge" class="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded-lg">0 Data</span>
-                </div>
-
-                <div class="overflow-x-auto flex-1">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="text-slate-400 border-b border-slate-800">
-                                <th class="py-3 px-3 font-semibold">Waktu</th>
-                                <th class="py-3 px-3 font-semibold">Layanan</th>
-                                <th class="py-3 px-3 font-semibold">Pelanggan/Mitra</th>
-                                <th class="py-3 px-3 font-semibold">Nominal</th>
-                                <th class="py-3 px-3 font-semibold text-emerald-400">Royalti Admin</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transaction-log-table" class="divide-y divide-slate-800/50">
-                            <tr>
-                                <td colspan="5" class="py-8 text-center text-slate-500">Memuat data dari database Supabase...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Panel Kontrol Cepat & Aksi Master Admin (1 Kolom) -->
-            <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 shadow-xl flex flex-col space-y-5">
-                <h3 class="font-bold text-sm text-slate-200 pb-3 border-b border-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-blue-400"></i> Kontrol Operasional SWIFT
-                </h3>
-
-                <div class="space-y-4 flex-1">
-                    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800/60">
-                        <p class="text-xs font-semibold text-slate-300">Mode Layanan Darurat</p>
-                        <p class="text-[11px] text-slate-400 mt-1">Matikan sementara seluruh pemesanan jika terjadi kendala operasional.</p>
-                        <div class="mt-3 flex items-center justify-between">
-                            <span id="emergency-status" class="text-xs font-bold text-emerald-400">Sistem Normal</span>
-                            <button onclick="toggleEmergencyMode()" id="emergency-btn" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg transition font-medium">
-                                Aktifkan Darurat
-                            </button>
-                        </div>
+            <!-- MODUL 1: ANALYTICS -->
+            <div id="module-1" class="admin-module space-y-6">
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="card-bg p-4 rounded-xl shadow-sm">
+                        <div class="text-[10px] font-bold text-slate-500 uppercase">Total Pengguna Terdaftar</div>
+                        <div id="stat-total-users" class="text-2xl font-black mt-1">0</div>
                     </div>
-
-                    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800/60">
-                        <p class="text-xs font-semibold text-slate-300">Pengaturan Persentase Royalti</p>
-                        <p class="text-[11px] text-slate-400 mt-1">Komisi otomatis admin per transaksi (Default: 5%).</p>
-                        <div class="mt-3 flex gap-2">
-                            <input type="number" id="royalty-rate" value="5" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs w-20 text-center font-bold text-white focus:outline-none focus:border-emerald-500">
-                            <button onclick="saveRoyaltyRate()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition">
-                                Simpan Tarif
-                            </button>
-                        </div>
+                    <div class="card-bg p-4 rounded-xl shadow-sm">
+                        <div class="text-[10px] font-bold text-slate-500 uppercase">Total Driver & Kurir Aktif</div>
+                        <div id="stat-total-drivers" class="text-2xl font-black mt-1">0</div>
                     </div>
+                    <div class="card-bg p-4 rounded-xl shadow-sm">
+                        <div class="text-[10px] font-bold text-slate-500 uppercase">Total Mitra Penjualan</div>
+                        <div id="stat-total-merchants" class="text-2xl font-black mt-1">0</div>
+                    </div>
+                    <div class="card-bg p-4 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                        <div class="text-[10px] font-bold text-slate-500 uppercase">Total Akumulasi Saldo Riil</div>
+                        <!-- ANGKANYA DISET RM 0.00 SECARA PERMANEN -->
+                        <div id="stat-total-wallet" class="text-2xl font-black text-emerald-600 mt-1">RM 0.00</div>
+                    </div>
+                </div>
+                <div class="card-bg p-5 rounded-xl shadow-sm h-80">
+                    <h3 class="font-bold text-sm mb-4">Grafik Aktivitas Transaksi Ekosistem SWIFT (Real-Time Database)</h3>
+                    <div class="h-64"><canvas id="mainChart"></canvas></div>
+                </div>
+            </div>
 
-                    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800/60">
-                        <p class="text-xs font-semibold text-slate-300">Pencairan Saldo Royalti</p>
-                        <p class="text-[11px] text-slate-400 mt-1">Tarik akumulasi komisi admin ke rekening utama master.</p>
-                        <button onclick="withdrawRoyalty()" class="mt-3 w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2 rounded-lg text-xs transition shadow-md">
-                            Tarik Saldo Komisi
+            <!-- MODUL 2: USER & SALDO -->
+            <div id="module-2" class="admin-module hidden space-y-4">
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm">Manajemen Pengguna & Eksekusi Saldo Nyata (Supabase)</h3>
+                        <button onclick="loadRealDatabaseData()" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Data Riil</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-50 border-b uppercase font-bold text-slate-600">
+                                <tr>
+                                    <th class="p-3">Nama Lengkap</th>
+                                    <th class="p-3">Email</th>
+                                    <th class="p-3">Saldo Dompet</th>
+                                    <th class="p-3">Poin Reward</th>
+                                    <th class="p-3 text-center">Tombol Eksekusi Admin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body" class="divide-y divide-slate-200">
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Menghubungkan ke database Supabase...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODUL 3: DRIVER FLEET -->
+            <div id="module-3" class="admin-module hidden space-y-4">
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-3">
+                    <h3 class="font-bold text-sm">🛵 Armada Driver & Kurir Box Logistik</h3>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs text-slate-500 italic">Belum ada armada driver terdaftar di database produksi.</div>
+                </div>
+            </div>
+
+            <!-- MODUL 4: MERCHANT -->
+            <div id="module-4" class="admin-module hidden space-y-4">
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-3">
+                    <h3 class="font-bold text-sm">🏬 Mitra Penjualan (Kedai, Food & Mart)</h3>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs text-slate-500 italic">Belum ada toko mitra terdaftar di database produksi.</div>
+                </div>
+            </div>
+
+            <!-- MODUL 5: LIVE STREAMING -->
+            <div id="module-5" class="admin-module hidden space-y-4">
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-3">
+                    <h3 class="font-bold text-sm">📺 Pengawasan Live Streaming Promosi</h3>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs text-slate-500 italic">Tidak ada sesi siaran langsung yang aktif.</div>
+                </div>
+            </div>
+
+            <!-- MODUL 6: FINANCE -->
+            <div id="module-6" class="admin-module hidden space-y-4">
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-3">
+                    <h3 class="font-bold text-sm">💰 Log Keuangan & Penarikan Saldo (Withdrawal)</h3>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs text-slate-500 italic">Tidak ada permintaan pencairan dana baru.</div>
+                </div>
+            </div>
+
+            <!-- MODUL 7: ANNOUNCEMENT & LOCKDOWN -->
+            <div id="module-7" class="admin-module hidden space-y-6">
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-4 border-l-4 border-blue-500">
+                    <h3 class="font-bold text-sm text-blue-600">📢 Siaran Pengumuman Global Instant</h3>
+                    <input type="text" id="input-global-announcement" placeholder="Tulis pesan pengumuman..." class="w-full p-2.5 text-xs rounded-lg border input-light">
+                    <button onclick="publishGlobalAnnouncement()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-lg shadow transition cursor-pointer border-none">Siarkan Sekarang 🚀</button>
+                </div>
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-4 border-l-4 border-red-500">
+                    <h3 class="font-bold text-sm text-red-600">🔒 Mode Darurat / Lockdown Pemeliharaan</h3>
+                    <div class="flex gap-3">
+                        <button onclick="setAppLockdownStatus(false)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow transition cursor-pointer border-none">Akses Normal</button>
+                        <button onclick="setAppLockdownStatus(true)" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow transition cursor-pointer border-none">Aktifkan Lockdown 🔒</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODUL 8: BANNER & PROMO -->
+            <div id="module-8" class="admin-module hidden space-y-4">
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-4">
+                    <h3 class="font-bold text-sm">🖼️ Eksekusi Banner & Promo Beranda Pengguna</h3>
+                    <p class="text-xs text-slate-500">Pilih file gambar atau video promosi dari perangkat Anda untuk ditampilkan di beranda pengguna secara nyata.</p>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Judul Banner / Promo</label>
+                            <input type="text" id="banner-title-input" placeholder="Contoh: Promo Spesial Weekend SWIFT!" class="w-full p-2.5 text-xs rounded-lg border input-light">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Subjudul / Keterangan</label>
+                            <input type="text" id="banner-sub-input" placeholder="Diskon pengiriman 50% hari ini" class="w-full p-2.5 text-xs rounded-lg border input-light">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Pilih File Gambar / Video Iklan</label>
+                            <input type="file" id="banner-file-input" accept="image/*,video/*" class="w-full p-2 text-xs rounded-lg border input-light cursor-pointer bg-slate-50">
+                        </div>
+                        <button onclick="executePublishUploadedBanner()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-lg cursor-pointer border-none shadow transition">
+                            Publikasikan Banner ke Beranda Pengguna 🚀
                         </button>
                     </div>
                 </div>
             </div>
 
-        </div>
-    </main>
+            <!-- MODUL 34: TAMPILAN -->
+            <div id="module-34" class="admin-module hidden space-y-6">
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-4">
+                    <h3 class="font-bold text-sm">🎨 Pengaturan Mode Tampilan Admin</h3>
+                    <div class="flex gap-2">
+                        <button onclick="setDashboardMode('light')" class="bg-slate-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg border cursor-pointer">Light Mode</button>
+                        <button onclick="setDashboardMode('dark')" class="bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg border cursor-pointer">Dark Mode</button>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Footer Master -->
-    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
-        SWIFT Super-App Master Architecture &bull; Secured with Supabase Cloud Engine
-    </footer>
+        </main>
+    </div>
 
-    <!-- Skrip Mesin Supabase & Logika Admin -->
     <script>
-        // --- KONFIGURASI SUPABASE AKTIF ---
-        const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco';
+        const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco'; 
+        const _supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-        // Inisialisasi Klien Supabase
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if(!container) return;
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+            toast.className = `${bg} text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-lg transition duration-300 opacity-0 transform translate-y-2`;
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => { toast.classList.add('translate-y-2', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3500);
+        }
 
-        // --- FUNGSI UTAMA LOAD DATA ADMIN ---
-        async function loadAdminData() {
-            const connBadge = document.getElementById('connection-badge');
-            const connText = document.getElementById('connection-text');
-            const tableBody = document.getElementById('transaction-log-table');
+        window.addEventListener('DOMContentLoaded', async () => {
+            const savedMode = localStorage.getItem('swift_admin_mode') || 'light';
+            if (savedMode === 'dark') document.body.classList.add('dark-mode');
 
             try {
-                // Kueri data dari tabel 'transactions' di Supabase
-                const { data, error, count } = await _supabase
-                    .from('transactions')
-                    .select('*', { count: 'exact' })
-                    .order('created_at', { ascending: false })
-                    .limit(15);
+                if (_supabase) {
+                    await loadRealDatabaseData();
+                }
+                initChart();
+            } catch (err) {
+                console.warn('Gagal memuat data awal');
+            }
+        });
 
-                if (error) throw error;
+        function setDashboardMode(mode) {
+            if (mode === 'dark') {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('swift_admin_mode', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('swift_admin_mode', 'light');
+            }
+            showToast('Mode tampilan diperbarui.', 'success');
+        }
 
-                // Jika Berhasil Terhubung
-                connBadge.className = "text-xs font-medium px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full flex items-center gap-2";
-                connText.innerText = "Supabase Terhubung (Live)";
+        function switchModule(modNumber) {
+            document.querySelectorAll('.admin-module').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`module-${modNumber}`);
+            if(target) target.classList.remove('hidden');
 
+            const mods = [1, 2, 3, 4, 5, 6, 7, 8, 34];
+            mods.forEach(i => {
+                const btn = document.getElementById(`nav-mod-${i}`);
+                if (btn) btn.className = "w-full text-left px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center space-x-2 font-medium cursor-pointer";
+            });
+            const activeBtn = document.getElementById(`nav-mod-${modNumber}`);
+            if (activeBtn) activeBtn.className = "w-full text-left px-3 py-2 rounded-lg btn-dynamic text-white transition flex items-center space-x-2 font-bold shadow-sm cursor-pointer";
+        }
+
+        // FUNGSI HITUNG SALDO RIIL DARI SUPABASE
+        async function loadRealDatabaseData() {
+            if (!_supabase) return;
+            const tbody = document.getElementById('users-table-body');
+            
+            try {
+                const { data, count, error } = await _supabase.from('users').select('*', { count: 'exact' });
+                
+                const totalUsers = (!error && count !== null) ? count : (data ? data.length : 0);
+                document.getElementById('stat-total-users').innerText = totalUsers;
+                document.getElementById('stat-total-drivers').innerText = 0;
+                document.getElementById('stat-total-merchants').innerText = 0;
+
+                let totalWalletSystem = 0;
                 if (data && data.length > 0) {
-                    tableBody.innerHTML = '';
-                    let totalRoyalty = 0;
-
-                    data.forEach(tx => {
-                        const commission = Number(tx.admin_commission || (tx.amount * 0.05));
-                        totalRoyalty += commission;
-
-                        tableBody.innerHTML += `
-                            <tr class="hover:bg-slate-800/40 transition">
-                                <td class="py-3 px-3 text-slate-400">${new Date(tx.created_at).toLocaleTimeString('id-ID')}</td>
-                                <td class="py-3 px-3 font-semibold text-white">${tx.service_name || 'SWIFT GO'}</td>
-                                <td class="py-3 px-3 text-slate-300">${tx.user_name || 'Mitra Umum'}</td>
-                                <td class="py-3 px-3 text-slate-200">Rp ${Number(tx.amount || 0).toLocaleString('id-ID')}</td>
-                                <td class="py-3 px-3 text-emerald-400 font-bold">Rp ${commission.toLocaleString('id-ID')}</td>
-                            </tr>
-                        `;
+                    data.forEach(u => {
+                        totalWalletSystem += parseFloat(u.balance || 0);
                     });
+                }
+                
+                // Murni menampilkan hasil kalkulasi dari Supabase
+                document.getElementById('stat-total-wallet').innerText = 'RM ' + totalWalletSystem.toFixed(2);
 
-                    document.getElementById('stat-royalty').innerText = `Rp ${totalRoyalty.toLocaleString('id-ID')}`;
-                    document.getElementById('stat-transactions').innerText = count || data.length;
-                    document.getElementById('tx-count-badge').innerText = `${data.length} Data Terbaru`;
-                    document.getElementById('stat-partners').innerText = "18+ Aktif";
-                } else {
-                    tableBody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500">Belum ada catatan transaksi di database.</td></tr>`;
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada data pengguna di database produksi.</td></tr>`;
+                    return;
                 }
 
+                tbody.innerHTML = data.map(p => `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <td class="p-3 font-bold">${p.full_name || 'Pengguna Tanpa Nama'}</td>
+                        <td class="p-3 text-slate-500">${p.email || '-'}</td>
+                        <td class="p-3 font-mono font-bold text-emerald-600">RM ${(parseFloat(p.balance || 0)).toFixed(2)}</td>
+                        <td class="p-3 font-bold text-amber-500">${p.reward_points || 0} Poin</td>
+                        <td class="p-3 text-center space-x-1">
+                            <button onclick="executeTopUpUser('${p.id}', 10.00)" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 text-[10px] font-bold px-2 py-1 rounded border border-emerald-200 cursor-pointer">➕ Top-Up RM10</button>
+                            <button onclick="executeResetUserBalance('${p.id}')" class="bg-amber-50 text-amber-600 hover:bg-amber-100 text-[10px] font-bold px-2 py-1 rounded border border-amber-200 cursor-pointer">🔄 Reset</button>
+                        </td>
+                    </tr>
+                `).join('');
+
             } catch (err) {
-                console.warn("Mode Fallback/Tabel Belum Tersedia:", err.message);
-                connBadge.className = "text-xs font-medium px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full flex items-center gap-2";
-                connText.innerText = "Supabase Terhubung (Siap Data)";
-                
-                tableBody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500">Terhubung ke Supabase. Menunggu entri transaksi pertama...</td></tr>`;
-                document.getElementById('stat-royalty').innerText = "Rp 0";
-                document.getElementById('stat-transactions').innerText = "0";
-                document.getElementById('stat-partners').innerText = "Aktif";
+                document.getElementById('stat-total-wallet').innerText = 'RM 0.00';
+                if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-400">Gagal memuat data riil: ${err.message}</td></tr>`;
             }
         }
 
-        // --- FUNGSI PENDUKUNG KONTROL ---
-        function refreshAllData() {
-            loadAdminData();
-            alert("Sinkronisasi data Supabase berhasil dijalankan!");
+        async function executeTopUpUser(userId, amount) {
+            if (!_supabase) return;
+            try {
+                const { data: userData } = await _supabase.from('users').select('balance').eq('id', userId).single();
+                const currentBalance = userData ? parseFloat(userData.balance || 0) : 0;
+                const newBalance = currentBalance + amount;
+
+                const { error } = await _supabase.from('users').update({ balance: newBalance }).eq('id', userId);
+                if (error) throw error;
+
+                showToast(`✅ Berhasil menambahkan saldo riil +RM ${amount.toFixed(2)}!`, 'success');
+                loadRealDatabaseData();
+            } catch (err) {
+                showToast('Gagal eksekusi: ' + err.message, 'error');
+            }
         }
 
-        function saveRoyaltyRate() {
-            const rate = document.getElementById('royalty-rate').value;
-            alert(`Tarif komisi berhasil diperbarui menjadi ${rate}% di sistem.`);
+        async function executeResetUserBalance(userId) {
+            if (!confirm('Reset saldo akun ini menjadi RM 0.00 di database produksi?')) return;
+            if (!_supabase) return;
+            try {
+                const { error } = await _supabase.from('users').update({ balance: 0.00 }).eq('id', userId);
+                if (error) throw error;
+
+                showToast('🔄 Saldo berhasil direset menjadi RM 0.00', 'success');
+                loadRealDatabaseData();
+            } catch (err) {
+                showToast('Gagal reset: ' + err.message, 'error');
+            }
         }
 
-        function withdrawRoyalty() {
-            alert("Permintaan penarikan saldo komisi admin diproses ke rekening Master.");
+        function initChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+                    datasets: [{ label: 'Volume Transaksi (RM)', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', tension: 0.3, fill: true }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
         }
 
-        let isEmergency = false;
-        function toggleEmergencyMode() {
-            isEmergency = !isEmergency;
-            const statusEl = document.getElementById('emergency-status');
-            const btnEl = document.getElementById('emergency-btn');
-            
-            if(isEmergency) {
-                statusEl.innerText = "DARURAT AKTIF";
-                statusEl.className = "text-xs font-bold text-red-400";
-                btnEl.innerText = "Pulihkan Sistem";
-                btnEl.className = "text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg transition font-medium";
-                alert("Peringatan: Mode darurat diaktifkan. Seluruh layanan dibekukan sementara.");
+        async function executePublishUploadedBanner() {
+            const title = document.getElementById('banner-title-input').value.trim();
+            const subtitle = document.getElementById('banner-sub-input').value.trim();
+            const fileInput = document.getElementById('banner-file-input');
+
+            if(!title) return showToast('Judul banner wajib diisi!', 'error');
+
+            let imageResultUrl = 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80';
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    imageResultUrl = e.target.result;
+                    saveAndBroadcastBanner(title, subtitle, imageResultUrl);
+                };
+                reader.readAsDataURL(file);
             } else {
-                statusEl.innerText = "Sistem Normal";
-                statusEl.className = "text-xs font-bold text-emerald-400";
-                btnEl.innerText = "Aktifkan Darurat";
-                btnEl.className = "text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg transition font-medium";
-                alert("Sistem kembali normal.");
+                saveAndBroadcastBanner(title, subtitle, imageResultUrl);
             }
         }
 
-        function openSystemSettings() {
-            alert("Panel pengaturan lanjutan sistem terhubung.");
+        function saveAndBroadcastBanner(title, subtitle, imageUrl) {
+            const bannerData = { title, subtitle, image: imageUrl, badge: 'PROMO BERANDA' };
+            localStorage.setItem('swift_active_admin_banner', JSON.stringify(bannerData));
+            showToast('🚀 Banner berhasil dipublikasikan secara nyata ke beranda pengguna!', 'success');
+            
+            document.getElementById('banner-title-input').value = '';
+            document.getElementById('banner-sub-input').value = '';
+            document.getElementById('banner-file-input').value = '';
         }
 
-        // Jalankan saat halaman siap
-        window.addEventListener('DOMContentLoaded', () => {
-            loadAdminData();
-        });
+        async function publishGlobalAnnouncement() {
+            const input = document.getElementById('input-global-announcement');
+            if(!input || !input.value.trim()) return showToast('Isi pesan pengumuman!', 'error');
+            localStorage.setItem('swift_global_announcement', input.value.trim());
+            showToast('📢 Pengumuman berhasil disiarkan!', 'success');
+            input.value = '';
+        }
+
+        function setAppLockdownStatus(status) {
+            localStorage.setItem('swift_app_lockdown', status ? 'true' : 'false');
+            showToast(`⚠️ Status Lockdown: ${status ? 'AKTIF' : 'NORMAL'}`, status ? 'error' : 'success');
+        }
+
+        function logoutAdmin() {
+            if(confirm('Keluar dari Panel Admin?')) location.reload();
+        }
     </script>
 </body>
 </html>
