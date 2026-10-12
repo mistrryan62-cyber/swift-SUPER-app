@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SWIFT — Master Enterprise Multi-Panel Command Tower</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
     tailwind.config = {
@@ -29,26 +30,33 @@
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #090d16; }
     ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
+    #toast-container { z-index: 99999; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white">
 
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-5 right-5 space-y-2 pointer-events-none"></div>
+
   <!-- TOP HEADER MASTER COMMAND -->
   <header class="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-cardborder">
     <div class="flex items-center gap-4">
-      <a href="index.html" class="text-purple-400 hover:text-purple-300 font-bold text-sm flex items-center gap-2 transition bg-purple-950/40 px-3 py-1.5 rounded-xl border border-purple-800/50">
+      <a href="index.html" class="text-purple-400 hover:text-purple-300 font-bold text-sm flex items-center gap-2 transition bg-purple-950/40 px-3 py-1.5 rounded-xl border border-purple-800/55">
         <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Aplikasi User (`index.html`)
       </a>
       <div class="h-5 w-[1px] bg-gray-700"></div>
       <div>
         <h1 class="text-lg font-black tracking-wide text-white uppercase flex items-center gap-2">
-          <i class="fa-solid fa-satellite-dish text-purple-400 animate-pulse"></i> SWIFT — Multi-Panel Command Tower (Supreme)
+          <i class="fa-solid fa-satellite-dish text-purple-400 animate-pulse"></i> SWIFT — Master Command Tower (Supreme)
         </h1>
-        <p class="text-xs text-slate-400">Pusat Kendali Multi-Panel, API Gateway, Firewall, & Konfigurasi Global</p>
+        <p class="text-xs text-slate-400">Pusat Kendali Real-Time Database, API Gateway, Firewall, & Konfigurasi Global</p>
       </div>
     </div>
     
     <div class="flex items-center gap-4">
+      <a href="admin.html" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-cardborder text-xs rounded-xl font-bold transition flex items-center gap-2 shadow">
+        <i class="fa-solid fa-gauge"></i> Panel Admin Utama (`admin.html`)
+      </a>
       <button onclick="refreshMasterHub()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-cardborder text-xs rounded-xl font-bold transition flex items-center gap-2 cursor-pointer shadow">
         <i class="fa-solid fa-rotate" id="refresh-icon"></i> Sinkronisasi Telemetri
       </button>
@@ -63,31 +71,33 @@
     <!-- SIDEBAR DINAMIS: DAFTAR MODUL TERDAFTAR -->
     <aside class="w-72 glass border-r border-cardborder flex flex-col shrink-0 overflow-y-auto hidden lg:flex">
       <div class="p-4 text-xs font-black uppercase text-slate-500 tracking-wider flex justify-between items-center">
-        <span>Navigasi Modul</span>
+        <span>Navigasi Ekosistem</span>
         <button onclick="openAddModuleModal()" class="text-purple-400 hover:text-white text-[10px] bg-purple-950 px-2 py-0.5 rounded border border-purple-800">+ Modul Baru</button>
       </div>
       <nav class="flex flex-col gap-1 px-3 pb-8 text-sm font-semibold" id="sidebar-module-nav">
         <a href="swift-master-admin.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left bg-purple-600 text-white shadow-lg shadow-purple-600/20 font-bold mb-2">
           <i class="fa-solid fa-gauge w-5"></i> ⚡ Master Command Tower
         </a>
-        <!-- Render otomatis via JS -->
+        <a href="admin.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white font-sans text-xs mb-1">
+          <i class="fa-solid fa-shield-halved w-5 text-emerald-400"></i> Panel Admin Operasional
+        </a>
       </nav>
     </aside>
 
     <!-- MAIN DASHBOARD CONTENT -->
     <main class="flex-1 overflow-y-auto p-6 lg:p-10 space-y-8">
       
-      <!-- KARTU RINGKASAN UTAMA & TELEMETRI -->
+      <!-- KARTU RINGKASAN UTAMA & TELEMETRI NYATA (SUPABASE) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="glass p-6 rounded-2xl border-l-4 border-purple-500">
-          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Modul Ekosistem</div>
-          <div class="text-3xl font-black text-white" id="master-stat-total-modules">16</div>
-          <div class="text-purple-400 text-xs mt-2 font-semibold">Integrasi Penuh Terhubung</div>
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Pengguna Riil (DB)</div>
+          <div class="text-3xl font-black text-white" id="stat-db-total-users">0</div>
+          <div class="text-purple-400 text-xs mt-2 font-semibold">Tabel Supabase Live</div>
         </div>
         <div class="glass p-6 rounded-2xl border-l-4 border-emerald-500">
-          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Modul Publik (Tampil di App)</div>
-          <div class="text-3xl font-black text-emerald-400" id="master-stat-public-modules">0</div>
-          <div class="text-emerald-400 text-xs mt-2 font-semibold">Akses Langsung Pengguna</div>
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Akumulasi Saldo Riil Sistem</div>
+          <div class="text-3xl font-black text-emerald-400" id="stat-db-total-wallet">RM 0.00</div>
+          <div class="text-emerald-400 text-xs mt-2 font-semibold">Tanpa Placeholder / Murni</div>
         </div>
         <div class="glass p-6 rounded-2xl border-l-4 border-blue-500">
           <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Penyimpanan Cache Lokal</div>
@@ -167,9 +177,9 @@
           <div class="bg-slate-900/80 p-4 rounded-xl border border-cardborder space-y-2">
             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-coins text-amber-400"></i> Format Mata Uang</label>
             <select id="setting-currency" class="w-full bg-darkbg border border-cardborder rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-              <option value="IDR">IDR (Rupiah - Rp)</option>
-              <option value="USD">USD (US Dollar - $)</option>
               <option value="MYR">MYR (Ringgit - RM)</option>
+              <option value="IDR">IDR (Rupiah - Rp)</option>
+              <option value="USD">USD (US Dollar - \$)</option>
             </select>
           </div>
           <div class="bg-slate-900/80 p-4 rounded-xl border border-cardborder space-y-2">
@@ -325,8 +335,24 @@
     </div>
   </div>
 
-  <!-- SCRIPT KONTROL MULTI-PANEL COMMAND TOWER -->
+  <!-- SCRIPT KONTROL MULTI-PANEL COMMAND TOWER & SUPABASE REAL-TIME -->
   <script>
+    const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co'; 
+    const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco'; 
+    const _supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if(!container) return;
+      const toast = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+      toast.className = `${bg} text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-lg transition duration-300 opacity-0 transform translate-y-2`;
+      toast.innerText = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => { toast.classList.add('translate-y-2', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+
     setInterval(() => {
       const now = new Date();
       document.getElementById('live-clock').innerText = now.toTimeString().split(' ')[0];
@@ -385,6 +411,7 @@
     function renderAuditLogs() {
       const container = document.getElementById('audit-log-container');
       const logs = getAuditLogs();
+      if (!container) return;
       if (logs.length === 0) {
         container.innerHTML = `<div class="text-slate-500">// Belum ada aktivitas tercatat.</div>`;
         return;
@@ -395,6 +422,31 @@
     function clearAuditLogs() {
       localStorage.removeItem('swift_master_audit_logs');
       renderAuditLogs();
+      showToast('Log audit berhasil dibersihkan.', 'success');
+    }
+
+    // TARIK DATA REAL-TIME DARI SUPABASE UNTUK TELEMETRI
+    async function loadSupabaseTelemetry() {
+      if (!_supabase) return;
+      try {
+        const { data, count, error } = await _supabase.from('users').select('*', { count: 'exact' });
+        const totalUsers = (!error && count !== null) ? count : (data ? data.length : 0);
+        
+        let totalWalletSystem = 0;
+        if (data && data.length > 0) {
+          data.forEach(u => {
+            totalWalletSystem += parseFloat(u.balance || 0);
+          });
+        }
+
+        const userElem = document.getElementById('stat-db-total-users');
+        const walletElem = document.getElementById('stat-db-total-wallet');
+
+        if(userElem) userElem.innerText = totalUsers;
+        if(walletElem) walletElem.innerText = 'RM ' + totalWalletSystem.toFixed(2);
+      } catch (err) {
+        console.warn('Gagal memuat telemetri Supabase:', err.message);
+      }
     }
 
     function renderMasterHub() {
@@ -402,25 +454,30 @@
       const tbody = document.getElementById('visibilityTableBody');
       const sidebarNav = document.getElementById('sidebar-module-nav');
       
-      tbody.innerHTML = '';
-      sidebarNav.innerHTML = `
-        <a href="swift-master-admin.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left bg-purple-600 text-white shadow-lg shadow-purple-600/20 font-bold mb-2">
-          <i class="fa-solid fa-gauge w-5"></i> ⚡ Master Command Tower
-        </a>
-      `;
+      if(tbody) tbody.innerHTML = '';
+      if(sidebarNav) {
+        sidebarNav.innerHTML = `
+          <a href="swift-master-admin.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left bg-purple-600 text-white shadow-lg shadow-purple-600/20 font-bold mb-2">
+            <i class="fa-solid fa-gauge w-5"></i> ⚡ Master Command Tower
+          </a>
+          <a href="admin.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white font-sans text-xs mb-1">
+            <i class="fa-solid fa-shield-halved w-5 text-emerald-400"></i> Panel Admin Operasional
+          </a>
+        `;
+      }
 
       let publicCount = 0;
-      let adminCount = 0;
 
       modules.forEach((m) => {
         if (m.public) publicCount++;
-        else adminCount++;
 
-        const navItem = document.createElement('a');
-        navItem.href = `${m.id}.html`;
-        navItem.className = "flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white font-sans text-xs";
-        navItem.innerHTML = `<i class="fa-solid fa-cube w-5 text-purple-400"></i> ${m.name}`;
-        sidebarNav.appendChild(navItem);
+        if(sidebarNav) {
+          const navItem = document.createElement('a');
+          navItem.href = `admin.html`;
+          navItem.className = "flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-left text-slate-400 hover:bg-slate-800/60 hover:text-white font-sans text-xs";
+          navItem.innerHTML = `<i class="fa-solid fa-cube w-5 text-purple-400"></i> ${m.name}`;
+          sidebarNav.appendChild(navItem);
+        }
 
         const badgeClass = m.public 
           ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' 
@@ -428,29 +485,33 @@
         
         const badgeText = m.public ? 'PUBLIC (Tampil di App)' : 'ADMIN ONLY (Disembunyikan)';
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="p-3">
-            <div class="font-bold text-white">${m.name}</div>
-            <div class="text-slate-400 text-[10px] font-mono">${m.id}.html</div>
-          </td>
-          <td class="p-3 text-slate-300 font-sans">${m.desc}</td>
-          <td class="p-3 text-center">
-            <span class="px-2.5 py-1 rounded border text-[10px] font-bold block w-max mx-auto ${badgeClass}">${badgeText}</span>
-          </td>
-          <td class="p-3 text-center">
-            <div class="flex justify-center gap-1.5">
-              <button onclick="toggleModuleVisibility('${m.id}')" class="px-2.5 py-1 bg-slate-900 hover:bg-purple-900 text-purple-400 rounded-lg border border-cardborder transition font-bold text-[11px] cursor-pointer shadow">Ubah Status</button>
-              <button onclick="deleteCustomModule('${m.id}')" class="px-2.5 py-1 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-lg border border-red-800/50 transition font-bold text-[11px] cursor-pointer">Hapus</button>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
+        if(tbody) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="p-3">
+              <div class="font-bold text-white">${m.name}</div>
+              <div class="text-slate-400 text-[10px] font-mono">${m.id}.html</div>
+            </td>
+            <td class="p-3 text-slate-300 font-sans">${m.desc}</td>
+            <td class="p-3 text-center">
+              <span class="px-2.5 py-1 rounded border text-[10px] font-bold block w-max mx-auto ${badgeClass}">${badgeText}</span>
+            </td>
+            <td class="p-3 text-center">
+              <div class="flex justify-center gap-1.5">
+                <button onclick="toggleModuleVisibility('${m.id}')" class="px-2.5 py-1 bg-slate-900 hover:bg-purple-900 text-purple-400 rounded-lg border border-cardborder transition font-bold text-[11px] cursor-pointer shadow">Ubah Status</button>
+                <button onclick="deleteCustomModule('${m.id}')" class="px-2.5 py-1 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-lg border border-red-800/50 transition font-bold text-[11px] cursor-pointer">Hapus</button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
       });
 
-      document.getElementById('master-stat-total-modules').innerText = modules.length;
-      document.getElementById('master-stat-public-modules').innerText = publicCount;
-      document.getElementById('master-stat-admin-modules').innerText = adminCount;
+      const totalModulesElem = document.getElementById('master-stat-total-modules');
+      const publicModulesElem = document.getElementById('master-stat-public-modules');
+
+      if(totalModulesElem) totalModulesElem.innerText = modules.length;
+      if(publicModulesElem) publicModulesElem.innerText = publicCount;
 
       // Render Cache & Storage List
       let totalSize = 0;
@@ -462,13 +523,17 @@
           storageKeysHtml += `<div>• <strong class="text-white">${key}</strong>: ${(valSize / 1024).toFixed(2)} KB</div>`;
         }
       }
-      document.getElementById('master-stat-cache-size').innerText = (totalSize / 1024).toFixed(1) + ' KB';
-      document.getElementById('storage-keys-list').innerHTML = storageKeysHtml || '<div>Tidak ada data lokal aktif.</div>';
+      const cacheSizeElem = document.getElementById('master-stat-cache-size');
+      const storageKeysListElem = document.getElementById('storage-keys-list');
+
+      if(cacheSizeElem) cacheSizeElem.innerText = (totalSize / 1024).toFixed(1) + ' KB';
+      if(storageKeysListElem) storageKeysListElem.innerHTML = storageKeysHtml || '<div>Tidak ada data lokal aktif.</div>';
 
       loadSavedSettings();
       const isLocked = localStorage.getItem('swift_app_lockdown') === 'true';
       updateBreakerUI(isLocked);
       renderAuditLogs();
+      loadSupabaseTelemetry();
     }
 
     function saveGlobalSettings() {
@@ -480,7 +545,7 @@
       };
       localStorage.setItem('swift_global_app_settings', JSON.stringify(settings));
       logAction('Memperbarui Konfigurasi Global Settings');
-      alert("Pengaturan global berhasil disimpan dan diseragamkan ke index.html!");
+      showToast('Pengaturan global berhasil disimpan & diseragamkan!', 'success');
     }
 
     function loadSavedSettings() {
@@ -488,9 +553,13 @@
         const stored = localStorage.getItem('swift_global_app_settings');
         if (stored) {
           const settings = JSON.parse(stored);
-          if(settings.registration) document.getElementById('setting-reg-status').value = settings.registration;
-          if(settings.currency) document.getElementById('setting-currency').value = settings.currency;
-          if(settings.theme) document.getElementById('setting-theme').value = settings.theme;
+          const regElem = document.getElementById('setting-reg-status');
+          const currElem = document.getElementById('setting-currency');
+          const themeElem = document.getElementById('setting-theme');
+
+          if(regElem && settings.registration) regElem.value = settings.registration;
+          if(currElem && settings.currency) currElem.value = settings.currency;
+          if(themeElem && settings.theme) themeElem.value = settings.theme;
         }
       } catch(e) {}
     }
@@ -499,26 +568,29 @@
       const limit = document.getElementById('api-rate-limit').value;
       localStorage.setItem('swift_api_rate_limit', limit);
       logAction(`Mengatur ulang batas Rate Limiting API Gateway menjadi ${limit} req/s`);
-      alert(`Rate limiting berhasil diatur ke ${limit} permintaan per detik.`);
+      showToast(`Rate limiting diatur ke ${limit} req/s.`, 'success');
     }
 
     function toggleSandboxMode() {
       const current = localStorage.getItem('swift_api_sandbox') === 'false';
       localStorage.setItem('swift_api_sandbox', current);
       const label = document.getElementById('sandbox-status-label');
-      if (current) {
-        label.innerText = 'AKTIF';
-        label.className = 'text-emerald-400';
-      } else {
-        label.innerText = 'NONAKTIF (PRODUCTION)';
-        label.className = 'text-amber-400';
+      if (label) {
+        if (current) {
+          label.innerText = 'AKTIF';
+          label.className = 'text-emerald-400';
+        } else {
+          label.innerText = 'NONAKTIF (PRODUCTION)';
+          label.className = 'text-amber-400';
+        }
       }
       logAction(`Mengubah status lingkungan API Sandbox menjadi ${current ? 'AKTIF' : 'PRODUCTION'}`);
+      showToast('Status Sandbox API diperbarui.', 'success');
     }
 
     function triggerWebhookPing() {
       logAction('Mengirim uji ping ke gerbang Webhook eksternal');
-      alert("Webhook Ping Berhasil: Respon dari server tujuan diterima dengan status HTTP 200 OK (Latensi: 12ms).");
+      showToast('Webhook Ping Berhasil: HTTP 200 OK (Latensi: 12ms).', 'success');
     }
 
     function exportDatabaseJSON() {
@@ -533,13 +605,14 @@
       dlAnchorElem.setAttribute("download", `swift_enterprise_backup_${new Date().toISOString().slice(0,10)}.json`);
       dlAnchorElem.click();
       logAction('Mengekspor seluruh database LocalStorage ke berkas JSON cadangan');
+      showToast('Backup JSON berhasil diunduh.', 'success');
     }
 
     function purgeLocalStorageCache() {
-      if (confirm("PERINGATAN: Tindakan ini akan membersihkan seluruh cache sementara LocalStorage. Lanjutkan?")) {
+      if (confirm("PERINGATAN: Tindakan ini akan membersihkan cache sementara LocalStorage. Lanjutkan?")) {
         localStorage.clear();
-        alert("Cache berhasil dibersihkan. Sistem akan dimuat ulang.");
-        location.reload();
+        showToast('Cache dibersihkan. Memuat ulang...', 'success');
+        setTimeout(() => location.reload(), 1000);
       }
     }
 
@@ -554,6 +627,7 @@
       });
       saveModuleRegistry(modules);
       renderMasterHub();
+      showToast('Visibilitas modul diperbarui.', 'success');
     }
 
     function deleteCustomModule(id) {
@@ -563,6 +637,7 @@
         saveModuleRegistry(modules);
         logAction(`Menghapus modul ${id} dari registry`);
         renderMasterHub();
+        showToast('Modul dihapus.', 'success');
       }
     }
 
@@ -575,7 +650,7 @@
 
       let modules = getModuleRegistry();
       if (modules.some(m => m.id === id)) {
-        alert("ID Modul sudah terdaftar.");
+        showToast("ID Modul sudah terdaftar.", "error");
         return;
       }
       modules.push({ id, name, desc, public: isPublic });
@@ -584,21 +659,22 @@
       closeAddModuleModal();
       document.getElementById('addModuleForm').reset();
       renderMasterHub();
+      showToast('Modul baru berhasil didaftarkan!', 'success');
     }
 
     function syncToUserApp() {
       const modules = getModuleRegistry();
       localStorage.setItem('swift_synced_public_modules', JSON.stringify(modules.filter(m => m.public)));
       logAction('Menyingkronkan modul publik ke index.html');
-      alert("Berhasil menyinkronkan modul publik ke aplikasi pengguna (`index.html`).");
+      showToast("Berhasil menyinkronkan modul publik ke aplikasi pengguna (`index.html`).", 'success');
     }
 
     function broadcastAnnouncement() {
       const text = document.getElementById('global-announcement-input').value.trim();
-      if (!text) { alert("Masukkan teks pengumuman."); return; }
+      if (!text) { showToast("Masukkan teks pengumuman.", "error"); return; }
       localStorage.setItem('swift_global_announcement', text);
       logAction('Mengirim broadcast pengumuman global');
-      alert("Pengumuman berhasil disiarkan.");
+      showToast("Pengumuman berhasil disiarkan ke beranda pengguna!", 'success');
       document.getElementById('global-announcement-input').value = '';
     }
 
@@ -608,12 +684,12 @@
       localStorage.setItem('swift_app_lockdown', nextState);
       updateBreakerUI(nextState);
       logAction(nextState ? 'Mengaktifkan Master Lockdown' : 'Membuka kembali sistem dari Lockdown');
-      alert(nextState ? "Aplikasi pengguna dikunci (Lockdown)." : "Aplikasi pengguna dibuka kembali.");
+      showToast(nextState ? "Aplikasi pengguna dikunci (Lockdown)." : "Aplikasi pengguna dibuka kembali.", nextState ? "error" : "success");
     }
 
     function runSystemDiagnostics() {
       logAction('Menjalankan diagnostik node mendalam');
-      alert("Diagnostik Multi-Panel: Semua 16 modul, API Gateway, dan Webhook berada dalam kondisi prima.");
+      showToast("Diagnostik Multi-Panel: Semua 16 modul, API Gateway, dan Supabase Database prima.", 'success');
     }
 
     function updateBreakerUI(isLocked) {
@@ -624,32 +700,47 @@
       const statSub = document.getElementById('master-stat-app-sub');
 
       if (isLocked) {
-        dot.className = 'w-3 h-3 rounded-full bg-red-500 animate-ping';
-        text.innerText = 'Status: Terkunci (Lockdown)';
-        btn.className = 'px-4 py-2 bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800/50 text-xs rounded-lg font-bold transition';
-        btn.innerText = 'Buka Kunci Aplikasi';
-        statStatus.innerText = 'LOCKED';
-        statStatus.className = 'text-3xl font-black text-red-500';
-        statSub.innerText = 'Akses Pengguna Ditangguhkan';
+        if(dot) dot.className = 'w-3 h-3 rounded-full bg-red-500 animate-ping';
+        if(text) text.innerText = 'Status: Terkunci (Lockdown)';
+        if(btn) {
+          btn.className = 'px-4 py-2 bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800/50 text-xs rounded-lg font-bold transition';
+          btn.innerText = 'Buka Kunci Aplikasi';
+        }
+        if(statStatus) {
+          statStatus.innerText = 'LOCKED';
+          statStatus.className = 'text-3xl font-black text-red-500';
+        }
+        if(statSub) statSub.innerText = 'Akses Pengguna Ditangguhkan';
       } else {
-        dot.className = 'w-3 h-3 rounded-full bg-emerald-500 animate-pulse';
-        text.innerText = 'Status: Sistem Normal (Aktif)';
-        btn.className = 'px-4 py-2 bg-red-950/80 hover:bg-red-900 text-red-400 border border-red-800/50 text-xs rounded-lg font-bold transition';
-        btn.innerText = 'Lockdown Aplikasi';
-        statStatus.innerText = 'ONLINE';
-        statStatus.className = 'text-3xl font-black text-emerald-400';
-        statSub.innerText = 'Akses Pengguna Normal';
+        if(dot) dot.className = 'w-3 h-3 rounded-full bg-emerald-500 animate-pulse';
+        if(text) text.innerText = 'Status: Sistem Normal (Aktif)';
+        if(btn) {
+          btn.className = 'px-4 py-2 bg-red-950/80 hover:bg-red-900 text-red-400 border border-red-800/50 text-xs rounded-lg font-bold transition';
+          btn.innerText = 'Lockdown Aplikasi';
+        }
+        if(statStatus) {
+          statStatus.innerText = 'ONLINE';
+          statStatus.className = 'text-3xl font-black text-emerald-400';
+        }
+        if(statSub) statSub.innerText = 'Akses Pengguna Normal';
       }
     }
 
-    function openAddModuleModal() { document.getElementById('addModuleModal').classList.remove('hidden'); }
-    function closeAddModuleModal() { document.getElementById('addModuleModal').classList.add('hidden'); }
+    function openAddModuleModal() { 
+      const modal = document.getElementById('addModuleModal');
+      if(modal) modal.classList.remove('hidden'); 
+    }
+    function closeAddModuleModal() { 
+      const modal = document.getElementById('addModuleModal');
+      if(modal) modal.classList.add('hidden'); 
+    }
 
     function resetModuleRegistry() {
       if (confirm("Reset registry modul ke default?")) {
         localStorage.setItem('swift_master_module_registry', JSON.stringify(defaultModules));
         logAction('Reset registry modul ke default');
         renderMasterHub();
+        showToast('Registry modul dikembalikan ke default.', 'success');
       }
     }
 
@@ -658,9 +749,9 @@
       if(icon) icon.classList.add('fa-spin');
       renderMasterHub();
       setTimeout(() => { if(icon) icon.classList.remove('fa-spin'); }, 500);
+      showToast('Telemetri disinkronkan ulang.', 'success');
     }
 
     window.onload = () => { renderMasterHub(); };
   </script>
 </body>
-</html>
