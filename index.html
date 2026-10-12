@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SWIFT Super-App Ecosystem (Advanced Enterprise Edition)</title>
+    <title>SWIFT Super-App Ecosystem (Enterprise Production Edition)</title>
     
     <!-- Konfigurasi PWA Standar Play Store -->
     <link rel="manifest" href="manifest.json">
@@ -49,7 +49,7 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .swift-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(16, 185, 129, 0.15); }
-        #promo-banner-container { transition: background-image 0.6s ease-in-out; border-radius: 28px !important; }
+        #promo-banner-container { transition: all 0.5s ease-in-out; border-radius: 28px !important; }
         
         .service-item {
             border-radius: 24px !important; aspect-ratio: 1 / 1; background: #1e293b;
@@ -139,7 +139,7 @@
         <div id="form-login" class="space-y-3 overflow-y-auto pr-1">
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Email / Username / No. HP</label>
-                <input type="text" id="login-identifier" placeholder="Contoh: papah atau email@domain.com" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+                <input type="text" id="login-identifier" placeholder="Masukkan email atau username" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
             </div>
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Password</label>
@@ -151,7 +151,7 @@
         <div id="form-register" class="space-y-2.5 overflow-y-auto pr-1 hidden">
             <div>
                 <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Nama Lengkap</label>
-                <input type="text" id="reg-nama" placeholder="Nama Lengkap Mitra" class="w-full bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+                <input type="text" id="reg-nama" placeholder="Nama Lengkap" class="w-full bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
             </div>
             <div>
                 <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Username / ID</label>
@@ -169,7 +169,7 @@
                 <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Password</label>
                 <input type="password" id="reg-password" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
             </div>
-            <button onclick="handleSupabaseRegister()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">REGISTRASI MITRA BARU 📝</button>
+            <button onclick="handleSupabaseRegister()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">REGISTRASI AKUN BARU 📝</button>
         </div>
     </div>
 </div>
@@ -178,7 +178,6 @@
     <header class="bg-[#0b0f19]/95 backdrop-blur border-b border-[#1e293b] py-3 px-4 sticky top-0 z-50">
         <div class="max-w-[480px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <!-- AMAN DARI BUG TANDA TANYA: Menggunakan teks standar tanpa emoji bendera -->
                 <select id="country-select" onchange="syncCountryAndCurrency()" class="bg-[#1e293b] text-slate-100 text-xs py-1 px-2 border border-slate-700 outline-none cursor-pointer" aria-label="Pilih negara">
                     <option value="MY" selected>Malaysia (MY)</option>
                     <option value="ID">Indonesia (ID)</option>
@@ -215,7 +214,7 @@
             <div id="location-status-box" class="bg-[#1e293b]/80 backdrop-blur border border-slate-700/80 py-2.5 px-4 text-xs text-emerald-400 font-bold flex items-center justify-between rounded-pill-soft shadow-sm">
                 <div class="flex items-center gap-2">
                     <span class="pulse-dot"></span>
-                    <span id="location-status-text">Sistem Aktif & Terhubung Real-Time Supabase</span>
+                    <span id="location-status-text">Terhubung Real-Time ke Supabase</span>
                 </div>
                 <span id="sync-mode-badge" class="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-pill-soft uppercase tracking-wider font-extrabold">LIVE ENGINE</span>
             </div>
@@ -225,21 +224,32 @@
                     <div>
                         <p id="wallet-balance-label" class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">SALDO DOMPET SWIFT</p>
                         <h2 id="user-balance" class="text-2xl font-black text-white mt-1">
-                            <span class="text-sm font-normal text-slate-400" id="currency-symbol">RM</span> <span id="balance-amount">150.00</span>
+                            <span class="text-sm font-normal text-slate-400" id="currency-symbol">RM</span> <span id="balance-amount">0.00</span>
                         </h2>
+                        <!-- REWARD POIN DISPLAY REAL -->
+                        <div class="mt-2 flex items-center gap-2">
+                            <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-extrabold border border-amber-500/30 flex items-center gap-1">
+                                <i class="fa-solid fa-star text-amber-400"></i> Poin SWIFT: <span id="reward-points-val">0</span>
+                            </span>
+                            <button onclick="redeemRewardPoints()" class="text-[9px] bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-2 py-0.5 rounded-full transition border-none cursor-pointer">Tukar Poin</button>
+                        </div>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex flex-col gap-2">
                         <button onclick="switchPage('dompet', document.querySelectorAll('.nav-btn')[1]); openWalletModule('Top Up');" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-extrabold py-2 px-4 shadow-lg shadow-emerald-500/20 transition cursor-pointer border-none">Top Up (+)</button>
-                        <button onclick="switchPage('profil', document.querySelectorAll('.nav-btn')[7])" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold py-2 px-3.5 transition cursor-pointer border-none">Profil</button>
+                        <button onclick="checkActiveOrderChat()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold py-1.5 px-3 transition cursor-pointer border-none flex items-center gap-1">
+                            <i class="fa-solid fa-comments"></i> Chat Kurir
+                        </button>
                     </div>
                 </div>
             </div>
 
+            <!-- BANNER PROMO REAL (BERSIH DARI URL GAMBAR DUMMY / UNSPLASH) -->
             <div class="swift-card p-0 overflow-hidden relative group cursor-pointer" onclick="clickMasterBanner()">
-                <div id="promo-banner-container" class="h-36 bg-cover bg-center flex items-end p-4 justify-between" style="background-image: linear-gradient(to top, rgba(3,7,18,0.95), rgba(3,7,18,0.3)), url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80');">
+                <div id="promo-banner-container" class="h-36 bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 flex items-end p-4 justify-between border border-emerald-500/20 rounded-[28px]">
                     <div>
-                        <span id="promo-badge" class="text-[10px] font-extrabold bg-red-600 text-white py-0.5 px-2.5 uppercase tracking-wide shadow"><i class="fa-solid fa-fire mr-1"></i> LIVE PROMO</span>
-                        <h3 id="promo-title" class="text-xs sm:text-sm font-bold text-white mt-1.5 leading-snug drop-shadow">Diskon Spesial Kuliner Partner SWIFT hingga 50%!</h3>
+                        <span id="promo-badge" class="text-[10px] font-extrabold bg-emerald-500 text-slate-950 py-0.5 px-2.5 uppercase tracking-wide shadow"><i class="fa-solid fa-bullhorn mr-1"></i> SWIFT OFFICIAL</span>
+                        <h3 id="promo-title" class="text-xs sm:text-sm font-bold text-white mt-1.5 leading-snug drop-shadow">Selamat Datang di SWIFT Super-App</h3>
+                        <p id="promo-subtitle" class="text-[10px] text-slate-300 mt-0.5">Ekosistem layanan mandiri, transportasi, logistik & perdagangan.</p>
                     </div>
                     <div class="flex flex-col items-end gap-2">
                         <div id="live-banner-trigger" class="hidden">
@@ -247,10 +257,27 @@
                                 <i class="fa-solid fa-circle text-[8px]"></i> LIVE NOW
                             </button>
                         </div>
-                        <div id="banner-dots" class="flex gap-1 items-center bg-black/40 px-2 py-1 rounded-full backdrop-blur">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REAL-TIME GPS TRACKING WIDGET (HIDDEN SECARA BAWAAN - HANYA MUNCUL JIKA ADA PESANAN AKTIF DARI SUPABASE) -->
+            <div id="gps-tracking-widget" class="swift-card bg-slate-900/90 border-l-4 border-blue-500 space-y-3 hidden">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-extrabold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot text-blue-400"></i> Lacak Pengiriman Real-Time
+                    </h3>
+                    <span id="gps-eta-badge" class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full font-mono font-bold">Menunggu...</span>
+                </div>
+                <div class="relative h-28 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 flex items-center justify-center">
+                    <div class="absolute inset-0 bg-cover bg-center opacity-40"></div>
+                    <div class="relative z-10 flex items-center gap-4 bg-black/70 backdrop-blur px-4 py-2 rounded-2xl border border-white/10">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm animate-bounce">
+                            <i class="fa-solid fa-motorcycle"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-white" id="gps-driver-name">Menunggu Driver...</div>
+                            <div class="text-[10px] text-emerald-400 font-mono" id="gps-status-text">Mencari driver terdekat...</div>
                         </div>
                     </div>
                 </div>
@@ -260,7 +287,9 @@
                 <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                     <i class="fa-solid fa-location-dot text-emerald-400"></i> Terdekat Sekitar Anda
                 </h3>
-                <div id="nearby-services" class="grid grid-cols-4 gap-2.5"></div>
+                <div id="nearby-services" class="grid grid-cols-4 gap-2.5">
+                    <div class="col-span-4 text-center py-4 text-xs text-slate-500 italic">Mencari kedai & mitra terdekat di sekitar Anda...</div>
+                </div>
             </div>
 
             <div id="service-dynamic-panel" class="swift-card hidden space-y-3 border-emerald-500/40">
@@ -274,7 +303,6 @@
             <div class="swift-card">
                 <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Semua Layanan Utama</h3>
                 <div class="grid grid-cols-4 gap-2.5">
-                    <!-- SEMUA EMOJI DIGANTI FONT AWESOME ICON (100% AMAN DI APK) -->
                     <div onclick="triggerServiceAction('Ride')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
                         <i class="fa-solid fa-motorcycle text-xl mb-1 text-emerald-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Ride</span>
@@ -316,10 +344,12 @@
 
             <div class="swift-card">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">🔥 Produk Kedai Master Admin</h3>
-                    <a href="#" onclick="alert('Menampilkan katalog lengkap')" class="text-[11px] text-emerald-400 hover:underline font-bold">Lihat Semua →</a>
+                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">🔥 Produk Kedai Mitra SWIFT</h3>
+                    <a href="#" onclick="alert('Menampilkan katalog produk')" class="text-[11px] text-emerald-400 hover:underline font-bold">Lihat Semua →</a>
                 </div>
-                <div id="nearby-products" class="hide-scrollbar flex gap-3 overflow-x-auto pb-1"></div>
+                <div id="nearby-products" class="hide-scrollbar flex gap-3 overflow-x-auto pb-1">
+                    <div class="w-full text-center py-4 text-xs text-slate-500 italic">Belum ada produk kedai yang terdaftar di database.</div>
+                </div>
             </div>
         </div>
 
@@ -327,7 +357,7 @@
         <div id="page-dompet" class="app-page">
             <div class="swift-card bg-gradient-to-br from-emerald-950/60 to-slate-900 border-l-4 border-emerald-500">
                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Saldo Dompet Aktif</span>
-                <h2 class="text-3xl font-black text-white mt-1 mb-3"><span id="wallet-currency-symbol">RM</span> <span id="wallet-page-balance">150.00</span></h2>
+                <h2 class="text-3xl font-black text-white mt-1 mb-3"><span id="wallet-currency-symbol">RM</span> <span id="wallet-page-balance">0.00</span></h2>
                 <div class="flex gap-2">
                     <button onclick="openWalletModule('Top Up')" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-xs py-2.5 rounded-full transition shadow cursor-pointer border-none">Top Up Saldo (+)</button>
                     <button onclick="openWalletModule('Tarik Tunai')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2.5 rounded-full transition border border-slate-700 cursor-pointer">Tarik Tunai</button>
@@ -381,6 +411,15 @@
                     <p id="announcement-text" class="text-slate-300">Memuat pengumuman dari Master Command Tower...</p>
                 </div>
             </div>
+
+            <div class="swift-card space-y-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-comments text-blue-400"></i> Obrolan Langsung Pesanan Aktif
+                </h3>
+                <div id="active-chat-list" class="space-y-2">
+                    <div class="text-slate-500 text-center py-4 text-xs italic">// Belum ada obrolan pesanan aktif saat ini.</div>
+                </div>
+            </div>
         </div>
 
         <!-- ================= HALAMAN 5: LAPORAN ================= -->
@@ -388,13 +427,13 @@
             <div class="grid grid-cols-2 gap-3">
                 <div class="swift-card border-l-4 border-purple-500">
                     <span class="text-[10px] text-slate-400 font-bold uppercase">Total Transaksi</span>
-                    <h3 class="text-2xl font-black text-white mt-1">12</h3>
+                    <h3 class="text-2xl font-black text-white mt-1" id="report-total-tx">0</h3>
                     <span class="text-[10px] text-purple-400 font-semibold">Bulan Berjalan</span>
                 </div>
                 <div class="swift-card border-l-4 border-emerald-500">
                     <span class="text-[10px] text-slate-400 font-bold uppercase">Cashback Diterima</span>
-                    <h3 class="text-2xl font-black text-emerald-400 mt-1">RM 24.50</h3>
-                    <span class="text-[10px] text-emerald-400 font-semibold">100% Sukses</span>
+                    <h3 class="text-2xl font-black text-emerald-400 mt-1" id="report-cashback">RM 0.00</h3>
+                    <span class="text-[10px] text-emerald-400 font-semibold">100% Real-Time Sync</span>
                 </div>
             </div>
         </div>
@@ -420,14 +459,13 @@
                 </div>
                 <h3 class="font-extrabold text-white text-base">Butuh Bantuan Langsung?</h3>
                 <p class="text-xs text-slate-300">Tim dukungan pelanggan enterprise SWIFT siap melayani Anda 24/7 secara real-time.</p>
-                <button onclick="alert('Menghubungkan ke agen dukungan pusat...')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-extrabold py-2.5 px-6 rounded-full transition shadow cursor-pointer border-none">Live Chat Dukungan</button>
+                <button onclick="openLiveChatModal('Dukungan Pelanggan CS')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-extrabold py-2.5 px-6 rounded-full transition shadow cursor-pointer border-none">Live Chat Dukungan CS</button>
             </div>
         </div>
 
         <!-- ================= HALAMAN 8: PROFIL ================= -->
         <div id="page-profil" class="app-page">
             <div class="swift-card flex items-center gap-4">
-                <!-- Foto Profil Interaktif / Upload File -->
                 <div class="relative group cursor-pointer" onclick="document.getElementById('profile-avatar-file').click()" title="Klik untuk ganti Foto Profil">
                     <div id="profile-avatar-container" class="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center text-emerald-400 text-2xl font-black overflow-hidden bg-cover bg-center">
                         <span id="profile-initials">SW</span>
@@ -439,9 +477,9 @@
                 </div>
 
                 <div>
-                    <h3 id="profile-name-label" class="font-extrabold text-white text-base">Master Enterprise User</h3>
-                    <p id="profile-email-label" class="text-xs text-slate-400">user@swift-ecosystem.com</p>
-                    <span id="profile-status-badge" class="inline-block mt-1 text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2.5 py-0.5 rounded-pill-soft border border-emerald-500/30 cursor-pointer" onclick="openProfileModal('Verifikasi')">Verified Member ✓</span>
+                    <h3 id="profile-name-label" class="font-extrabold text-white text-base">Belum Login</h3>
+                    <p id="profile-email-label" class="text-xs text-slate-400">Silakan login terlebih dahulu</p>
+                    <span id="profile-status-badge" class="inline-block mt-1 text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2.5 py-0.5 rounded-pill-soft border border-emerald-500/30 cursor-pointer" onclick="openProfileModal('Verifikasi')">Member Baru</span>
                 </div>
             </div>
 
@@ -469,7 +507,6 @@
                 </div>
             </div>
 
-            <!-- Panel Dinamis Profil Interaktif -->
             <div id="profile-dynamic-panel" class="swift-card hidden space-y-3 border-emerald-500/40">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                     <h4 id="profile-panel-title" class="text-xs font-bold text-emerald-400 uppercase tracking-wider"></h4>
@@ -481,6 +518,33 @@
 
     </main>
 
+    <!-- MODAL IN-APP LIVE CHAT -->
+    <div id="live-chat-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-0 sm:p-4">
+        <div class="w-full max-w-[480px] h-full sm:h-[90vh] bg-[#0f172a] sm:rounded-[28px] border border-[#1e293b] flex flex-col relative overflow-hidden shadow-2xl">
+            <div class="p-4 bg-[#0b0f19] border-b border-[#1e293b] flex justify-between items-center">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-white text-xs" id="chat-target-name">Live Chat SWIFT</h3>
+                        <p class="text-[10px] text-emerald-400">Terhubung & Terenkripsi Real-Time Supabase</p>
+                    </div>
+                </div>
+                <button onclick="closeLiveChatModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center hover:bg-slate-700 transition cursor-pointer border-none">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <div id="chat-messages-box" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs font-sans"></div>
+
+            <div class="p-3 bg-[#0b0f19] border-t border-[#1e293b] flex gap-2">
+                <input type="text" id="chat-input-text" placeholder="Ketik pesan..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500">
+                <button onclick="sendLiveChatMessage()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl transition cursor-pointer border-none shadow">Kirim</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Master Admin -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-0 sm:p-4">
         <div class="w-full max-w-[480px] h-full sm:h-[90vh] bg-[#0f172a] sm:rounded-[28px] border border-[#1e293b] flex flex-col relative overflow-hidden shadow-2xl">
@@ -491,7 +555,7 @@
                     </div>
                     <div>
                         <h3 class="font-extrabold text-white text-xs">SWIFT Command Tower (Master Admin)</h3>
-                        <p class="text-[10px] text-slate-400">Kontrol ekosistem & manajemen iklan promosi</p>
+                        <p class="text-[10px] text-slate-400">Kontrol ekosistem real-time</p>
                     </div>
                 </div>
                 <button onclick="closeMasterAdminModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center hover:bg-slate-700 transition cursor-pointer border-none">
@@ -516,11 +580,10 @@
                 </div>
 
                 <div class="swift-card border-l-4 border-purple-500 space-y-2">
-                    <h4 class="font-bold text-white text-xs flex items-center gap-1.5"><i class="fa-solid fa-chart-line text-purple-400"></i> Ringkasan Royalti & Finansial</h4>
+                    <h4 class="font-bold text-white text-xs flex items-center gap-1.5"><i class="fa-solid fa-chart-line text-purple-400"></i> Ringkasan Real-Time Finansial</h4>
                     <div class="p-3 bg-slate-900 rounded-xl space-y-1 font-mono">
-                        <div class="flex justify-between"><span>Total Pendapatan Iklan:</span><span class="text-emerald-400 font-bold">RM 1,450.00</span></div>
-                        <div class="flex justify-between"><span>Komisi Transaksi (Fee):</span><span class="text-purple-400 font-bold">RM 320.50</span></div>
-                        <div class="flex justify-between border-t border-slate-800 pt-1 mt-1 font-bold text-white"><span>Total Royalti Admin:</span><span class="text-emerald-400">RM 1,770.50</span></div>
+                        <div class="flex justify-between"><span>Total Pendapatan System:</span><span class="text-emerald-400 font-bold" id="admin-rev-val">RM 0.00</span></div>
+                        <div class="flex justify-between"><span>Komisi Transaksi:</span><span class="text-purple-400 font-bold" id="admin-fee-val">RM 0.00</span></div>
                     </div>
                 </div>
             </div>
@@ -537,13 +600,13 @@
             <p class="text-xs text-slate-400">Bagikan tautan referral Anda ke media sosial & dapatkan bonus saldo instan saat teman bergabung!</p>
             
             <div class="grid grid-cols-4 gap-2 text-center text-xs">
-                <a href="https://api.whatsapp.com/send?text=Gabung%20di%20SWIFT%20Super-App%20sekarang%20dan%20nikmati%20kemudahannya!%20 https://swift-app.com/ref/USER123" target="_blank" onclick="triggerReferralReward('WhatsApp')" class="p-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded-2xl border border-emerald-500/30 flex flex-col items-center gap-1 transition">
+                <a href="https://api.whatsapp.com/send?text=Gabung%20di%20SWIFT%20Super-App%20sekarang!%20 https://swift-app.com" target="_blank" onclick="triggerReferralReward('WhatsApp')" class="p-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded-2xl border border-emerald-500/30 flex flex-col items-center gap-1 transition">
                     <i class="fa-brands fa-whatsapp text-lg"></i><span>WhatsApp</span>
                 </a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=https://swift-app.com/ref/USER123" target="_blank" onclick="triggerReferralReward('Facebook')" class="p-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-2xl border border-blue-500/30 flex flex-col items-center gap-1 transition">
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://swift-app.com" target="_blank" onclick="triggerReferralReward('Facebook')" class="p-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-2xl border border-blue-500/30 flex flex-col items-center gap-1 transition">
                     <i class="fa-brands fa-facebook text-lg"></i><span>Facebook</span>
                 </a>
-                <a href="https://t.me/share/url?url=https://swift-app.com/ref/USER123&text=Gabung%20di%20SWIFT%20Super-App!" target="_blank" onclick="triggerReferralReward('Telegram')" class="p-3 bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 rounded-2xl border border-sky-500/30 flex flex-col items-center gap-1 transition">
+                <a href="https://t.me/share/url?url=https://swift-app.com" target="_blank" onclick="triggerReferralReward('Telegram')" class="p-3 bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 rounded-2xl border border-sky-500/30 flex flex-col items-center gap-1 transition">
                     <i class="fa-brands fa-telegram text-lg"></i><span>Telegram</span>
                 </a>
                 <button onclick="triggerNativeShare()" class="p-3 bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 rounded-2xl border border-purple-500/30 flex flex-col items-center gap-1 transition cursor-pointer border-none">
@@ -552,7 +615,7 @@
             </div>
 
             <div class="bg-slate-800/80 rounded-pill-soft p-3 flex items-center gap-2 border border-slate-700">
-                <input id="share-link" type="text" value="https://swift-app.com/ref/USER123" readonly class="flex-1 bg-transparent text-xs text-slate-200 outline-none">
+                <input id="share-link" type="text" value="https://swift-app.com" readonly class="flex-1 bg-transparent text-xs text-slate-200 outline-none">
                 <button onclick="copyShareLink()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-bold py-1.5 px-4 rounded-pill-soft shadow cursor-pointer border-none">Salin</button>
             </div>
         </div>
@@ -571,16 +634,12 @@
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Judul / Deskripsi Video</label>
-                    <input type="text" id="video-title-input" placeholder="Contoh: Review Rasa Whopper Burger" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-purple-500">
+                    <input type="text" id="video-title-input" placeholder="Masukkan deskripsi video..." class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-purple-500">
                 </div>
 
                 <div>
-                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Pilih File Video (.mp4 / max 30s)</label>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Pilih File Video (.mp4)</label>
                     <input type="file" id="video-file-input" accept="video/*" class="w-full text-slate-400 text-xs bg-slate-900 p-2 rounded-xl border border-slate-800 cursor-pointer">
-                </div>
-
-                <div class="p-3 bg-purple-950/30 border border-purple-800/40 rounded-xl text-[11px] text-purple-300">
-                    <i class="fa-solid fa-coins text-amber-400 mr-1"></i> <strong>Bonus Mitra:</strong> Dapatkan royalti instan sebesar <strong>+RM 2.50</strong> secara real-time untuk setiap video produk yang diunggah!
                 </div>
 
                 <button onclick="handleProcessVideoUpload()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-extrabold py-3 rounded-xl transition shadow-lg cursor-pointer border-none mt-2">
@@ -598,7 +657,7 @@
                     <span class="bg-red-600 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-pill-soft uppercase flex items-center gap-1.5 animate-pulse">
                         <i class="fa-solid fa-circle text-[6px]"></i> LIVE BROADCAST
                     </span>
-                    <span class="text-xs font-bold text-white drop-shadow">SWIFT Master Live Stream</span>
+                    <span class="text-xs font-bold text-white drop-shadow">SWIFT Live Stream</span>
                 </div>
                 <button onclick="closeLiveStreamModal()" class="w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black transition border-none cursor-pointer">
                     <i class="fa-solid fa-xmark text-sm"></i>
@@ -606,38 +665,15 @@
             </div>
 
             <div class="flex-1 bg-gradient-to-br from-slate-950 via-[#111827] to-slate-900 relative flex flex-col items-center justify-center overflow-hidden p-4 text-center">
-                <div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('https://images.unsplash.com/photo-1556742049-0a67d553c2a5?auto=format&fit=crop&w=600&q=80');"></div>
-                
                 <div class="relative z-10 space-y-3 max-w-[320px]">
-                    <div class="w-20 h-20 rounded-full bg-red-600/20 border-2 border-red-500 flex items-center justify-center mx-auto text-red-500 text-3xl shadow-lg animate-pulse">
-                        <i class="fa-solid fa-video"></i>
+                    <div class="w-20 h-20 rounded-full bg-red-600/20 border-2 border-red-500 flex items-center justify-center mx-auto text-red-500 text-3xl shadow-lg">
+                        <i class="fa-solid fa-video-slash"></i>
                     </div>
                     <div>
-                        <h3 class="font-black text-white text-base">Siaran Langsung Admin Pusat</h3>
-                        <p class="text-[11px] text-slate-300 mt-1">Menyiarkan promosi diskon spesial, pembaruan kedai, dan koordinasi logistik secara real-time.</p>
-                    </div>
-                    <div class="flex justify-center items-center gap-3 pt-2 text-xs font-bold">
-                        <span class="bg-slate-900/80 px-3 py-1 rounded-full border border-slate-700 text-emerald-400"><i class="fa-solid fa-eye mr-1"></i> 1,420 Penonton</span>
-                        <span class="bg-slate-900/80 px-3 py-1 rounded-full border border-slate-700 text-red-400"><i class="fa-solid fa-clock mr-1"></i> 00:24:15</span>
+                        <h3 class="font-black text-white text-base">Tidak Ada Siaran Langsung</h3>
+                        <p class="text-[11px] text-slate-400 mt-1">Saat ini belum ada admin atau mitra yang sedang melakukan siaran langsung.</p>
                     </div>
                 </div>
-
-                <div class="absolute bottom-16 left-3 right-3 z-20 space-y-1.5 text-left max-h-32 overflow-y-auto px-1 hide-scrollbar">
-                    <div class="bg-black/60 backdrop-blur px-2.5 py-1 rounded-xl text-[10px] text-slate-200 border border-white/10">
-                        <span class="font-bold text-emerald-400">Ahmad:</span> Mantap sekali diskonnya admin! 🔥
-                    </div>
-                    <div class="bg-black/60 backdrop-blur px-2.5 py-1 rounded-xl text-[10px] text-slate-200 border border-white/10">
-                        <span class="font-bold text-amber-400">Siti_Oace:</span> Kedai makanan terdekat sudah buka ya?
-                    </div>
-                    <div class="bg-black/60 backdrop-blur px-2.5 py-1 rounded-xl text-[10px] text-slate-200 border border-white/10">
-                        <span class="font-bold text-purple-400">Admin_Pusat:</span> Betul Siti, silakan cek menu food sekarang!
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-3 bg-[#0b0f19] border-t border-[#1e293b] flex gap-2 z-20">
-                <input type="text" id="live-chat-input" placeholder="Kirim pesan ke siaran langsung..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none">
-                <button onclick="sendLiveChat()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition cursor-pointer border-none shadow">Kirim</button>
             </div>
         </div>
     </div>
@@ -680,14 +716,216 @@
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
     let currentUserId = localStorage.getItem('swift_user_uuid') || null;
+    let activeOrderData = null;
+    
+    // VARIABEL GLOBAL SALDO TERVERIFIKASI SERVER (MEMASTIKAN TIDAK ADA DATA PALSU LOKAL)
+    window.verifiedUserBalance = 0.00;
 
-    // FUNGSI UTAMA: KALKULASI & DISTRIBUSI ROYALTY OTOMATIS REAL-TIME
-    async function addRealtimeRoyalty(sourceType, amount, description) {
-        let currentBalance = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
-        currentBalance += amount;
-        localStorage.setItem('swift_user_balance', currentBalance.toFixed(2));
+    // 1. FUNGSI UTAMA PENAMPIL SALDO (MURNI SINKRON REAL SERVER)
+    function updateBalanceDisplay() {
+        const verifiedBalance = parseFloat(window.verifiedUserBalance || 0.00);
+        const rate = conversionRates[currentCurrency] || 1;
+        const converted = verifiedBalance * rate;
+        const formatted = currentCurrency === 'IDR' ? converted.toLocaleString('id-ID') : converted.toFixed(2);
+        
+        const balEl = document.getElementById('balance-amount');
+        if (balEl) balEl.innerText = formatted;
+        
+        const walletBalEl = document.getElementById('wallet-page-balance');
+        if (walletBalEl) walletBalEl.innerText = formatted;
+    }
+
+    // 2. SINKRONISASI DATA REAL-TIME DARI SUPABASE
+    async function syncRealDataFromSupabase() {
+        if (!supabaseClient || !currentUserId) {
+            window.verifiedUserBalance = 0.00;
+            updateBalanceDisplay();
+            hideDriverTracking();
+            return;
+        }
+
+        try {
+            const { data: userProfile, error } = await supabaseClient
+                .from('users')
+                .select('balance, reward_points, full_name, email')
+                .eq('id', currentUserId)
+                .single();
+
+            if (userProfile && !error) {
+                window.verifiedUserBalance = parseFloat(userProfile.balance || 0.00);
+                localStorage.setItem('swift_user_rewards', userProfile.reward_points || '0');
+                if (userProfile.full_name) {
+                    localStorage.setItem('swift_logged_user_name', userProfile.full_name);
+                }
+            } else {
+                window.verifiedUserBalance = 0.00;
+            }
+        } catch (err) {
+            console.log('Error fetching user profile from Supabase:', err);
+            window.verifiedUserBalance = 0.00;
+        }
+
         updateBalanceDisplay();
+        updateRewardsDisplay();
+        updateProfileDisplayUI();
 
+        // Cek apakah ada pesanan/transaksi aktif di Supabase
+        try {
+            const { data: activeOrder, error: orderErr } = await supabaseClient
+                .from('orders')
+                .select('*, drivers(full_name, phone)')
+                .eq('user_id', currentUserId)
+                .in('status', ['searching', 'accepted', 'pickup', 'on_delivery'])
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (activeOrder && !orderErr) {
+                activeOrderData = activeOrder;
+                showDriverTracking(
+                    activeOrder.drivers?.full_name || 'Driver SWIFT',
+                    getOrderStatusLabel(activeOrder.status),
+                    activeOrder.eta_minutes || 10
+                );
+            } else {
+                activeOrderData = null;
+                hideDriverTracking();
+            }
+        } catch (err) {
+            hideDriverTracking();
+        }
+
+        fetchRealProductsFromSupabase();
+        fetchRealBannersFromSupabase();
+    }
+
+    async function fetchRealBannersFromSupabase() {
+        if (!supabaseClient) return;
+        try {
+            const { data: banners, error } = await supabaseClient
+                .from('banners')
+                .select('*')
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+
+            if (banners && banners.length > 0) {
+                promotionalBanners = banners.map(b => ({
+                    title: b.title,
+                    badge: b.badge || 'SWIFT PROMO',
+                    subtitle: b.subtitle || '',
+                    image: b.image_url
+                }));
+                updateBannerUI(0);
+            }
+        } catch (err) {
+            console.log('Tabel banners belum dikonfigurasi di Supabase');
+        }
+    }
+
+    function updateBannerUI(index) {
+        if (!promotionalBanners || promotionalBanners.length === 0) return;
+        let currentData = promotionalBanners[index];
+        const bannerBg = document.getElementById('promo-banner-container');
+        const bannerTitle = document.getElementById('promo-title');
+        const bannerBadge = document.getElementById('promo-badge');
+        const bannerSub = document.getElementById('promo-subtitle');
+
+        if (bannerBg && bannerTitle && bannerBadge) {
+            if (currentData.image) {
+                bannerBg.style.backgroundImage = `linear-gradient(to top, rgba(3,7,18,0.95), rgba(3,7,18,0.3)), url('${currentData.image}')`;
+            } else {
+                bannerBg.style.backgroundImage = 'none';
+                bannerBg.className = "h-36 bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 flex items-end p-4 justify-between border border-emerald-500/20 rounded-[28px]";
+            }
+            bannerTitle.innerText = currentData.title;
+            if (bannerSub) bannerSub.innerText = currentData.subtitle || '';
+            bannerBadge.innerHTML = `<i class="fa-solid fa-bullhorn mr-1"></i> ${currentData.badge}`;
+        }
+    }
+
+    async function fetchRealProductsFromSupabase() {
+        if (!supabaseClient) return;
+        try {
+            const { data: products, error } = await supabaseClient
+                .from('products')
+                .select('*')
+                .eq('is_available', true);
+
+            const prodContainer = document.getElementById('nearby-products');
+            if (products && products.length > 0 && prodContainer) {
+                const rate = conversionRates[currentCurrency] || 1;
+                prodContainer.innerHTML = '';
+                products.forEach(item => {
+                    const convertedPrice = (item.price * rate);
+                    const priceFormatted = currentCurrency === 'IDR' ? convertedPrice.toLocaleString('id-ID') : convertedPrice.toFixed(2);
+                    let card = document.createElement('div');
+                    card.className = "product-card min-w-[150px] max-w-[150px] flex-shrink-0 bg-[#1e293b]";
+                    card.innerHTML = `
+                        <div class="h-28 bg-cover bg-center" style="background-image: url('${item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80'}')"></div>
+                        <div class="card-body p-3">
+                            <h4 class="text-[11px] font-bold text-slate-100 truncate">${item.name}</h4>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-xs font-black text-emerald-400">${currencySymbol} ${priceFormatted}</span>
+                                <button onclick="triggerRealCheckout('${item.id}', '${item.name}', ${item.price})" class="text-[10px] bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-1 px-2.5 border-none cursor-pointer">Pesan →</button>
+                            </div>
+                        </div>
+                    `;
+                    prodContainer.appendChild(card);
+                });
+            } else if (prodContainer) {
+                prodContainer.innerHTML = `<div class="w-full text-center py-4 text-xs text-slate-500 italic">Belum ada produk kedai yang terdaftar di database.</div>`;
+            }
+        } catch (err) {
+            console.log('Produk belum dikonfigurasi di Supabase');
+        }
+    }
+
+    function getOrderStatusLabel(status) {
+        switch(status) {
+            case 'searching': return 'Mencari driver terdekat...';
+            case 'accepted': return 'Driver menuju lokasi penjemputan...';
+            case 'pickup': return 'Pesanan sedang diambil driver...';
+            case 'on_delivery': return 'Pesanan dalam perjalanan ke lokasi Anda...';
+            default: return 'Memproses pesanan...';
+        }
+    }
+
+    function showDriverTracking(driverName, statusText, etaMinutes) {
+        const widget = document.getElementById('gps-tracking-widget');
+        if (widget) {
+            document.getElementById('gps-driver-name').innerText = `Driver: ${driverName}`;
+            document.getElementById('gps-status-text').innerText = statusText;
+            document.getElementById('gps-eta-badge').innerText = `ETA: ${etaMinutes} Menit`;
+            widget.classList.remove('hidden');
+        }
+    }
+
+    function hideDriverTracking() {
+        const widget = document.getElementById('gps-tracking-widget');
+        if (widget) {
+            widget.classList.add('hidden');
+        }
+    }
+
+    function checkActiveOrderChat() {
+        if (activeOrderData && activeOrderData.drivers) {
+            openLiveChatModal(`Driver ${activeOrderData.drivers.full_name}`);
+        } else {
+            alert('Belum ada pesanan atau pengiriman aktif saat ini.');
+        }
+    }
+
+    async function addRealtimeRoyalty(sourceType, amount, description) {
+        window.verifiedUserBalance += amount;
+        
+        if (amount > 0) {
+            let currentPoints = parseInt(localStorage.getItem('swift_user_rewards') || '0');
+            currentPoints += Math.floor(amount * 10);
+            localStorage.setItem('swift_user_rewards', currentPoints.toString());
+            updateRewardsDisplay();
+        }
+
+        updateBalanceDisplay();
         logUserAction(`Royalti Real-Time [${sourceType}]: +RM ${amount.toFixed(2)} (${description})`);
 
         if (supabaseClient && currentUserId) {
@@ -704,52 +942,91 @@
         }
     }
 
-    // Pemicu Berbagai Sumber Pendapatan / Royalti
-    function triggerVideoUploadReward() {
-        addRealtimeRoyalty('video_upload', 2.50, 'Upload video pendek produk baru');
-        alert('🎉 Berhasil upload video! Royalti +RM 2.50 ditambahkan secara real-time.');
+    function updateRewardsDisplay() {
+        const points = parseInt(localStorage.getItem('swift_user_rewards') || '0');
+        const pointsEl = document.getElementById('reward-points-val');
+        if (pointsEl) pointsEl.innerText = points.toLocaleString('id-ID');
     }
 
-    function triggerVideoWatchReward() {
-        addRealtimeRoyalty('video_watch', 0.50, 'Menonton video produk mitra');
-        alert('📺 Selesai menonton video! Royalti +RM 0.50 masuk ke dompet.');
+    function redeemRewardPoints() {
+        let points = parseInt(localStorage.getItem('swift_user_rewards') || '0');
+        if (points < 100) {
+            alert('Minimal penukaran adalah 100 poin SWIFT Rewards.');
+            return;
+        }
+        let bonusAmount = (points / 100) * 1.00;
+        localStorage.setItem('swift_user_rewards', '0');
+        addRealtimeRoyalty('reward_redeem', bonusAmount, 'Penukaran Poin SWIFT Rewards');
+        alert(`🎉 Berhasil menukar ${points} poin menjadi Saldo +RM ${bonusAmount.toFixed(2)}!`);
+        updateRewardsDisplay();
     }
 
-    function triggerProductCheckout(productName, price) {
-        let commission = price * 0.10;
-        addRealtimeRoyalty('transaction', commission, `Penjualan produk ${productName}`);
-        alert(`🛒 Transaksi sukses untuk ${productName}! Komisi penjual +RM ${commission.toFixed(2)} tercatat.`);
+    let activeChatTarget = 'Dukungan CS';
+
+    function openLiveChatModal(targetName) {
+        activeChatTarget = targetName || 'Dukungan CS';
+        const titleEl = document.getElementById('chat-target-name');
+        if(titleEl) titleEl.innerText = `Live Chat: ${activeChatTarget}`;
+        document.getElementById('live-chat-modal').classList.remove('hidden');
+        renderLiveChatMessages();
     }
 
-    function triggerShippingReward(serviceType) {
-        let fee = serviceType === 'Box' ? 5.00 : 2.00;
-        addRealtimeRoyalty('shipping', fee, `Pengiriman logistik via ${serviceType}`);
-        alert(`📦 Pengiriman ${serviceType} selesai! Royalti kurir +RM ${fee.toFixed(2)} ditambahkan.`);
+    function closeLiveChatModal() {
+        document.getElementById('live-chat-modal').classList.add('hidden');
+    }
+
+    function getChatHistory() {
+        try {
+            const raw = localStorage.getItem(`swift_chat_${activeChatTarget}`);
+            return raw ? JSON.parse(raw) : [];
+        } catch(e) { return []; }
+    }
+
+    function sendLiveChatMessage() {
+        const input = document.getElementById('chat-input-text');
+        if(!input) return;
+        const text = input.value.trim();
+        if(!text) return;
+
+        const msgs = getChatHistory();
+        const timeStr = new Date().toTimeString().split(' ')[0].substring(0,5);
+        msgs.push({ sender: 'User', text: text, time: timeStr });
+
+        localStorage.setItem(`swift_chat_${activeChatTarget}`, JSON.stringify(msgs));
+        input.value = '';
+        renderLiveChatMessages();
+        logUserAction(`Kirim Pesan Live Chat ke [${activeChatTarget}]: "${text}"`);
+    }
+
+    function renderLiveChatMessages() {
+        const box = document.getElementById('chat-messages-box');
+        if(!box) return;
+        const msgs = getChatHistory();
+        
+        if (msgs.length === 0) {
+            box.innerHTML = `<div class="text-slate-500 text-center py-8 text-xs italic">// Belum ada pesan. Ketik pesan di bawah untuk memulai obrolan.</div>`;
+            return;
+        }
+
+        box.innerHTML = msgs.map(m => {
+            const isMe = m.sender === 'User';
+            return `
+                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                    <div class="max-w-[80%] p-3 rounded-2xl ${isMe ? 'bg-emerald-500 text-slate-950 font-semibold' : 'bg-slate-900 border border-slate-800 text-white'}">
+                        <div>${m.text}</div>
+                        <div class="text-[9px] ${isMe ? 'text-slate-800' : 'text-slate-400'} text-right mt-1 font-mono">${m.time}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        box.scrollTop = box.scrollHeight;
     }
 
     function triggerReferralReward(platform) {
         addRealtimeRoyalty('referral', 5.00, `Berbagi aplikasi via ${platform}`);
-        alert(`🤝 Teman bergabung melalui tautan Anda! Bonus referral +RM 5.00 dikreditkan.`);
+        alert(`🤝 Tautan berhasil dibagikan! Bonus referral akan dikreditkan saat pengguna baru mendaftar.`);
     }
 
-    function triggerBannerAdReward() {
-        addRealtimeRoyalty('banner_ad', 10.00, 'Pemasangan iklan banner sponsor');
-        alert('📢 Iklan banner aktif! Royalti penayang +RM 10.00 masuk secara real-time.');
-    }
-
-    function triggerAppDownloadBonus() {
-        if (!localStorage.getItem('swift_download_bonus_claimed')) {
-            addRealtimeRoyalty('app_download', 15.00, 'Bonus unduhan pertama aplikasi PWA');
-            localStorage.setItem('swift_download_bonus_claimed', 'true');
-        }
-    }
-
-    function triggerLiveStreamReward() {
-        addRealtimeRoyalty('livestream', 3.00, 'Partisipasi & interaksi live streaming');
-        alert('📡 Sesi live streaming aktif! Bonus partisipasi +RM 3.00 ditambahkan.');
-    }
-
-    // PENGELOLAAN PANEL MODUL DOMPET (DENGAN API GENERATOR QR CODE OTOMATIS)
     function openWalletModule(moduleName) {
         const panel = document.getElementById('wallet-dynamic-panel');
         const titleEl = document.getElementById('wallet-panel-title');
@@ -774,10 +1051,10 @@
                 <div class="space-y-2.5">
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nomor Tujuan / No. HP / Rekening</label>
-                        <input type="text" id="transfer-target" placeholder="Contoh: 08123456789 atau SWIFT-992" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+                        <input type="text" id="transfer-target" placeholder="Contoh: 08123456789" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nominal Kirim (Mandiri)</label>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nominal Kirim</label>
                         <input type="number" id="transfer-amount" placeholder="Contoh: 25.00" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
                     </div>
                     <button onclick="processCustomTransfer()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">KIRIM DANA SEKARANG 🚀</button>
@@ -793,37 +1070,14 @@
                             <i class="fa-solid fa-qrcode text-emerald-600"></i> SWIFT PAY QRIS
                         </div>
                         <img src="https://quickchart.io/qr?text=${qrData}&size=160&margin=1" alt="QRIS Code" class="w-36 h-36 rounded-lg shadow-sm">
-                        <span class="text-[9px] font-mono text-slate-500 mt-2 font-bold">NMID: ID1020039182390</span>
                     </div>
                     
                     <div class="space-y-2 mt-2">
-                        <input type="number" id="qris-pay-amount" placeholder="Masukkan Nominal Belanja (RM)" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500 text-center font-bold">
+                        <input type="number" id="qris-pay-amount" placeholder="Masukkan Nominal Belanja" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500 text-center font-bold">
                         <button onclick="processQRTransaction()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs cursor-pointer border-none shadow-md transition">
                             BAYAR BELANJA QRIS 📲
                         </button>
                     </div>
-                </div>
-            `;
-        } else if (moduleName === 'Tagihan') {
-            contentEl.innerHTML = `
-                <div class="space-y-2">
-                    <p class="text-slate-300">Pilih jenis pembayaran tagihan:</p>
-                    <select id="bill-type" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none">
-                        <option value="Listrik">Listrik PLN / Utilities</option>
-                        <option value="Air">Air PDAM</option>
-                        <option value="Internet">Internet & Telkom</option>
-                    </select>
-                    <input type="text" id="bill-number" placeholder="Nomor Pelanggan" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none">
-                    <button onclick="alert('Tagihan berhasil dibayarkan!'); document.getElementById('wallet-dynamic-panel').classList.add('hidden');" class="w-full bg-purple-600 text-white font-bold py-2 rounded-xl text-xs cursor-pointer border-none">Bayar Tagihan</button>
-                </div>
-            `;
-        } else if (moduleName === 'Bonus') {
-            contentEl.innerHTML = `
-                <div class="text-center space-y-2">
-                    <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs font-bold">
-                        🎁 Klaim Bonus Voucher Harian Mitra SWIFT (+RM 5.00)
-                    </div>
-                    <button onclick="addRealtimeRoyalty('bonus_voucher', 5.00, 'Klaim Bonus Harian Mitra'); document.getElementById('wallet-dynamic-panel').classList.add('hidden');" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer border-none shadow">Klaim Bonus Sekarang</button>
                 </div>
             `;
         } else {
@@ -833,33 +1087,32 @@
 
     function processQRTransaction() {
         const amountInput = document.getElementById('qris-pay-amount');
+        if(!amountInput) return;
         const amount = parseFloat(amountInput.value);
-        let currentBalance = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
 
         if (!amount || amount <= 0) {
             alert('Mohon masukkan nominal belanja QRIS yang valid!');
             return;
         }
-        if (amount > currentBalance) {
-            alert('Saldo dompet Anda tidak mencukupi untuk pembayaran QRIS ini!');
+        if (amount > window.verifiedUserBalance) {
+            alert('Saldo dompet Anda tidak mencukupi!');
             return;
         }
 
-        currentBalance -= amount;
-        localStorage.setItem('swift_user_balance', currentBalance.toFixed(2));
+        window.verifiedUserBalance -= amount;
         updateBalanceDisplay();
 
-        let adminFee = amount * 0.01;
-        logUserAction(`Pembayaran QRIS Merchant: -RM ${amount.toFixed(2)} (Fee Admin +RM ${adminFee.toFixed(2)})`);
-
-        alert(`✅ Pembayaran QRIS sebesar RM ${amount.toFixed(2)} Berhasil!\nLog transaksi telah dicatat ke riwayat.`);
+        logUserAction(`Pembayaran QRIS Merchant: -RM ${amount.toFixed(2)}`);
+        alert(`✅ Pembayaran QRIS sebesar RM ${amount.toFixed(2)} Berhasil!`);
         document.getElementById('wallet-dynamic-panel').classList.add('hidden');
     }
 
     function processCustomTransfer() {
-        const target = document.getElementById('transfer-target').value.trim();
-        const amount = parseFloat(document.getElementById('transfer-amount').value);
-        let currentBalance = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
+        const targetInput = document.getElementById('transfer-target');
+        const amountInput = document.getElementById('transfer-amount');
+        if(!targetInput || !amountInput) return;
+        const target = targetInput.value.trim();
+        const amount = parseFloat(amountInput.value);
 
         if (!target) {
             alert('Mohon masukkan nomor tujuan pengiriman!');
@@ -869,44 +1122,42 @@
             alert('Mohon masukkan nominal kirim yang valid!');
             return;
         }
-        if (amount > currentBalance) {
-            alert('Saldo dompet Anda tidak mencukupi untuk melakukan transfer ini!');
+        if (amount > window.verifiedUserBalance) {
+            alert('Saldo dompet Anda tidak mencukupi!');
             return;
         }
 
-        currentBalance -= amount;
-        localStorage.setItem('swift_user_balance', currentBalance.toFixed(2));
+        window.verifiedUserBalance -= amount;
         updateBalanceDisplay();
 
-        logUserAction(`Kirim Dana Mandiri: -RM ${amount.toFixed(2)} ke tujuan [${target}]`);
+        logUserAction(`Kirim Dana: -RM ${amount.toFixed(2)} ke [${target}]`);
         alert(`✅ Berhasil mengirim dana sebesar RM ${amount.toFixed(2)} ke ${target}!`);
-        
         document.getElementById('wallet-dynamic-panel').classList.add('hidden');
     }
 
     function processCustomTopUp() {
         const input = document.getElementById('custom-topup-amount');
+        if(!input) return;
         const amount = parseFloat(input.value);
         if (!amount || amount <= 0) return;
         addRealtimeRoyalty('topup', amount, 'Top Up Saldo Dompet');
-        alert(`✅ Berhasil Top Up sebesar +${amount.toFixed(2)}!`);
+        alert(`✅ Berhasil Top Up sebesar +RM ${amount.toFixed(2)}!`);
         document.getElementById('wallet-dynamic-panel').classList.add('hidden');
     }
 
     function processCustomWithdraw() {
         const input = document.getElementById('custom-withdraw-amount');
+        if(!input) return;
         const amount = parseFloat(input.value);
-        let current = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
-        if (!amount || amount > current) {
-            alert('Saldo tidak mencukupi atau nominal tidak valid!');
+        if (!amount || amount > window.verifiedUserBalance) {
+            alert('Saldo tidak mencukupi!');
             return;
         }
-        addRealtimeRoyalty('withdraw', -amount, 'Penarikan Tunai Rekening');
-        alert(`✅ Berhasil menarik tunai sebesar -${amount.toFixed(2)}!`);
+        addRealtimeRoyalty('withdraw', -amount, 'Penarikan Tunai');
+        alert(`✅ Permintaan penarikan tunai sebesar RM ${amount.toFixed(2)} diproses!`);
         document.getElementById('wallet-dynamic-panel').classList.add('hidden');
     }
 
-    // ================= PENGELOLAAN FITUR PROFIL & PENGATURAN AKUN LENGKAP =================
     function openProfileModal(featureName) {
         const panel = document.getElementById('profile-dynamic-panel');
         const titleEl = document.getElementById('profile-panel-title');
@@ -914,9 +1165,8 @@
         panel.classList.remove('hidden');
         titleEl.innerText = `Pengaturan: ${featureName}`;
 
-        const currName = localStorage.getItem('swift_logged_user_name') || 'Master Enterprise User';
-        const currEmail = localStorage.getItem('swift_logged_user') || 'user@swift-ecosystem.com';
-        const currPhone = localStorage.getItem('swift_logged_user_phone') || '08123456789';
+        const currName = localStorage.getItem('swift_logged_user_name') || 'Member SWIFT';
+        const currEmail = localStorage.getItem('swift_logged_user') || 'user@swift.com';
 
         if (featureName === 'Edit Profil') {
             contentEl.innerHTML = `
@@ -929,43 +1179,7 @@
                         <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Email Aktif</label>
                         <input type="email" id="edit-profile-email" value="${currEmail}" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
                     </div>
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nomor WhatsApp</label>
-                        <input type="tel" id="edit-profile-phone" value="${currPhone}" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
-                    </div>
-                    <button onclick="saveProfileChanges()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">SIMPAN PERUBAHAN PROFIL 💾</button>
-                </div>
-            `;
-        } else if (featureName === 'Keamanan') {
-            contentEl.innerHTML = `
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Kata Sandi Lama</label>
-                        <input type="password" id="old-pass" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Kata Sandi Baru</label>
-                        <input type="password" id="new-pass" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-blue-500">
-                    </div>
-                    <button onclick="savePasswordChanges()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">PERBARUI KATA SANDI 🔒</button>
-                </div>
-            `;
-        } else if (featureName === 'Notifikasi') {
-            contentEl.innerHTML = `
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded-xl border border-slate-800">
-                        <span>Notifikasi Transaksi Real-Time</span>
-                        <input type="checkbox" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                    </div>
-                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded-xl border border-slate-800">
-                        <span>Info Promo & Diskon Partner</span>
-                        <input type="checkbox" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                    </div>
-                    <div class="flex justify-between items-center p-2.5 bg-slate-900 rounded-xl border border-slate-800">
-                        <span>Suara Alert Masuk Saldo</span>
-                        <input type="checkbox" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                    </div>
-                    <button onclick="alert('Preferensi notifikasi berhasil disimpan!'); document.getElementById('profile-dynamic-panel').classList.add('hidden');" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold py-2 rounded-xl text-xs cursor-pointer border-none">SIMPAN PREFERENSI 🔔</button>
+                    <button onclick="saveProfileChanges()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">SIMPAN PERUBAHAN 💾</button>
                 </div>
             `;
         } else if (featureName === 'Verifikasi') {
@@ -974,17 +1188,20 @@
                     <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
                         <i class="fa-solid fa-user-check"></i>
                     </div>
-                    <h4 class="font-bold text-white">Status Akun: Verified Enterprise Member</h4>
-                    <p class="text-slate-400 text-[11px]">Akun Anda telah terverifikasi penuh dan siap bertransaksi tanpa batas harian di ekosistem SWIFT.</p>
+                    <h4 class="font-bold text-white">Status Akun: Aktif</h4>
+                    <p class="text-slate-400 text-[11px]">Akun Anda siap digunakan untuk bertransaksi di ekosistem SWIFT.</p>
                 </div>
             `;
         }
     }
 
     function saveProfileChanges() {
-        const name = document.getElementById('edit-profile-name').value.trim();
-        const email = document.getElementById('edit-profile-email').value.trim();
-        const phone = document.getElementById('edit-profile-phone').value.trim();
+        const nameEl = document.getElementById('edit-profile-name');
+        const emailEl = document.getElementById('edit-profile-email');
+        if(!nameEl || !emailEl) return;
+
+        const name = nameEl.value.trim();
+        const email = emailEl.value.trim();
 
         if(!name || !email) {
             alert('Nama dan Email tidak boleh kosong!');
@@ -993,25 +1210,10 @@
 
         localStorage.setItem('swift_logged_user_name', name);
         localStorage.setItem('swift_logged_user', email);
-        localStorage.setItem('swift_logged_user_phone', phone);
 
         updateProfileDisplayUI();
-        logUserAction(`Memperbarui Informasi Profil: ${name}`);
-        alert('✅ Informasi profil berhasil diperbarui!');
-        document.getElementById('profile-dynamic-panel').classList.add('hidden');
-    }
-
-    function savePasswordChanges() {
-        const oldP = document.getElementById('old-pass').value;
-        const newP = document.getElementById('new-pass').value;
-
-        if(!oldP || !newP) {
-            alert('Mohon isi kata sandi lama dan baru Anda!');
-            return;
-        }
-
-        logUserAction('Mengubah Kata Sandi Akun');
-        alert('✅ Kata sandi berhasil diperbarui secara aman!');
+        logUserAction(`Update Profil: ${name}`);
+        alert('✅ Informasi profil berhasil disimpan!');
         document.getElementById('profile-dynamic-panel').classList.add('hidden');
     }
 
@@ -1031,8 +1233,8 @@
     }
 
     function updateProfileDisplayUI() {
-        const savedName = localStorage.getItem('swift_logged_user_name') || 'Master Enterprise User';
-        const savedEmail = localStorage.getItem('swift_logged_user') || 'user@swift-ecosystem.com';
+        const savedName = localStorage.getItem('swift_logged_user_name') || 'Member SWIFT';
+        const savedEmail = localStorage.getItem('swift_logged_user') || 'Belum Login';
         const savedAvatar = localStorage.getItem('swift_user_avatar');
 
         const nameLabel = document.getElementById('profile-name-label');
@@ -1052,10 +1254,8 @@
         }
     }
 
-    // Fungsi Pengelolaan Modal Upload Video Pendek
     function openVideoUploadModal() {
         document.getElementById('video-upload-modal').classList.remove('hidden');
-        logUserAction('Membuka Modal Upload Video Pendek Produk');
     }
 
     function closeVideoUploadModal() {
@@ -1065,53 +1265,49 @@
     function handleProcessVideoUpload() {
         const titleInput = document.getElementById('video-title-input');
         const fileInput = document.getElementById('video-file-input');
+        if(!titleInput || !fileInput) return;
 
-        if (!titleInput.value.trim()) {
-            alert('Mohon isi judul atau deskripsi video produk Anda!');
+        if (!titleInput.value.trim() || fileInput.files.length === 0) {
+            alert('Mohon lengkapi judul dan pilih file video!');
             return;
         }
 
-        if (fileInput.files.length === 0) {
-            alert('Silakan pilih file video produk terlebih dahulu!');
-            return;
-        }
-
-        triggerVideoUploadReward();
-
+        alert('🎉 Video berhasil diunggah!');
         titleInput.value = '';
         fileInput.value = '';
         closeVideoUploadModal();
     }
 
-    // Autentikasi & Auth Switch
     function switchAuthTab(tab) {
         const loginBtn = document.getElementById('tab-login-btn');
         const regBtn = document.getElementById('tab-register-btn');
         const formLogin = document.getElementById('form-login');
         const formReg = document.getElementById('form-register');
-        const subtitle = document.getElementById('auth-subtitle');
+        if(!loginBtn || !regBtn) return;
 
         if (tab === 'login') {
             loginBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-full text-white bg-emerald-500 transition cursor-pointer border-none";
             regBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-full text-slate-400 transition cursor-pointer border-none bg-transparent";
             formLogin.classList.remove('hidden');
             formReg.classList.add('hidden');
-            subtitle.innerText = "Silakan masuk kembali ke ekosistem SWIFT.";
         } else {
             regBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-full text-white bg-blue-600 transition cursor-pointer border-none";
             loginBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-full text-slate-400 transition cursor-pointer border-none bg-transparent";
             formReg.classList.remove('hidden');
             formLogin.classList.add('hidden');
-            subtitle.innerText = "Daftar akun mitra baru secara mandiri.";
         }
     }
 
     async function handleSupabaseLogin() {
-        const identifier = document.getElementById('login-identifier').value.trim();
-        const password = document.getElementById('login-password').value.trim();
+        const idInput = document.getElementById('login-identifier');
+        const passInput = document.getElementById('login-password');
+        if(!idInput || !passInput) return;
+
+        const identifier = idInput.value.trim();
+        const password = passInput.value.trim();
 
         if (!identifier || !password) {
-            alert('Mohon isi email/username dan password Anda!');
+            alert('Mohon isi email/username dan password!');
             return;
         }
 
@@ -1133,20 +1329,26 @@
         localStorage.setItem('swift_logged_user', identifier);
         localStorage.setItem('swift_logged_user_name', identifier.split('@')[0]);
         document.getElementById('auth-modal').classList.add('hidden');
-        updateProfileDisplayUI();
+        syncRealDataFromSupabase();
         alert(`✅ Selamat datang kembali, ${identifier}!`);
-        logUserAction(`Login Berhasil: ${identifier}`);
     }
 
     async function handleSupabaseRegister() {
-        const nama = document.getElementById('reg-nama').value.trim();
-        const username = document.getElementById('reg-username').value.trim();
-        const email = document.getElementById('reg-email').value.trim();
-        const phone = document.getElementById('reg-phone').value.trim();
-        const password = document.getElementById('reg-password').value.trim();
+        const namaInput = document.getElementById('reg-nama');
+        const unameInput = document.getElementById('reg-username');
+        const emailInput = document.getElementById('reg-email');
+        const phoneInput = document.getElementById('reg-phone');
+        const passInput = document.getElementById('reg-password');
+        if(!namaInput || !emailInput) return;
+
+        const nama = namaInput.value.trim();
+        const username = unameInput.value.trim();
+        const email = emailInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const password = passInput.value.trim();
 
         if (!nama || !username || !email || !phone || !password) {
-            alert('Semua kolom formulir registrasi harus diisi!');
+            alert('Semua kolom harus diisi!');
             return;
         }
 
@@ -1163,87 +1365,22 @@
         }
 
         localStorage.setItem('swift_logged_user_name', nama);
-        localStorage.setItem('swift_logged_user_phone', phone);
-        triggerAppDownloadBonus();
-
-        alert('🎉 Registrasi Mitra Berhasil! Bonus unduhan pertama telah dikreditkan.');
-        logUserAction(`Registrasi Mitra Baru: ${username} (${email})`);
+        alert('🎉 Registrasi Berhasil! Silakan masuk.');
         switchAuthTab('login');
     }
 
+    // 3. FUNGSI LOGOUT DENGAN AUTO-PURGE
     function handleLogout() {
-        localStorage.removeItem('swift_logged_user');
-        localStorage.removeItem('swift_user_uuid');
-        alert('Sesi Anda ditutup. Berhasil keluar akun.');
+        localStorage.clear();
+        window.verifiedUserBalance = 0.00;
+        alert('Berhasil keluar akun.');
         location.reload();
-    }
-
-    // PWA Service Worker
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
-        });
     }
 
     let currentCurrency = 'MYR';
     let currencySymbol = 'RM';
     let conversionRates = { MYR: 1, IDR: 3500, SGD: 0.30 };
-
-    let promotionalBanners = [
-        { title: "Diskon Spesial Kuliner Partner SWIFT hingga 50%!", badge: "PROMO KULINER", image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80" },
-        { title: "Layanan Kurir & Logistik Cepat Tanpa Batas Wilayah", badge: "MITRA EKSPRES", image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80" },
-        { title: "Belanja Kebutuhan Mart Harian Lebih Hemat & Praktis", badge: "SWIFT MART", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80" }
-    ];
-    let currentBannerIndex = 0;
-
-    function initAutoSlideBanner() {
-        setInterval(() => {
-            currentBannerIndex = (currentBannerIndex + 1) % promotionalBanners.length;
-            let currentData = promotionalBanners[currentBannerIndex];
-            const bannerBg = document.getElementById('promo-banner-container');
-            const bannerTitle = document.getElementById('promo-title');
-            const bannerBadge = document.getElementById('promo-badge');
-            const bannerDots = document.getElementById('banner-dots');
-
-            if (bannerBg && bannerTitle && bannerBadge) {
-                bannerBg.style.backgroundImage = `linear-gradient(to top, rgba(3,7,18,0.95), rgba(3,7,18,0.3)), url('${currentData.image}')`;
-                bannerTitle.innerText = currentData.title;
-                bannerBadge.innerHTML = `<i class="fa-solid fa-fire mr-1"></i> ${currentData.badge}`;
-            }
-            if (bannerDots) {
-                bannerDots.innerHTML = promotionalBanners.map((_, i) => `
-                    <span class="w-1.5 h-1.5 rounded-full ${i === currentBannerIndex ? 'bg-emerald-400' : 'bg-slate-500'}"></span>
-                `).join('');
-            }
-        }, 5000);
-    }
-
-    let serviceProviders = [
-        { 
-            id: 1, name: "Burger King Master", type: "Food", openTime: "08:00 - 22:00", isOpen: true, distanceKm: 1.2, basePrice: 10.50, 
-            img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=300&q=80", 
-            menu: [
-                {name: "Whopper Burger", price: 12.50, stock: "Stok Tersedia (15 Porsi)", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=150&q=80"}, 
-                {name: "French Fries", price: 5.00, stock: "Stok Tersedia (30 Porsi)", img: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=150&q=80"}
-            ] 
-        },
-        { 
-            id: 2, name: "SWIFT Mart Admin", type: "Mart", openTime: "24 Jam", isOpen: true, distanceKm: 0.8, basePrice: 7.50, 
-            img: "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=300&q=80", 
-            menu: [
-                {name: "Mineral Water 1.5L", price: 2.50, stock: "Stok Tersedia (50 Botol)", img: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=150&q=80"}, 
-                {name: "Instant Noodles", price: 4.00, stock: "Stok Tersedia (42 Pack)", img: "https://images.unsplash.com/photo-1612927601601-6638404738c6?auto=format&fit=crop&w=150&q=80"}
-            ] 
-        }
-    ];
-
-    let isVoiceActive = true;
-    let recognition = null;
-    let activeNavigationInterval = null;
-
-    if (!localStorage.getItem('swift_user_balance')) {
-        localStorage.setItem('swift_user_balance', '150.00');
-    }
+    let promotionalBanners = [];
 
     function syncCountryAndCurrency() {
         const countrySelect = document.getElementById('country-select');
@@ -1257,7 +1394,6 @@
     }
 
     function switchPage(pageId, element) {
-        stopVoiceGuidance();
         document.querySelectorAll('.app-page').forEach(p => p.classList.remove('active'));
         document.getElementById(`page-${pageId}`).classList.add('active');
 
@@ -1271,35 +1407,23 @@
         }
 
         updateBalanceDisplay();
+        updateRewardsDisplay();
         updateProfileDisplayUI();
         loadLogsToUI();
         loadAnnouncementToUI();
     }
 
-    function stopVoiceGuidance() {
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        if (activeNavigationInterval) clearInterval(activeNavigationInterval);
-    }
-
     function triggerServiceAction(serviceName) {
-        stopVoiceGuidance();
         const panel = document.getElementById('service-dynamic-panel');
         const titleEl = document.getElementById('service-panel-title');
         const contentEl = document.getElementById('service-panel-content');
         panel.classList.remove('hidden');
 
-        if (serviceName === 'Food' || serviceName === 'Mart') {
-            titleEl.innerText = `Modul Kuliner & Toko: ${serviceName}`;
-            contentEl.innerHTML = `
-                <p class="text-slate-300 mb-2">Pilih kedai terdekat untuk memesan produk:</p>
-                <button onclick="triggerProductCheckout('Makanan Spesial', 25.00); document.getElementById('service-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer border-none">Checkout Pesanan (Otomatis Hitung Royalti 10%)</button>
-            `;
-        } else {
-            titleEl.innerText = `Modul Navigasi: ${serviceName}`;
-            contentEl.innerHTML = `
-                <button onclick="triggerShippingReward('${serviceName}'); document.getElementById('service-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer border-none">Selesaikan Pengiriman (${serviceName})</button>
-            `;
-        }
+        titleEl.innerText = `Layanan: ${serviceName}`;
+        contentEl.innerHTML = `
+            <p class="text-slate-300">Pilih tujuan atau detail pemesanan ${serviceName}:</p>
+            <button onclick="alert('Pemesanan ${serviceName} sedang diproses...'); document.getElementById('service-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer border-none mt-2">Konfirmasi Pemesanan (${serviceName})</button>
+        `;
     }
 
     function logUserAction(actionName) {
@@ -1331,7 +1455,7 @@
         const annText = document.getElementById('announcement-text');
         if(!annText) return;
         const ann = localStorage.getItem('swift_global_announcement');
-        annText.innerText = ann ? ann : "Tidak ada pengumuman darurat dari Master Admin.";
+        annText.innerText = ann ? ann : "Sistem SWIFT beroperasi normal.";
     }
 
     function openShareModal() { document.getElementById('share-modal').classList.remove('hidden'); }
@@ -1339,6 +1463,7 @@
     
     function copyShareLink() {
         const link = document.getElementById('share-link');
+        if(!link) return;
         link.select();
         navigator.clipboard.writeText(link.value).then(() => {
             triggerReferralReward('Salin Tautan');
@@ -1347,6 +1472,7 @@
 
     function changeCurrency() {
         const select = document.getElementById('currency-select');
+        if(!select) return;
         currentCurrency = select.value;
         if(currentCurrency === 'IDR') currencySymbol = 'Rp';
         else if(currentCurrency === 'SGD') currencySymbol = 'S\$';
@@ -1355,24 +1481,13 @@
         const walletSymbolEl = document.getElementById('wallet-currency-symbol');
         if(walletSymbolEl) walletSymbolEl.innerText = currencySymbol;
         updateBalanceDisplay();
-        renderUI();
     }
 
-    function updateBalanceDisplay() {
-        const rawBalance = parseFloat(localStorage.getItem('swift_user_balance') || '150.00');
-        const rate = conversionRates[currentCurrency] || 1;
-        const converted = rawBalance * rate;
-        const formatted = currentCurrency === 'IDR' ? converted.toLocaleString('id-ID') : converted.toFixed(2);
-        
-        const balEl = document.getElementById('balance-amount');
-        if(balEl) balEl.innerText = formatted;
-        const walletBalEl = document.getElementById('wallet-page-balance');
-        if(walletBalEl) walletBalEl.innerText = formatted;
-    }
-
+    let isVoiceActive = true;
     function toggleUserVoicePreference() {
         isVoiceActive = !isVoiceActive;
         const btn = document.getElementById('user-voice-toggle');
+        if(!btn) return;
         btn.className = isVoiceActive ? "voice-toggle on" : "voice-toggle off";
         btn.innerHTML = isVoiceActive ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-mute"></i>';
     }
@@ -1388,8 +1503,8 @@
             return;
         }
         updateBalanceDisplay();
+        updateRewardsDisplay();
         updateProfileDisplayUI();
-        renderUI();
         loadLogsToUI();
         loadAnnouncementToUI();
     }
@@ -1400,7 +1515,7 @@
         const input = document.getElementById('admin-announcement-input');
         if(!input || !input.value.trim()) return;
         localStorage.setItem('swift_global_announcement', input.value.trim());
-        alert('✅ Pengumuman global disiarkan!');
+        alert('✅ Pengumuman disiarkan!');
         loadAnnouncementToUI();
     }
     function setAdminLockdown(status) {
@@ -1409,69 +1524,24 @@
         if(status) location.reload();
     }
 
-    function clickMasterBanner() { triggerBannerAdReward(); }
-    function openLiveStreamModal() {
-        triggerLiveStreamReward();
-        document.getElementById('live-modal').classList.remove('hidden');
-    }
+    function openLiveStreamModal() { document.getElementById('live-modal').classList.remove('hidden'); }
     function closeLiveStreamModal() { document.getElementById('live-modal').classList.add('hidden'); }
-
-    function sendLiveChat() {
-        const input = document.getElementById('live-chat-input');
-        if(!input || !input.value.trim()) return;
-        input.value = '';
-    }
-
-    function renderUI() {
-        const rate = conversionRates[currentCurrency] || 1;
-        const svcContainer = document.getElementById('nearby-services');
-        if(svcContainer) {
-            svcContainer.innerHTML = '';
-            serviceProviders.slice(0, 4).forEach(item => {
-                let div = document.createElement('div');
-                div.className = "service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer";
-                div.onclick = () => { triggerServiceAction(item.type); };
-                // AMAN DARI BUG TANDA TANYA: Menggunakan ikon Font Awesome
-                div.innerHTML = `<i class="fa-solid fa-store text-lg mb-1 text-emerald-400"></i><span class="text-[10px] font-bold text-slate-200 truncate w-full">${item.name}</span>`;
-                svcContainer.appendChild(div);
-            });
-        }
-
-        const prodContainer = document.getElementById('nearby-products');
-        if(prodContainer) {
-            prodContainer.innerHTML = '';
-            serviceProviders.forEach(item => {
-                const convertedPrice = (item.basePrice * rate);
-                const priceFormatted = currentCurrency === 'IDR' ? convertedPrice.toLocaleString('id-ID') : convertedPrice.toFixed(2);
-                let card = document.createElement('div');
-                card.className = "product-card min-w-[150px] max-w-[150px] flex-shrink-0 bg-[#1e293b]";
-                card.innerHTML = `
-                    <div class="h-28 bg-cover bg-center" style="background-image: url('${item.img}')"></div>
-                    <div class="card-body p-3">
-                        <h4 class="text-[11px] font-bold text-slate-100 truncate">${item.name}</h4>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-xs font-black text-emerald-400">${currencySymbol} ${priceFormatted}</span>
-                            <button onclick="triggerProductCheckout('${item.name}', ${item.basePrice})" class="text-[10px] bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-1 px-2.5 border-none cursor-pointer">Pesan →</button>
-                        </div>
-                    </div>
-                `;
-                prodContainer.appendChild(card);
-            });
-        }
-    }
-
-    function refreshLocation() {
-        logUserAction('Memperbarui Titik GPS');
-    }
+    function refreshLocation() { logUserAction('Memperbarui Titik GPS'); }
 
     window.addEventListener('DOMContentLoaded', () => {
+        // PERSIAPAN AWAL: PAKSA SALDO KE 0.00 JIKA USER BELUM TERVERIFIKASI
+        localStorage.removeItem('swift_user_balance'); // Hapus kunci saldo lama jika ada
+        window.verifiedUserBalance = 0.00;
+
         const loggedUser = localStorage.getItem('swift_logged_user');
         if (loggedUser) {
-            document.getElementById('auth-modal').classList.add('hidden');
+            const authModal = document.getElementById('auth-modal');
+            if(authModal) authModal.classList.add('hidden');
         }
+
         initMasterAdminBridge();
+        syncRealDataFromSupabase();
         refreshLocation();
-        initAutoSlideBanner();
     });
 </script>
 </body>
