@@ -303,221 +303,175 @@
             </div>
 
         </div>
-        <!-- ================= KODE MASTER UTUH: LAYANAN BERSIH (PERSIS GAMBAR 1 & 2) ================= -->
-<div class="app-wrapper max-w-[480px] mx-auto min-h-screen bg-[#030712] text-slate-100 relative pb-20 font-sans border-x border-slate-800 shadow-2xl">
-
-    <!-- HEADER & KONTROL ATAS -->
-    <header class="p-3.5 bg-[#0b0f19]/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-800/80 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-            <button onclick="openSidebarMenu()" class="w-9 h-9 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-white cursor-pointer hover:bg-slate-800 transition">
-                <i class="fa-solid fa-bars text-sm"></i>
-            </button>
-            <select id="country-selector" onchange="switchCountryRegion(this.value)" class="bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-[11px] font-bold text-white outline-none">
-                <option value="MY">MY</option>
-                <option value="ID">ID</option>
-                <option value="SG">SG</option>
-            </select>
-            <select id="currency-selector" onchange="switchCurrencySymbol(this.value)" class="bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-[11px] font-bold text-emerald-400 outline-none">
-                <option value="MYR">MYR</option>
-                <option value="IDR">IDR</option>
-                <option value="SGD">SGD</option>
-            </select>
-        </div>
-
-        <div class="flex items-center gap-1.5">
-            <button onclick="toggleAudioEngine()" id="audio-toggle-btn" class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-xs cursor-pointer hover:bg-emerald-500/30 transition">
-                <i class="fa-solid fa-volume-high"></i>
-            </button>
-            <button onclick="openShareModal()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 font-bold px-2.5 py-1.5 rounded-xl text-[10px] flex items-center gap-1 cursor-pointer transition">
-                <i class="fa-solid fa-share-nodes"></i> Bagikan
-            </button>
-            <button onclick="openAdminDashboard()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-[10px] flex items-center gap-1 cursor-pointer transition shadow">
-                <i class="fa-solid fa-shield-halved"></i> Admin
-            </button>
-        </div>
-    </header>
-
-    <!-- AREA KONTEN UTAMA MULTI-HALAMAN -->
-    <main class="p-3.5 space-y-4">
-
-        <!-- STATUS KONEKSI REAL-TIME SUPABASE -->
-        <div class="swift-card bg-slate-900/80 border-slate-800 p-2.5 flex items-center justify-between text-[11px]">
-            <div class="flex items-center gap-2 text-slate-300">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Terhubung Real-Time ke Supabase</span>
-            </div>
-            <span class="text-[9px] bg-emerald-500/20 text-emerald-400 font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/30">LIVE ENGINE</span>
-        </div>
-
-        <!-- ================= HALAMAN 1: BERANDA ================= -->
-        <div id="page-beranda" class="app-page active space-y-4">
-            
-            <!-- KARTU SALDO & DOMPET BERANDA -->
-            <div class="swift-card bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/60 border-emerald-500/30 p-4 space-y-3 shadow-lg relative overflow-hidden">
-                <div class="flex justify-between items-center text-xs">
-                    <span class="text-slate-400 font-medium">SALDO DOMPET SWIFT</span>
-                    <span class="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">DuitNow QR Active</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <div>
-                        <div class="text-2xl font-black text-white flex items-baseline gap-1">
-                            <span id="home-currency-symbol">RM</span>
-                            <span id="home-user-balance">0.00</span>
-                        </div>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2.5 py-0.5 rounded-full font-extrabold border border-amber-500/30" id="home-reward-points">⭐ Poin SWIFT: 50</span>
-                            <button onclick="openWalletModule('Bonus')" class="text-[9px] text-slate-300 underline bg-transparent border-none cursor-pointer">Tukar Poin</button>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <button onclick="openWalletModule('Top Up')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2 rounded-xl text-xs transition border-none cursor-pointer shadow">Top Up (+)</button>
-                        <button onclick="openLiveChatModal('Driver SWIFT Express')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-xl text-[10px] border border-blue-500 transition cursor-pointer flex items-center justify-center gap-1 shadow">
-                            <i class="fa-solid fa-comment-dots text-white"></i> Chat Kurir
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BANNER SELAMAT DATANG -->
-            <div class="swift-card bg-gradient-to-br from-slate-900 to-slate-950 border-slate-800 p-4 space-y-2">
-                <span class="text-[9px] bg-emerald-500/20 text-emerald-400 font-black px-2 py-0.5 rounded-full border border-emerald-500/30 uppercase"><i class="fa-solid fa-bullhorn"></i> SWIFT OFFICIAL</span>
-                <h3 class="text-sm font-black text-white">Selamat Datang di SWIFT Super-App</h3>
-                <p class="text-[11px] text-slate-400">Ekosistem layanan mandiri, transportasi, logistik & perdagangan.</p>
-            </div>
-
-            <!-- PENCARIAN KEDAI & MITRA TERDEKAT -->
-            <div class="swift-card bg-slate-900 border-slate-800 p-4 space-y-2">
-                <div class="flex items-center gap-2 text-xs font-bold text-emerald-400">
-                    <i class="fa-solid fa-location-dot"></i> TERDEKAT SEKITAR ANDA
-                </div>
-                <div class="text-[11px] text-slate-400 italic text-center py-2" id="home-merchant-recommendations">
-                    Mencari kedai & mitra terdekat di sekitar Anda...
-                </div>
-            </div>
-
-            <!-- SEMUA LAYANAN UTAMA -->
-            <div class="swift-card bg-slate-900/90 border-slate-800 p-4 space-y-3">
-                <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">SEMUA LAYANAN UTAMA</h3>
-                <div class="grid grid-cols-4 gap-2.5">
-                    <div onclick="openTransportModal('Ride')" class="flex flex-col items-center justify-center p-3 bg-slate-950/60 border border-slate-800/80 rounded-2xl cursor-pointer hover:bg-slate-800 transition text-center group">
-                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition"><i class="fa-solid fa-motorcycle"></i></div>
-                        <span class="text-[10px] font-bold text-slate-200">Ride</span>
-                    </div>
-                    <div onclick="openTransportModal('Send')" class="flex flex-col items-center justify-center p-3 bg-slate-950/60 border border-slate-800/80 rounded-2xl cursor-pointer hover:bg-slate-800 transition text-center group">
-                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition"><i class="fa-solid fa-box-open"></i></div>
-                        <span class="text-[10px] font-bold text-slate-200">Send</span>
-                    </div>
-                    <div onclick="switchPage('dompet', document.querySelectorAll('.nav-btn')[1])" class="flex flex-col items-center justify-center p-3 bg-slate-950/60 border border-slate-800/80 rounded-2xl cursor-pointer hover:bg-slate-800 transition text-center group">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition"><i class="fa-solid fa-utensils"></i></div>
-                        <span class="text-[10px] font-bold text-slate-200">Food</span>
-                    </div>
-                    <div onclick="openMerchantStudioModal()" class="flex flex-col items-center justify-center p-3 bg-slate-950/60 border border-slate-800/80 rounded-2xl cursor-pointer hover:bg-slate-800 transition text-center group">
-                        <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition"><i class="fa-solid fa-store"></i></div>
-                        <span class="text-[10px] font-bold text-slate-200">Mart</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ================= HALAMAN 2: DOMPET & SALDO ================= -->
-        <div id="page-dompet" class="app-page p-4 space-y-4 hidden">
-            <div class="p-5 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 border border-emerald-500/30 rounded-3xl space-y-3 shadow-xl">
+        <!-- HALAMAN 2: DOMPET & SALDO -->
+        <div id="page-dompet" class="app-page">
+            <div class="swift-card bg-gradient-to-br from-emerald-950 via-[#0f172a] to-[#030712] border-emerald-500/30 space-y-3">
                 <div class="flex justify-between items-center text-xs text-slate-400">
                     <span>Saldo Terverifikasi (Supabase Cloud)</span>
-                    <span class="text-emerald-400 font-bold" id="reward-points-val">50 Poin</span>
+                    <span class="text-emerald-400 font-bold" id="reward-points-val">0 Poin</span>
                 </div>
                 <div class="text-3xl font-black text-white flex items-baseline gap-1">
                     <span id="wallet-currency-symbol">RM</span>
                     <span id="wallet-page-balance">0.00</span>
                 </div>
-                <div class="grid grid-cols-3 gap-2 pt-2">
-                    <button onclick="openWalletModule('Top Up')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2 rounded-xl text-xs transition cursor-pointer border-none shadow">Top Up (+)</button>
-                    <button onclick="openWalletModule('Tarik Tunai')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs border border-slate-700 transition cursor-pointer">Tarik Tunai</button>
-                    <button onclick="openWalletModule('Kirim')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs border border-slate-700 transition cursor-pointer">Kirim Dana</button>
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <button onclick="openWalletModule('Top Up')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-pill-soft text-xs transition cursor-pointer border-none shadow">Top Up (+)</button>
+                    <button onclick="openWalletModule('Tarik Tunai')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-pill-soft text-xs border border-slate-700 transition cursor-pointer">Tarik Tunai</button>
+                    <button onclick="openWalletModule('Kirim')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-pill-soft text-xs border border-slate-700 transition cursor-pointer">Kirim Dana</button>
                 </div>
             </div>
-            <div id="wallet-dynamic-panel" class="p-4 bg-slate-900 border border-slate-800 rounded-3xl space-y-3 hidden">
+
+            <!-- DYNAMIC WALLET PANEL CONTAINER -->
+            <div id="wallet-dynamic-panel" class="swift-card space-y-3 hidden">
                 <div class="flex justify-between items-center pb-2 border-b border-slate-800">
                     <h4 id="wallet-panel-title" class="font-bold text-xs text-white">Panel Layanan</h4>
                     <button onclick="document.getElementById('wallet-dynamic-panel').classList.add('hidden')" class="text-slate-400 hover:text-white text-xs border-none bg-transparent cursor-pointer">✕ Close</button>
                 </div>
                 <div id="wallet-panel-content"></div>
             </div>
-        </div>
 
-        <!-- ================= HALAMAN 3: RIWAYAT ================= -->
-        <div id="page-riwayat" class="app-page p-4 space-y-3 hidden">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Riwayat Transaksi Real-Time</h3>
-            <div id="activity-log-container" class="space-y-2">
-                <div class="text-slate-500 text-center py-8 text-xs italic">// Memuat riwayat dari Supabase...</div>
+            <div class="grid grid-cols-2 gap-3">
+                <div onclick="openWalletModule('QRIS')" class="swift-card flex items-center gap-3 cursor-pointer hover:bg-slate-800/80 transition p-3.5">
+                    <div class="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg"><i class="fa-solid fa-qrcode"></i></div>
+                    <div>
+                        <div class="font-bold text-white text-xs">Gateway QR</div>
+                        <div class="text-[10px] text-slate-400">Bayar & Terima QR</div>
+                    </div>
+                </div>
+                <div onclick="openWalletModule('Bonus')" class="swift-card flex items-center gap-3 cursor-pointer hover:bg-slate-800/80 transition p-3.5">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg"><i class="fa-solid fa-gift"></i></div>
+                    <div>
+                        <div class="font-bold text-white text-xs">Klaim Bonus</div>
+                        <div class="text-[10px] text-slate-400">Poin & Referral</div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- ================= HALAMAN 4: PESAN ================= -->
-        <div id="page-pesan" class="app-page p-4 space-y-3 hidden">
+        <!-- HALAMAN 3: RIWAYAT AKTIVITAS -->
+        <div id="page-riwayat" class="app-page">
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Riwayat Transaksi Real-Time</h3>
+            <div id="activity-log-container" class="space-y-2">
+                <div class="swift-card text-slate-500 text-center py-6 text-xs italic">// Memuat riwayat dari Supabase...</div>
+            </div>
+        </div>
+
+        <!-- HALAMAN 4: PESAN / LIVE CHAT -->
+        <div id="page-pesan" class="app-page">
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Pusat Pesan & Obrolan</h3>
-            <div class="space-y-2">
-                <div onclick="openLiveChatModal('Dukungan CS')" class="p-3.5 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-slate-800 transition">
+            <div class="space-y-2.5">
+                <div onclick="openLiveChatModal('Dukungan CS')" class="swift-card flex items-center justify-between cursor-pointer hover:bg-slate-800/80 transition p-3.5">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center font-bold text-base"><i class="fa-solid fa-headset"></i></div>
+                        <div class="w-10 h-10 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center font-bold text-base"><i class="fa-solid fa-headset"></i></div>
                         <div>
                             <div class="font-bold text-white text-xs">Dukungan CS SWIFT</div>
                             <div class="text-[10px] text-slate-400">Layanan bantuan pelanggan 24/7</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2.5 py-1 rounded-pill-soft">Aktif</span>
+                </div>
+                <div onclick="openLiveChatModal('Driver SWIFT Express')" class="swift-card flex items-center justify-between cursor-pointer hover:bg-slate-800/80 transition p-3.5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center font-bold text-base"><i class="fa-solid fa-motorcycle"></i></div>
+                        <div>
+                            <div class="font-bold text-white text-xs">Mitra Driver</div>
+                            <div class="text-[10px] text-slate-400">Koordinasi lokasi penjemputan</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ================= HALAMAN 5: LAPORAN ================= -->
-        <div id="page-laporan" class="app-page p-4 space-y-3 hidden">
+        <!-- HALAMAN 5: LAPORAN -->
+        <div id="page-laporan" class="app-page">
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Laporan Ringkasan Finansial</h3>
-            <div class="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-2 text-xs">
+            <div class="swift-card space-y-2 text-xs">
                 <div class="flex justify-between text-slate-300"><span>Status Akun:</span><span class="text-emerald-400 font-bold">Terverifikasi</span></div>
+                <div class="flex justify-between text-slate-300"><span>Aktivitas Bulan Ini:</span><span class="text-white font-bold">Aktif</span></div>
             </div>
         </div>
 
-        <!-- ================= HALAMAN 6: ATUR ================= -->
-        <div id="page-atur" class="app-page p-4 space-y-3 hidden">
+        <!-- HALAMAN 6: ATUR / PENGATURAN -->
+        <div id="page-atur" class="app-page">
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Pengaturan Sistem</h3>
-            <div class="space-y-2 text-xs">
-                <div onclick="openProfileModal('Pengaturan Notifikasi')" class="p-3.5 bg-slate-900 border border-slate-800 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-slate-800">
+            <div class="space-y-2.5 text-xs">
+                <div onclick="openProfileModal('Pengaturan Notifikasi')" class="swift-card flex justify-between items-center cursor-pointer hover:bg-slate-800/80 transition p-3.5">
                     <span class="font-bold text-white">Preferensi Notifikasi</span>
+                    <i class="fa-solid fa-chevron-right text-slate-500"></i>
+                </div>
+                <div onclick="openProfileModal('Keamanan')" class="swift-card flex justify-between items-center cursor-pointer hover:bg-slate-800/80 transition p-3.5">
+                    <span class="font-bold text-white">Pengaturan Keamanan</span>
                     <i class="fa-solid fa-chevron-right text-slate-500"></i>
                 </div>
             </div>
         </div>
 
-        <!-- ================= HALAMAN 7: BANTUAN ================= -->
-        <div id="page-bantu" class="app-page p-4 space-y-3 hidden">
+        <!-- HALAMAN 7: BANTUAN -->
+        <div id="page-bantu" class="app-page">
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Pusat Bantuan</h3>
-            <div class="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-xs text-slate-300 space-y-2">
+            <div class="swift-card text-xs text-slate-300 space-y-3">
                 <p class="font-bold text-white">Butuh bantuan transaksi?</p>
-                <button onclick="openLiveChatModal('Dukungan CS')" class="w-full bg-emerald-500 text-slate-950 font-extrabold py-2 rounded-xl border-none cursor-pointer">Buka Live Chat CS</button>
+                <p class="text-[11px] text-slate-400">Hubungi tim layanan pengguna SWIFT melalui Live Chat CS atau email resmi.</p>
+                <button onclick="openLiveChatModal('Dukungan CS')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-pill-soft border-none cursor-pointer">Buka Live Chat CS</button>
             </div>
         </div>
 
-        <!-- ================= HALAMAN 8: PROFIL ================= -->
-        <div id="page-profil" class="app-page p-4 space-y-4 hidden">
-            <div class="p-5 bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-3xl flex items-center gap-4 relative overflow-hidden shadow-lg">
+        <!-- HALAMAN 8: PROFIL PENGGUNA -->
+        <div id="page-profil" class="app-page space-y-4">
+            <div class="swift-card bg-gradient-to-br from-[#0f172a] to-[#1e1b4b] flex items-center gap-4 relative overflow-hidden shadow-lg">
                 <div class="relative group">
                     <div id="profile-avatar-container" onclick="triggerAvatarUpload()" class="w-16 h-16 rounded-2xl bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center font-black text-2xl text-emerald-400 cursor-pointer overflow-hidden shadow-inner">
                         <i class="fa-solid fa-user"></i>
                     </div>
+                    <button onclick="triggerAvatarUpload()" class="absolute -bottom-1 -right-1 bg-emerald-500 text-slate-950 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-slate-950 cursor-pointer shadow">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
+                    <input type="file" id="profile-avatar-file-input" accept="image/*" onchange="handleAvatarUpload(event)" class="hidden">
                 </div>
-                <div class="flex-1">
-                    <h2 id="profile-name-label" class="text-base font-extrabold text-white">Pengguna SWIFT</h2>
+                <div class="flex-1 overflow-hidden">
+                    <h2 id="profile-name-label" class="text-base font-extrabold text-white truncate">Pengguna SWIFT</h2>
                     <p id="profile-email-label" class="text-xs text-slate-400 truncate">user@swift.com</p>
-                    <span class="inline-block mt-1 text-[9px] bg-emerald-500/20 text-emerald-400 font-extrabold px-2 py-0.5 rounded-full uppercase">Member Terverifikasi</span>
+                    <span class="inline-block mt-1 text-[9px] bg-emerald-500/20 text-emerald-400 font-extrabold px-2 py-0.5 rounded-pill-soft uppercase">Member Terverifikasi</span>
                 </div>
+            </div>
+
+            <div class="swift-card space-y-2.5">
+                <h3 class="text-xs font-black uppercase tracking-wider text-slate-400 mb-2">Pengaturan Akun & Mitra</h3>
+                
+                <div onclick="openMerchantStudioModal()" class="p-3 bg-[#1e293b]/70 hover:bg-[#1e293b] border border-amber-500/30 rounded-2xl flex justify-between items-center cursor-pointer transition">
+                    <span class="font-bold text-amber-400 text-xs flex items-center gap-2"><i class="fa-solid fa-store"></i> Studio Merchant Mitra SWIFT</span>
+                    <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                </div>
+                
+                <div onclick="openProfileModal('Edit Informasi Akun')" class="p-3 bg-[#1e293b]/70 hover:bg-[#1e293b] border border-slate-800 rounded-2xl flex justify-between items-center cursor-pointer transition">
+                    <span class="font-bold text-slate-200 text-xs flex items-center gap-2"><i class="fa-solid fa-user-pen text-emerald-400"></i> Edit Informasi Akun</span>
+                    <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                </div>
+
+                <div onclick="openProfileModal('Ubah Kata Sandi')" class="p-3 bg-[#1e293b]/70 hover:bg-[#1e293b] border border-slate-800 rounded-2xl flex justify-between items-center cursor-pointer transition">
+                    <span class="font-bold text-slate-200 text-xs flex items-center gap-2"><i class="fa-solid fa-key text-blue-400"></i> Ubah Kata Sandi</span>
+                    <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                </div>
+
+                <div onclick="handleLogout()" class="p-3 bg-red-950/30 hover:bg-red-950/50 border border-red-500/30 rounded-2xl flex justify-between items-center cursor-pointer transition mt-2">
+                    <span class="font-extrabold text-red-400 text-xs flex items-center gap-2"><i class="fa-solid fa-right-from-bracket"></i> Keluar Akun</span>
+                    <i class="fa-solid fa-chevron-right text-red-400 text-xs"></i>
+                </div>
+            </div>
+
+            <div id="profile-dynamic-panel" class="swift-card space-y-3 hidden">
+                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                    <h4 id="profile-panel-title" class="font-bold text-xs text-white">Panel Pengaturan</h4>
+                    <button onclick="document.getElementById('profile-dynamic-panel').classList.add('hidden')" class="text-slate-400 hover:text-white text-xs border-none bg-transparent cursor-pointer">✕ Close</button>
+                </div>
+                <div id="profile-panel-content"></div>
             </div>
         </div>
 
     </main>
 
     <!-- BOTTOM NAVIGATION BAR -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-slate-950/95 backdrop-blur-md border-t border-slate-900 px-2 py-2 flex justify-around items-center z-40">
+    <nav class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-[#0b0f19]/95 backdrop-blur-md border-t border-[#1e293b] px-2 py-2 flex justify-around items-center z-40">
         <button onclick="switchPage('beranda', this)" class="nav-btn active flex flex-col items-center gap-1 text-emerald-400 cursor-pointer border-none bg-transparent">
             <i class="fa-solid fa-house text-base"></i>
             <span class="text-[9px] font-bold">Beranda</span>
@@ -554,29 +508,152 @@
 
 </div> <!-- End of .app-wrapper -->
 
-<!-- ================= MODAL AUTH (TERSEMBUNYI SECARA DEFAULT DENGAN 'hidden') ================= -->
-<div id="auth-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-[#10172a] border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4">
-        <div class="text-center space-y-1">
-            <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center font-black text-xl mx-auto mb-2"><i class="fa-solid fa-bolt"></i></div>
-            <h2 class="text-base font-black text-white">SWIFT Super-App</h2>
-            <p class="text-xs text-slate-400">Masuk untuk mengakses layanan lengkap</p>
+<!-- ================= MODAL POP-UP KOMPLEKS ================= -->
+
+<!-- MODAL CART / KERANJANG -->
+<div id="cart-modal" class="fixed inset-0 bg-[#030712]/85 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-[#0f172a] border border-[#1e293b] w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] p-5 shadow-2xl space-y-4 max-h-[80vh] flex flex-col">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+            <h3 class="font-black text-white text-sm flex items-center gap-2"><i class="fa-solid fa-cart-shopping text-emerald-400"></i> Keranjang Belanja Anda</h3>
+            <button onclick="closeCartModal()" class="text-slate-400 hover:text-white text-base border-none bg-transparent cursor-pointer">✕</button>
         </div>
-        <div class="flex bg-slate-900 p-1 rounded-full border border-slate-800">
-            <button onclick="switchAuthTab('login')" id="tab-login-btn" class="flex-1 py-1.5 text-xs font-bold rounded-full text-white bg-emerald-500 transition cursor-pointer border-none">Masuk</button>
-            <button onclick="switchAuthTab('register')" id="tab-register-btn" class="flex-1 py-1.5 text-xs font-bold rounded-full text-slate-400 transition cursor-pointer border-none bg-transparent">Daftar</button>
-        </div>
-        <div id="form-login" class="space-y-3 text-xs">
+        <div id="cart-items-container" class="overflow-y-auto space-y-2 flex-1 pr-1"></div>
+        <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
             <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email / Pengguna</label>
-                <input type="text" id="login-identifier" placeholder="nama@email.com" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                <div class="text-[10px] text-slate-400">Total Pembayaran:</div>
+                <div class="text-lg font-black text-emerald-400" id="cart-total-amount">RM 0.00</div>
+            </div>
+            <button onclick="checkoutCartOrder()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold px-5 py-2.5 rounded-pill-soft text-xs transition shadow border-none cursor-pointer">BAYAR SEKARANG 🛒</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ROUTE & FARE CALCULATOR (TRANSPORT) -->
+<div id="transport-modal" class="fixed inset-0 bg-[#030712]/85 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-[#0f172a] border border-[#1e293b] w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] p-5 shadow-2xl space-y-4">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+            <h3 id="transport-title" class="font-black text-white text-sm">Order Layanan Transport</h3>
+            <button onclick="closeTransportModal()" class="text-slate-400 hover:text-white text-base border-none bg-transparent cursor-pointer">✕</button>
+        </div>
+        <div class="space-y-3 text-xs">
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Titik Penjemputan</label>
+                <div class="flex gap-2">
+                    <input type="text" id="transport-pickup-input" placeholder="Masukkan Alamat Penjemputan" class="flex-1 bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                    <button onclick="useCurrentLocationForPickup()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 px-3 rounded-xl border border-slate-700 cursor-pointer" title="Gunakan Posisi GPS"><i class="fa-solid fa-crosshairs"></i></button>
+                </div>
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Kata Sandi</label>
-                <input type="password" id="login-password" placeholder="••••••••" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Lokasi Tujuan</label>
+                <input type="text" id="transport-dest-input" oninput="calculateRouteFareRealtime()" placeholder="Masukkan Alamat Tujuan" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
             </div>
-            <button onclick="handleSupabaseLogin()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-3 rounded-xl text-xs transition shadow border-none cursor-pointer">MASUK AKUN 🚀</button>
+            <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex justify-between items-center">
+                <div>
+                    <div class="text-[10px] text-slate-400">Estimasi Jarak & Layanan (<span id="calc-service-type">Ride</span>):</div>
+                    <div class="font-bold text-white text-xs" id="calc-distance-text">0.0 KM</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[10px] text-slate-400">Tarif Resmi:</div>
+                    <div class="text-base font-black text-emerald-400" id="calc-fare-amount">RM 0.00</div>
+                </div>
+            </div>
+            <button onclick="confirmTransportBooking()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-3 rounded-pill-soft text-xs transition shadow border-none cursor-pointer">KONFIRMASI PESANAN 🚀</button>
         </div>
+    </div>
+</div>
+
+<!-- MODAL MERCHANT STUDIO -->
+<div id="merchant-studio-modal" class="fixed inset-0 bg-[#030712]/85 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-[#0f172a] border border-[#1e293b] w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] p-5 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+            <h3 class="font-black text-white text-sm flex items-center gap-2"><i class="fa-solid fa-shop text-amber-400"></i> Studio Merchant Mitra SWIFT</h3>
+            <button onclick="closeMerchantStudioModal()" class="text-slate-400 hover:text-white text-base border-none bg-transparent cursor-pointer">✕</button>
+        </div>
+        <div class="space-y-3 text-xs overflow-y-auto flex-1 pr-1">
+            <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-2xl space-y-2">
+                <h4 class="font-bold text-amber-400 text-xs">Tambah / Unggah Produk Kedai</h4>
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-1">Nama Produk / Makanan</label>
+                    <input type="text" id="merchant-prod-name" placeholder="Contoh: Nasi Lemak Spesial" class="w-full bg-slate-950 border border-slate-800 p-2 rounded-xl text-white outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1">Kategori</label>
+                        <select id="merchant-prod-cat" class="w-full bg-slate-950 border border-slate-800 p-2 rounded-xl text-white outline-none">
+                            <option value="food">Kuliner (Food)</option>
+                            <option value="mart">Toko (Mart)</option>
+                            <option value="promo">Promo Khusus</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1">Harga Produk</label>
+                        <input type="number" id="merchant-prod-price" placeholder="Nominal" class="w-full bg-slate-950 border border-slate-800 p-2 rounded-xl text-white outline-none">
+                    </div>
+                </div>
+                <button onclick="handleSaveMerchantProduct()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2.5 rounded-pill-soft transition border-none cursor-pointer mt-1">SIMPAN PRODUK KE SUPABASE 💾</button>
+            </div>
+            <div class="space-y-2">
+                <h4 class="font-bold text-slate-300 text-xs">Daftar Produk Terdaftar di Database:</h4>
+                <div id="merchant-product-list-ui" class="space-y-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL LIVE CHAT -->
+<div id="live-chat-modal" class="fixed inset-0 bg-[#030712]/85 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-[#0f172a] border border-[#1e293b] w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] p-4 shadow-2xl space-y-3 h-[80vh] flex flex-col">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+            <h3 id="chat-target-name" class="font-black text-white text-xs flex items-center gap-2"><i class="fa-solid fa-comments text-emerald-400"></i> Live Chat CS</h3>
+            <button onclick="closeLiveChatModal()" class="text-slate-400 hover:text-white text-base border-none bg-transparent cursor-pointer">✕</button>
+        </div>
+        <div id="chat-messages-box" class="flex-1 overflow-y-auto space-y-2 p-2 bg-slate-950/50 rounded-2xl border border-slate-900 text-xs"></div>
+        <div class="flex gap-2">
+            <input type="text" id="chat-input-text" placeholder="Tulis pesan..." class="flex-1 bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none">
+            <button onclick="sendLiveChatMessage()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 rounded-xl border-none cursor-pointer"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL SHARE REFERRAL & LINTAS PLATFORM (DIPERBARUI & TERHUBUNG) -->
+<div id="share-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-[420px] bg-slate-900 border border-slate-800 rounded-3xl p-5 text-white shadow-2xl space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <h3 class="font-black text-sm flex items-center gap-2 text-white">
+                <i class="fa-solid fa-share-nodes text-emerald-400"></i> Bagikan SWIFT Super-App
+            </h3>
+            <button onclick="closeShareModal()" class="text-slate-400 hover:text-white text-base bg-slate-800 border border-slate-700 w-7 h-7 rounded-full flex items-center justify-center cursor-pointer border-none">✕</button>
+        </div>
+
+        <p class="text-xs text-slate-300">Bagikan tautan referral resmi Anda untuk mendapatkan bonus komisi otomatis secara real-time:</p>
+        
+        <div>
+            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Tautan Referral Anda</label>
+            <input type="text" id="referral-link-input" readonly value="https://swiftapp.id/ref?user=official" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-emerald-400 font-mono outline-none select-all" />
+        </div>
+
+        <button onclick="copyReferralLink()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2 border-none cursor-pointer">
+            <i class="fa-regular fa-copy text-sm"></i> SALIN TAUTAN REFERRAL
+        </button>
+
+        <div class="space-y-1.5">
+            <label class="block text-[10px] uppercase font-bold text-slate-400">Bagikan Langsung Ke Aplikasi:</label>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="shareToPlatform('whatsapp')" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-1 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border-none cursor-pointer shadow">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                </button>
+                <button onclick="shareToPlatform('telegram')" class="bg-sky-500 hover:bg-sky-400 text-white font-bold py-2 px-1 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border-none cursor-pointer shadow">
+                    <i class="fa-brands fa-telegram text-sm"></i> Telegram
+                </button>
+                <button onclick="shareToPlatform('native')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-1 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border-none cursor-pointer shadow">
+                    <i class="fa-solid fa-share-nodes text-sm"></i> Lainnya...
+                </button>
+            </div>
+        </div>
+
+        <button onclick="closeShareModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-xl text-xs font-semibold transition border border-slate-700 cursor-pointer">
+            Tutup
+        </button>
     </div>
 </div>
 <!-- ================= HALAMAN 2: DOMPET ================= -->
@@ -743,7 +820,7 @@
         </div>
 
     </main>
-    <!-- MODAL PEMESANAN TRANSPORTASI / LOGISTIK (RIDE, SEND, EXPRESS, CAR, BOX) -->
+  <!-- MODAL PEMESANAN TRANSPORTASI / LOGISTIK (RIDE, SEND, EXPRESS, CAR, BOX) -->
     <div id="transport-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-3 sm:p-4">
         <div class="w-full max-w-[480px] bg-[#0f172a] border border-[#1e293b] rounded-[32px] p-5 shadow-2xl flex flex-col space-y-4 max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -988,7 +1065,7 @@
         </div>
     </nav>
 </div>
-<script>
+  <script>
     // Inisialisasi Supabase Client Real Production
     const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co'; 
     const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco'; 
