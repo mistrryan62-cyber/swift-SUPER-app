@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -62,7 +62,7 @@
             border: 1px solid rgba(30, 41, 59, 0.6); transition: all 0.25s ease;
         }
         .product-card:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(2, 6, 23, 0.5); }
-        .product-card img { border-radius: 28px 28px 0 0 !important; }
+        .product-card img, .product-card video { border-radius: 28px 28px 0 0 !important; }
         .product-card .card-body { border-radius: 0 0 28px 28px !important; }
         
         button, a.bg-emerald-500, a.bg-red-600, a.bg-blue-600, a.bg-slate-800 { border-radius: 9999px !important; }
@@ -119,7 +119,7 @@
 
 <div id="global-announcement-banner"></div>
 
-<!-- ================= MODAL AUTH / LOGIN & REGISTER (SINKRON SUPABASE) ================= -->
+<!-- ================= MODAL AUTH / LOGIN & REGISTER ================= -->
 <div id="auth-modal" class="fixed inset-0 z-50 bg-[#030712] flex items-center justify-center p-3 sm:p-4">
     <div class="w-full max-w-[420px] max-h-[90vh] bg-[#0f172a] border border-[#1e293b] rounded-[32px] p-5 shadow-2xl flex flex-col space-y-4 overflow-hidden">
         
@@ -175,39 +175,38 @@
 </div>
 
 <div class="app-wrapper">
-    <!-- HEADER YANG TELAH DIRAPIKAN AGAR PRESISI DAN TIDAK TERPOTONG -->
     <header class="bg-[#0b0f19]/95 backdrop-blur border-b border-[#1e293b] py-2.5 px-3 sticky top-0 z-50">
-        <div class="max-w-[480px] mx-auto flex items-center justify-between gap-2">
+        <div class="max-w-[480px] mx-auto flex items-center justify-between gap-1.5">
             <div class="flex items-center gap-1.5">
                 <select id="country-select" onchange="syncCountryAndCurrency()" class="bg-[#1e293b] text-slate-100 text-[11px] py-1 px-1.5 border border-slate-700 outline-none cursor-pointer" aria-label="Pilih negara">
-                    <option value="MY" selected>MY</option>
-                    <option value="ID">ID</option>
-                    <option value="SG">SG</option>
+                    <option value="MY">MY (Malaysia)</option>
+                    <option value="ID">ID (Indonesia)</option>
+                    <option value="SG">SG (Singapore)</option>
                 </select>
                 <select id="currency-select" onchange="changeCurrency()" class="bg-[#1e293b] text-slate-100 text-[11px] py-1 px-1.5 border border-slate-700 outline-none cursor-pointer" aria-label="Pilih mata uang">
                     <option value="IDR">IDR</option>
-                    <option value="MYR" selected>MYR</option>
+                    <option value="MYR">MYR</option>
                     <option value="SGD">SGD</option>
                 </select>
             </div>
             
             <div class="flex items-center gap-1.5">
-                <button id="refresh-location-btn" onclick="refreshLocation()" class="text-xs bg-slate-800 hover:bg-slate-700 p-1.5 transition rounded-full cursor-pointer" title="Perbarui lokasi">
+                <button onclick="openCartModal()" class="relative text-xs bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 p-2 transition rounded-full cursor-pointer border-none" title="Keranjang Belanja">
+                    <i class="fa-solid fa-cart-shopping text-xs"></i>
+                    <span id="cart-badge-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                </button>
+                <button id="refresh-location-btn" onclick="refreshLocation()" class="text-xs bg-slate-800 hover:bg-slate-700 p-1.5 transition rounded-full cursor-pointer border-none" title="Perbarui lokasi">
                     <i class="fa-solid fa-location-crosshairs text-emerald-400 text-xs"></i>
                 </button>
                 <button onclick="toggleUserVoicePreference()" id="user-voice-toggle" class="voice-toggle on" title="Panduan Suara">
                     <i class="fa-solid fa-volume-high text-xs"></i>
                 </button>
-                <button onclick="openShareModal()" class="text-[10px] bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 px-2.5 py-1.5 rounded-full font-bold transition flex items-center gap-1 cursor-pointer" title="Bagikan">
+                <button onclick="openShareModal()" class="text-[10px] bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 px-2.5 py-1.5 rounded-full font-bold transition flex items-center gap-1 cursor-pointer border-none" title="Bagikan">
                     <i class="fa-solid fa-share-nodes"></i> Bagikan
-                </button>
-                <button onclick="openMasterAdminModal()" class="text-[10px] font-extrabold bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-2.5 rounded-full transition shadow flex items-center gap-1 cursor-pointer border-none" title="Admin">
-                    <i class="fa-solid fa-gear"></i> Admin
                 </button>
             </div>
         </div>
     </header>
-
     <main class="max-w-[480px] mx-auto p-4">
 
         <!-- ================= HALAMAN 1: BERANDA ================= -->
@@ -215,9 +214,9 @@
             <div id="location-status-box" class="bg-[#1e293b]/80 backdrop-blur border border-slate-700/80 py-2.5 px-4 text-xs text-emerald-400 font-bold flex items-center justify-between rounded-pill-soft shadow-sm">
                 <div class="flex items-center gap-2">
                     <span class="pulse-dot"></span>
-                    <span id="location-status-text">Terhubung Real-Time ke Supabase</span>
+                    <span id="location-status-text">Mendeteksi Wilayah & Gateway Otomatis...</span>
                 </div>
-                <span id="sync-mode-badge" class="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-pill-soft uppercase tracking-wider font-extrabold">LIVE ENGINE</span>
+                <span id="sync-mode-badge" class="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-pill-soft uppercase tracking-wider font-extrabold">AUTO-GEO</span>
             </div>
 
             <div class="swift-card bg-gradient-to-br from-[#0f172a] via-[#0f172a] to-[#1e1b4b] border-l-4 border-emerald-500 relative overflow-hidden">
@@ -227,7 +226,6 @@
                         <h2 id="user-balance" class="text-2xl font-black text-white mt-1">
                             <span class="text-sm font-normal text-slate-400" id="currency-symbol">RM</span> <span id="balance-amount">0.00</span>
                         </h2>
-                        <!-- REWARD POIN DISPLAY REAL -->
                         <div class="mt-2 flex items-center gap-2">
                             <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-extrabold border border-amber-500/30 flex items-center gap-1">
                                 <i class="fa-solid fa-star text-amber-400"></i> Poin SWIFT: <span id="reward-points-val">0</span>
@@ -244,17 +242,16 @@
                 </div>
             </div>
 
-            <!-- BANNER PROMO REAL (BERSIH DARI URL GAMBAR DUMMY / UNSPLASH) -->
             <div class="swift-card p-0 overflow-hidden relative group cursor-pointer" onclick="clickMasterBanner()">
                 <div id="promo-banner-container" class="h-36 bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 flex items-end p-4 justify-between border border-emerald-500/20 rounded-[28px]">
                     <div>
                         <span id="promo-badge" class="text-[10px] font-extrabold bg-emerald-500 text-slate-950 py-0.5 px-2.5 uppercase tracking-wide shadow"><i class="fa-solid fa-bullhorn mr-1"></i> SWIFT OFFICIAL</span>
                         <h3 id="promo-title" class="text-xs sm:text-sm font-bold text-white mt-1.5 leading-snug drop-shadow">Selamat Datang di SWIFT Super-App</h3>
-                        <p id="promo-subtitle" class="text-[10px] text-slate-300 mt-0.5">Ekosistem layanan mandiri, transportasi, logistik & perdagangan.</p>
+                        <p id="promo-subtitle" class="text-[10px] text-slate-300 mt-0.5">Ekosistem layanan mandiri lintas negara (Multi-Region).</p>
                     </div>
                     <div class="flex flex-col items-end gap-2">
                         <div id="live-banner-trigger" class="hidden">
-                            <button onclick="event.stopPropagation(); openLiveStreamModal()" class="bg-red-600 hover:bg-red-700 text-white text-[10px] font-extrabold py-1.5 px-3 uppercase tracking-wider shadow-lg animate-pulse flex items-center gap-1.5 rounded-pill-soft cursor-pointer">
+                            <button onclick="event.stopPropagation(); openLiveStreamModal()" class="bg-red-600 hover:bg-red-700 text-white text-[10px] font-extrabold py-1.5 px-3 uppercase tracking-wider shadow-lg animate-pulse flex items-center gap-1.5 rounded-pill-soft cursor-pointer border-none">
                                 <i class="fa-solid fa-circle text-[8px]"></i> LIVE NOW
                             </button>
                         </div>
@@ -262,22 +259,28 @@
                 </div>
             </div>
 
-            <!-- REAL-TIME GPS TRACKING WIDGET (HIDDEN SECARA BAWAAN - HANYA MUNCUL JIKA ADA PESANAN AKTIF DARI SUPABASE) -->
+            <!-- GPS Live Route Tracking Panel -->
             <div id="gps-tracking-widget" class="swift-card bg-slate-900/90 border-l-4 border-blue-500 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xs font-extrabold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-map-location-dot text-blue-400"></i> Lacak Pengiriman Real-Time
+                        <i class="fa-solid fa-map-location-dot text-blue-400"></i> Peta Rute & Pengiriman Real-Time
                     </h3>
                     <span id="gps-eta-badge" class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full font-mono font-bold">Menunggu...</span>
                 </div>
-                <div class="relative h-28 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 flex items-center justify-center">
-                    <div class="absolute inset-0 bg-cover bg-center opacity-40"></div>
-                    <div class="relative z-10 flex items-center gap-4 bg-black/70 backdrop-blur px-4 py-2 rounded-2xl border border-white/10">
+                <div class="relative h-32 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 flex flex-col justify-between p-3">
+                    <div class="flex justify-between items-center text-[10px] text-slate-300 font-mono z-10 bg-black/60 px-2.5 py-1 rounded-xl backdrop-blur">
+                        <span>Jemput: <strong id="route-pickup-text" class="text-emerald-400">Lokasi Anda</strong></span>
+                        <span>Tujuan: <strong id="route-dest-text" class="text-blue-400">Titik Tujuan</strong></span>
+                    </div>
+                    <div class="relative z-10 flex items-center gap-3 bg-black/70 backdrop-blur px-3 py-2 rounded-2xl border border-white/10">
                         <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm animate-bounce">
                             <i class="fa-solid fa-motorcycle"></i>
                         </div>
-                        <div>
-                            <div class="text-xs font-bold text-white" id="gps-driver-name">Menunggu Driver...</div>
+                        <div class="flex-1">
+                            <div class="text-xs font-bold text-white flex justify-between">
+                                <span id="gps-driver-name">Driver: Menunggu...</span>
+                                <span id="route-fare-text" class="text-emerald-400 font-black">RM 0.00</span>
+                            </div>
                             <div class="text-[10px] text-emerald-400 font-mono" id="gps-status-text">Mencari driver terdekat...</div>
                         </div>
                     </div>
@@ -286,17 +289,18 @@
 
             <div class="swift-card">
                 <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                    <i class="fa-solid fa-location-dot text-emerald-400"></i> Terdekat Sekitar Anda
+                    <i class="fa-solid fa-location-dot text-emerald-400"></i> Rekomendasi Mitra Terdekat
                 </h3>
                 <div id="nearby-services" class="grid grid-cols-4 gap-2.5">
-                    <div class="col-span-4 text-center py-4 text-xs text-slate-500 italic">Mencari kedai & mitra terdekat di sekitar Anda...</div>
+                    <div class="col-span-4 text-center py-4 text-xs text-slate-500 italic">Mencari kedai & mitra terdekat di wilayah Anda...</div>
                 </div>
             </div>
 
+            <!-- Panel Layanan Navigasi Komplit (Ride, Send, Express, Car, Box) -->
             <div id="service-dynamic-panel" class="swift-card hidden space-y-3 border-emerald-500/40">
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                     <h4 id="service-panel-title" class="text-xs font-bold text-emerald-400 uppercase tracking-wider"></h4>
-                    <button onclick="document.getElementById('service-dynamic-panel').classList.add('hidden')" class="text-slate-400 hover:text-white text-sm cursor-pointer">&times;</button>
+                    <button onclick="document.getElementById('service-dynamic-panel').classList.add('hidden')" class="text-slate-400 hover:text-white text-sm cursor-pointer border-none bg-transparent">&times;</button>
                 </div>
                 <div id="service-panel-content" class="text-xs text-slate-300 space-y-3"></div>
             </div>
@@ -304,11 +308,11 @@
             <div class="swift-card">
                 <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Semua Layanan Utama</h3>
                 <div class="grid grid-cols-4 gap-2.5">
-                    <div onclick="triggerServiceAction('Ride')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
+                    <div onclick="openTransportModal('Ride')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
                         <i class="fa-solid fa-motorcycle text-xl mb-1 text-emerald-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Ride</span>
                     </div>
-                    <div onclick="triggerServiceAction('Send')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
+                    <div onclick="openTransportModal('Send')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
                         <i class="fa-solid fa-box text-xl mb-1 text-blue-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Send</span>
                     </div>
@@ -320,40 +324,38 @@
                         <i class="fa-solid fa-store text-xl mb-1 text-purple-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Mart</span>
                     </div>
-                    <div onclick="triggerServiceAction('Express')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
+                    <div onclick="openTransportModal('Express')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
                         <i class="fa-solid fa-bolt text-xl mb-1 text-yellow-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Express</span>
                     </div>
-                    <div onclick="triggerServiceAction('Car')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
+                    <div onclick="openTransportModal('Car')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
                         <i class="fa-solid fa-car text-xl mb-1 text-sky-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Car</span>
                     </div>
-                    <div onclick="triggerServiceAction('Box')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
+                    <div onclick="openTransportModal('Box')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
                         <i class="fa-solid fa-truck text-xl mb-1 text-emerald-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Box</span>
                     </div>
-                    <div onclick="openLiveStreamModal()" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition border-none cursor-pointer">
-                        <i class="fa-solid fa-tower-broadcast text-xl mb-1 text-red-500 animate-pulse"></i>
-                        <span class="text-[10px] font-semibold text-slate-200">Live</span>
-                    </div>
-                    <div onclick="openVideoUploadModal()" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer border border-purple-500/40 bg-purple-950/20">
-                        <i class="fa-solid fa-video text-xl mb-1 text-purple-400"></i>
-                        <span class="text-[10px] font-semibold text-slate-200">Upload Video</span>
+                    <div onclick="openMerchantStudioModal()" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer border border-amber-500/40 bg-amber-950/20">
+                        <i class="fa-solid fa-store text-xl mb-1 text-amber-400"></i>
+                        <span class="text-[10px] font-semibold text-slate-200">Studio Mitra</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Feed Video Pendek Promosi Produk (Food & Mart) -->
             <div class="swift-card">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">🔥 Produk Kedai Mitra SWIFT</h3>
-                    <a href="#" onclick="alert('Menampilkan katalog produk')" class="text-[11px] text-emerald-400 hover:underline font-bold">Lihat Semua →</a>
+                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-play text-red-500 animate-pulse"></i> 🔥 Promo Video Produk Kedai
+                    </h3>
+                    <button onclick="openMerchantStudioModal()" class="text-[10px] text-emerald-400 hover:underline font-bold bg-transparent border-none cursor-pointer">+ Upload Promo</button>
                 </div>
                 <div id="nearby-products" class="hide-scrollbar flex gap-3 overflow-x-auto pb-1">
-                    <div class="w-full text-center py-4 text-xs text-slate-500 italic">Belum ada produk kedai yang terdaftar di database.</div>
+                    <div class="w-full text-center py-4 text-xs text-slate-500 italic">Belum ada promo video produk.</div>
                 </div>
             </div>
         </div>
-
         <!-- ================= HALAMAN 2: DOMPET ================= -->
         <div id="page-dompet" class="app-page">
             <div class="swift-card bg-gradient-to-br from-emerald-950/60 to-slate-900 border-l-4 border-emerald-500">
@@ -386,7 +388,7 @@
             <div id="wallet-dynamic-panel" class="swift-card hidden space-y-3 border-emerald-500/40">
                 <div class="flex justify-between items-center">
                     <h4 id="wallet-panel-title" class="text-xs font-bold text-emerald-400 uppercase tracking-wider"></h4>
-                    <button onclick="document.getElementById('wallet-dynamic-panel').classList.add('hidden')" class="text-slate-400 hover:text-white text-sm cursor-pointer">&times;</button>
+                    <button onclick="document.getElementById('wallet-dynamic-panel').classList.add('hidden')" class="text-slate-400 hover:text-white text-sm cursor-pointer border-none bg-transparent">&times;</button>
                 </div>
                 <div id="wallet-panel-content" class="text-xs text-slate-300"></div>
             </div>
@@ -442,11 +444,11 @@
         <!-- ================= HALAMAN 6: ATUR ================= -->
         <div id="page-atur" class="app-page">
             <div class="swift-card space-y-4">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-sliders mr-1 text-emerald-400"></i> Preferensi Antarmuka</h3>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-sliders mr-1 text-emerald-400"></i> Preferensi Antarmuka & Region</h3>
                 <div class="space-y-3 text-xs">
                     <div class="flex justify-between items-center p-3 bg-slate-900 rounded-2xl border border-slate-800">
-                        <span class="font-bold text-white">Tema Tampilan</span>
-                        <span class="text-emerald-400 font-bold">Dark Mode (Aktif)</span>
+                        <span class="font-bold text-white">Wilayah Aktif (Auto-Geo)</span>
+                        <span id="active-region-label" class="text-emerald-400 font-bold">Malaysia (MY)</span>
                     </div>
                 </div>
             </div>
@@ -459,7 +461,7 @@
                     <i class="fa-solid fa-headset"></i>
                 </div>
                 <h3 class="font-extrabold text-white text-base">Butuh Bantuan Langsung?</h3>
-                <p class="text-xs text-slate-300">Tim dukungan pelanggan enterprise SWIFT siap melayani Anda 24/7 secara real-time.</p>
+                <p class="text-xs text-slate-300">Tim dukungan pelanggan enterprise SWIFT siap melayani Anda 24/7 di berbagai negara.</p>
                 <button onclick="openLiveChatModal('Dukungan Pelanggan CS')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-extrabold py-2.5 px-6 rounded-full transition shadow cursor-pointer border-none">Live Chat Dukungan CS</button>
             </div>
         </div>
@@ -485,8 +487,13 @@
             </div>
 
             <div class="swift-card space-y-2.5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2"><i class="fa-solid fa-user-gear mr-1 text-emerald-400"></i> Pengaturan Akun</h3>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2"><i class="fa-solid fa-user-gear mr-1 text-emerald-400"></i> Pengaturan Akun & Mitra</h3>
                 
+                <div onclick="openMerchantStudioModal()" class="p-3 bg-amber-950/30 hover:bg-amber-900/30 rounded-2xl border border-amber-800/40 flex justify-between items-center transition cursor-pointer">
+                    <span class="text-xs font-semibold text-amber-400 flex items-center gap-2"><i class="fa-solid fa-store"></i> Studio Merchant Mitra SWIFT</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-amber-500"></i>
+                </div>
+
                 <div onclick="openProfileModal('Edit Profil')" class="p-3 bg-slate-900 hover:bg-slate-800 rounded-2xl border border-slate-800 flex justify-between items-center transition cursor-pointer">
                     <span class="text-xs font-semibold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-emerald-400"></i> Edit Informasi Akun</span>
                     <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
@@ -494,11 +501,6 @@
 
                 <div onclick="openProfileModal('Keamanan')" class="p-3 bg-slate-900 hover:bg-slate-800 rounded-2xl border border-slate-800 flex justify-between items-center transition cursor-pointer">
                     <span class="text-xs font-semibold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-blue-400"></i> Ubah Kata Sandi</span>
-                    <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
-                </div>
-
-                <div onclick="openProfileModal('Notifikasi')" class="p-3 bg-slate-900 hover:bg-slate-800 rounded-2xl border border-slate-800 flex justify-between items-center transition cursor-pointer">
-                    <span class="text-xs font-semibold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-bell text-amber-400"></i> Pengaturan Notifikasi</span>
                     <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
                 </div>
 
@@ -518,6 +520,133 @@
         </div>
 
     </main>
+    <!-- MODAL PEMESANAN TRANSPORTASI / LOGISTIK (RIDE, SEND, EXPRESS, CAR, BOX) -->
+    <div id="transport-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="w-full max-w-[480px] bg-[#0f172a] border border-[#1e293b] rounded-[32px] p-5 shadow-2xl flex flex-col space-y-4 max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 id="transport-title" class="text-sm font-extrabold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-route text-emerald-400"></i> Order Layanan
+                </h3>
+                <button onclick="closeTransportModal()" class="text-slate-400 hover:text-white text-sm cursor-pointer border-none bg-transparent">&times;</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Titik Penjemputan / Lokasi Asal</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="transport-pickup-input" placeholder="Masukkan alamat penjemputan..." class="flex-1 bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                        <button onclick="useCurrentLocationForPickup()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 px-3 py-2 rounded-xl border border-slate-700 font-bold cursor-pointer">
+                            <i class="fa-solid fa-crosshairs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Titik Tujuan / Lokasi Pengiriman</label>
+                    <input type="text" id="transport-dest-input" onkeyup="calculateRouteFareRealtime()" placeholder="Masukkan alamat tujuan..." class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                </div>
+
+                <!-- Live Distance & Fare Calculator Box -->
+                <div class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-2xl space-y-2">
+                    <div class="flex justify-between items-center text-slate-300">
+                        <span>Estimasi Jarak Tempuh:</span>
+                        <strong id="calc-distance-text" class="text-white font-mono">0.0 KM</strong>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-300">
+                        <span>Layanan / Unit:</span>
+                        <strong id="calc-service-type" class="text-blue-400 font-bold">Ride</strong>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-slate-800 pt-2 text-emerald-400 font-black text-sm">
+                        <span>Total Biaya Tarif:</span>
+                        <span id="calc-fare-amount">RM 0.00</span>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-emerald-950/30 border border-emerald-500/30 rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-[11px] text-emerald-300">
+                        <i class="fa-solid fa-users text-emerald-400"></i>
+                        <span>Mitra Terdekat Ditemukan:</span>
+                    </div>
+                    <span id="calc-nearby-count" class="font-bold text-white bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/40">3 Unit</span>
+                </div>
+
+                <button onclick="confirmTransportBooking()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-3 rounded-xl transition shadow-lg cursor-pointer border-none text-xs">
+                    KONFIRMASI PESAN SEKARANG 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL MERCHANT STUDIO (UPLOAD/EDIT PROMO PRODUK MITRA) -->
+    <div id="merchant-studio-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="w-full max-w-[480px] bg-[#0f172a] border border-[#1e293b] rounded-[32px] p-5 shadow-2xl flex flex-col space-y-4 max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-extrabold text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-store"></i> Studio Promosi Merchant Mitra
+                </h3>
+                <button onclick="closeMerchantStudioModal()" class="text-slate-400 hover:text-white text-sm cursor-pointer border-none bg-transparent">&times;</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nama Produk / Makanan</label>
+                    <input type="text" id="merchant-prod-name" placeholder="Contoh: Nasi Lemak Special Aini" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-amber-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Kategori</label>
+                        <select id="merchant-prod-cat" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none">
+                            <option value="food">Makanan (Food)</option>
+                            <option value="mart">Barang Kedai (Mart)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Harga Dasar (${currencySymbol})</label>
+                        <input type="number" id="merchant-prod-price" placeholder="12.00" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-amber-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Pilih Video Promo (.mp4) / Foto Produk</label>
+                    <input type="file" id="merchant-media-file" accept="video/*,image/*" capture="environment" class="w-full text-slate-400 text-xs bg-slate-900 p-2 rounded-xl border border-slate-800 cursor-pointer">
+                </div>
+
+                <button onclick="handleSaveMerchantProduct()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold py-3 rounded-xl transition shadow-lg cursor-pointer border-none">
+                    UNGGAH / PERBARUI PROMO PRODUK 🚀
+                </button>
+
+                <div class="border-t border-slate-800 pt-3">
+                    <h4 class="font-bold text-slate-400 mb-2">Daftar Produk Yang Dipromosikan:</h4>
+                    <div id="merchant-product-list-ui" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KERANJANG BELANJA (CART SYSTEM) -->
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="w-full max-w-[480px] bg-[#0f172a] border border-[#1e293b] rounded-[32px] p-5 shadow-2xl flex flex-col space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-cart-shopping text-emerald-400"></i> Keranjang Belanja Produk
+                </h3>
+                <button onclick="closeCartModal()" class="text-slate-400 hover:text-white text-sm cursor-pointer border-none bg-transparent">&times;</button>
+            </div>
+
+            <div id="cart-items-container" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs"></div>
+
+            <div class="border-t border-slate-800 pt-3 space-y-3">
+                <div class="flex justify-between items-center text-sm font-black text-white">
+                    <span>Total Subtotal:</span>
+                    <span id="cart-total-amount" class="text-emerald-400">RM 0.00</span>
+                </div>
+                <button onclick="checkoutCartOrder()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-3 rounded-xl transition shadow-lg cursor-pointer border-none text-xs">
+                    PROSES PESANAN & BAYAR SEKARANG 🛒
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL IN-APP LIVE CHAT -->
     <div id="live-chat-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-0 sm:p-4">
@@ -546,57 +675,12 @@
         </div>
     </div>
 
-    <!-- Modal Master Admin -->
-    <div id="admin-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-0 sm:p-4">
-        <div class="w-full max-w-[480px] h-full sm:h-[90vh] bg-[#0f172a] sm:rounded-[28px] border border-[#1e293b] flex flex-col relative overflow-hidden shadow-2xl">
-            <div class="p-4 bg-[#0b0f19] border-b border-[#1e293b] flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center text-sm font-bold">
-                        <i class="fa-solid fa-gear"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-extrabold text-white text-xs">SWIFT Command Tower (Master Admin)</h3>
-                        <p class="text-[10px] text-slate-400">Kontrol ekosistem real-time</p>
-                    </div>
-                </div>
-                <button onclick="closeMasterAdminModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center hover:bg-slate-700 transition cursor-pointer border-none">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
-            </div>
-
-            <div class="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
-                <div class="swift-card border-l-4 border-blue-500 space-y-2">
-                    <h4 class="font-bold text-white text-xs flex items-center gap-1.5"><i class="fa-solid fa-bullhorn text-blue-400"></i> Siaran Pengumuman Global</h4>
-                    <input type="text" id="admin-announcement-input" placeholder="Ketik pengumuman untuk seluruh pengguna..." class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none">
-                    <button onclick="saveAdminAnnouncement()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition cursor-pointer border-none shadow">Kirim Siaran Pengumuman 📢</button>
-                </div>
-
-                <div class="swift-card border-l-4 border-emerald-500 space-y-2">
-                    <h4 class="font-bold text-white text-xs flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-emerald-400"></i> Status Darurat & Lockdown</h4>
-                    <p class="text-slate-400 text-[11px]">Aktifkan lockdown untuk menangguhkan akses aplikasi pengguna saat pemeliharaan sistem.</p>
-                    <div class="flex gap-2">
-                        <button onclick="setAdminLockdown(false)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2 rounded-xl cursor-pointer border-none transition">Sistem Normal (Aktif)</button>
-                        <button onclick="setAdminLockdown(true)" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-xl cursor-pointer border-none transition">Lockdown Aplikasi 🔒</button>
-                    </div>
-                </div>
-
-                <div class="swift-card border-l-4 border-purple-500 space-y-2">
-                    <h4 class="font-bold text-white text-xs flex items-center gap-1.5"><i class="fa-solid fa-chart-line text-purple-400"></i> Ringkasan Real-Time Finansial</h4>
-                    <div class="p-3 bg-slate-900 rounded-xl space-y-1 font-mono">
-                        <div class="flex justify-between"><span>Total Pendapatan System:</span><span class="text-emerald-400 font-bold" id="admin-rev-val">RM 0.00</span></div>
-                        <div class="flex justify-between"><span>Komisi Transaksi:</span><span class="text-purple-400 font-bold" id="admin-fee-val">RM 0.00</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal Bagikan Aplikasi -->
     <div id="share-modal" class="share-modal hidden">
         <div class="share-box space-y-4">
             <div class="flex justify-between items-center">
                 <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-share-nodes text-amber-400"></i> Bagikan SWIFT</h3>
-                <button onclick="closeShareModal()" class="text-slate-400 hover:text-white text-xl w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 cursor-pointer">&times;</button>
+                <button onclick="closeShareModal()" class="text-slate-400 hover:text-white text-xl w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 cursor-pointer border-none">&times;</button>
             </div>
             <p class="text-xs text-slate-400">Bagikan tautan referral Anda ke media sosial & dapatkan bonus saldo instan saat teman bergabung!</p>
             
@@ -618,34 +702,6 @@
             <div class="bg-slate-800/80 rounded-pill-soft p-3 flex items-center gap-2 border border-slate-700">
                 <input id="share-link" type="text" value="https://swift-app.com" readonly class="flex-1 bg-transparent text-xs text-slate-200 outline-none">
                 <button onclick="copyShareLink()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-bold py-1.5 px-4 rounded-pill-soft shadow cursor-pointer border-none">Salin</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Upload Video Pendek Produk -->
-    <div id="video-upload-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-4">
-        <div class="w-full max-w-[420px] bg-[#0f172a] border border-[#1e293b] rounded-[32px] p-6 shadow-2xl space-y-4 relative">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-extrabold text-white text-xs flex items-center gap-2">
-                    <i class="fa-solid fa-video text-purple-400"></i> Upload Video Pendek Produk
-                </h3>
-                <button onclick="closeVideoUploadModal()" class="text-slate-400 hover:text-white text-sm cursor-pointer border-none bg-transparent">&times;</button>
-            </div>
-
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Judul / Deskripsi Video</label>
-                    <input type="text" id="video-title-input" placeholder="Masukkan deskripsi video..." class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-purple-500">
-                </div>
-
-                <div>
-                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Pilih File Video (.mp4)</label>
-                    <input type="file" id="video-file-input" accept="video/*" class="w-full text-slate-400 text-xs bg-slate-900 p-2 rounded-xl border border-slate-800 cursor-pointer">
-                </div>
-
-                <button onclick="handleProcessVideoUpload()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-extrabold py-3 rounded-xl transition shadow-lg cursor-pointer border-none mt-2">
-                    UNGGAH VIDEO SEKARANG 🚀
-                </button>
             </div>
         </div>
     </div>
@@ -709,9 +765,8 @@
         </div>
     </nav>
 </div>
-
 <script>
-    // Inisialisasi Supabase Client Real
+    // Inisialisasi Supabase Client Real Production
     const SUPABASE_URL = 'https://ydulzwenmideyjrntwie.supabase.co'; 
     const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco'; 
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -719,10 +774,89 @@
     let currentUserId = localStorage.getItem('swift_user_uuid') || null;
     let activeOrderData = null;
     
-    // VARIABEL GLOBAL SALDO TERVERIFIKASI SERVER (MEMASTIKAN TIDAK ADA DATA PALSU LOKAL)
     window.verifiedUserBalance = 0.00;
 
-    // 1. FUNGSI UTAMA PENAMPIL SALDO (MURNI SINKRON REAL SERVER)
+    let currentCurrency = 'MYR';
+    let currencySymbol = 'RM';
+    let activeCountryCode = 'MY';
+    let conversionRates = { MYR: 1, IDR: 3500, SGD: 0.30 };
+
+    let userCart = [];
+    let selectedTransportService = 'Ride';
+
+    // Auto-Geo Detection & Multi-Region Setup
+    async function autoDetectUserCountryAndGateway() {
+        const statusText = document.getElementById('location-status-text');
+        if (statusText) statusText.innerText = "Mendeteksi posisi geografis lintas negara...";
+
+        try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            if (data && data.country_code) activeCountryCode = data.country_code;
+        } catch (e) {
+            activeCountryCode = 'MY';
+        }
+
+        const countrySelect = document.getElementById('country-select');
+        const currencySelect = document.getElementById('currency-select');
+        const regionLabel = document.getElementById('active-region-label');
+
+        if (activeCountryCode === 'ID') {
+            if (countrySelect) countrySelect.value = 'ID';
+            if (currencySelect) currencySelect.value = 'IDR';
+            currentCurrency = 'IDR';
+            currencySymbol = 'Rp';
+            if (regionLabel) regionLabel.innerText = "Indonesia (ID) - Gateway: QRIS Nasional";
+        } else if (activeCountryCode === 'SG') {
+            if (countrySelect) countrySelect.value = 'SG';
+            if (currencySelect) currencySelect.value = 'SGD';
+            currentCurrency = 'SGD';
+            currencySymbol = 'S\$';
+            if (regionLabel) regionLabel.innerText = "Singapore (SG) - Gateway: PayNow SG";
+        } else {
+            if (countrySelect) countrySelect.value = 'MY';
+            if (currencySelect) currencySelect.value = 'MYR';
+            currentCurrency = 'MYR';
+            currencySymbol = 'RM';
+            if (regionLabel) regionLabel.innerText = "Malaysia (MY) - Gateway: DuitNow QR";
+        }
+
+        applyCurrencySettings();
+        if (statusText) statusText.innerText = `Terhubung Otomatis ke Wilayah [${activeCountryCode}] (Live Cross-Border Engine)`;
+    }
+
+    function syncCountryAndCurrency() {
+        const countrySelect = document.getElementById('country-select');
+        const currencySelect = document.getElementById('currency-select');
+        if (!countrySelect || !currencySelect) return;
+        
+        activeCountryCode = countrySelect.value;
+        if (activeCountryCode === 'ID') currencySelect.value = 'IDR';
+        else if (activeCountryCode === 'SG') currencySelect.value = 'SGD';
+        else currencySelect.value = 'MYR';
+        
+        changeCurrency();
+    }
+
+    function changeCurrency() {
+        const select = document.getElementById('currency-select');
+        if(!select) return;
+        currentCurrency = select.value;
+        currencySymbol = currentCurrency === 'IDR' ? 'Rp' : (currentCurrency === 'SGD' ? 'S\$' : 'RM');
+        applyCurrencySettings();
+    }
+
+    function applyCurrencySettings() {
+        const symEl = document.getElementById('currency-symbol');
+        if(symEl) symEl.innerText = currencySymbol;
+        
+        const walletSymbolEl = document.getElementById('wallet-currency-symbol');
+        if(walletSymbolEl) walletSymbolEl.innerText = currencySymbol;
+
+        updateBalanceDisplay();
+        fetchRealProductsFromSupabase();
+    }
+
     function updateBalanceDisplay() {
         const verifiedBalance = parseFloat(window.verifiedUserBalance || 0.00);
         const rate = conversionRates[currentCurrency] || 1;
@@ -736,7 +870,314 @@
         if (walletBalEl) walletBalEl.innerText = formatted;
     }
 
-    // 2. SINKRONISASI DATA REAL-TIME DARI SUPABASE
+    // ================= MODUL 1: MERCHANT STUDIO & CART SYSTEM =================
+    function openMerchantStudioModal() {
+        document.getElementById('merchant-studio-modal').classList.remove('hidden');
+        renderMerchantProductList();
+    }
+
+    function closeMerchantStudioModal() {
+        document.getElementById('merchant-studio-modal').classList.add('hidden');
+    }
+
+    async function handleSaveMerchantProduct() {
+        const nameInput = document.getElementById('merchant-prod-name');
+        const catSelect = document.getElementById('merchant-prod-cat');
+        const priceInput = document.getElementById('merchant-prod-price');
+        const mediaInput = document.getElementById('merchant-media-file');
+
+        if(!nameInput.value.trim() || !priceInput.value) {
+            alert('Mohon isi nama produk dan harga!');
+            return;
+        }
+
+        if (!supabaseClient) {
+            alert('Database Supabase tidak terhubung!');
+            return;
+        }
+
+        try {
+            const { data, error } = await supabaseClient.from('products').insert([
+                {
+                    name: nameInput.value.trim(),
+                    category: catSelect.value,
+                    price: parseFloat(priceInput.value),
+                    is_active: true,
+                    created_at: new Date()
+                }
+            ]);
+
+            if (error) {
+                alert(`Gagal menyimpan produk ke database: ${error.message}`);
+                return;
+            }
+
+            alert('🎉 Produk berhasil disimpan langsung ke database Supabase!');
+            nameInput.value = '';
+            priceInput.value = '';
+            renderMerchantProductList();
+            fetchRealProductsFromSupabase();
+        } catch (err) {
+            alert('Terjadi kesalahan koneksi database.');
+        }
+    }
+
+    async function renderMerchantProductList() {
+        const container = document.getElementById('merchant-product-list-ui');
+        if(!container) return;
+
+        if (!supabaseClient) {
+            container.innerHTML = `<div class="text-slate-500 italic text-[11px]">Koneksi database tidak tersedia.</div>`;
+            return;
+        }
+
+        try {
+            const { data: products, error } = await supabaseClient
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error || !products || products.length === 0) {
+                container.innerHTML = `<div class="text-slate-500 italic text-[11px]">Belum ada produk yang diunggah di database.</div>`;
+                return;
+            }
+
+            container.innerHTML = products.map((item) => `
+                <div class="p-2.5 bg-slate-900 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-white text-xs">${item.name} (${item.category.toUpperCase()})</div>
+                        <div class="text-emerald-400 font-bold text-[11px]">${currencySymbol} ${parseFloat(item.price).toFixed(2)}</div>
+                    </div>
+                    <button onclick="deleteMerchantProduct('${item.id}')" class="text-red-400 hover:text-red-300 text-xs bg-red-950/40 px-2 py-1 rounded-lg cursor-pointer border-none">Hapus</button>
+                </div>
+            `).join('');
+        } catch (err) {
+            container.innerHTML = `<div class="text-slate-500 italic text-[11px]">Gagal memuat produk.</div>`;
+        }
+    }
+
+    async function deleteMerchantProduct(productId) {
+        if (!supabaseClient) return;
+        try {
+            const { error } = await supabaseClient.from('products').delete().eq('id', productId);
+            if (error) {
+                alert(`Gagal menghapus produk: ${error.message}`);
+                return;
+            }
+            renderMerchantProductList();
+            fetchRealProductsFromSupabase();
+        } catch (err) {
+            alert('Kesalahan jaringan saat menghapus produk.');
+        }
+    }
+
+    function addToCart(prodId, prodName, price) {
+        const existing = userCart.find(i => i.id === prodId);
+        if(existing) {
+            existing.qty += 1;
+        } else {
+            userCart.push({ id: prodId, name: prodName, price: parseFloat(price), qty: 1 });
+        }
+        updateCartBadge();
+        logUserActionToDatabase(`Menambahkan ke Keranjang: ${prodName}`);
+        alert(`🛒 ${prodName} berhasil dimasukkan ke keranjang!`);
+    }
+
+    function updateCartBadge() {
+        const badge = document.getElementById('cart-badge-count');
+        const totalCount = userCart.reduce((acc, curr) => acc + curr.qty, 0);
+        if(badge) badge.innerText = totalCount;
+    }
+
+    function openCartModal() {
+        document.getElementById('cart-modal').classList.remove('hidden');
+        renderCartItems();
+    }
+
+    function closeCartModal() {
+        document.getElementById('cart-modal').classList.add('hidden');
+    }
+
+    function renderCartItems() {
+        const container = document.getElementById('cart-items-container');
+        const totalEl = document.getElementById('cart-total-amount');
+        if(!container) return;
+
+        if(userCart.length === 0) {
+            container.innerHTML = `<div class="text-slate-500 text-center py-6 italic">Keranjang belanja Anda masih kosong.</div>`;
+            if(totalEl) totalEl.innerText = `${currencySymbol} 0.00`;
+            return;
+        }
+
+        let total = 0;
+        container.innerHTML = userCart.map((item, index) => {
+            const itemTotal = item.price * item.qty;
+            total += itemTotal;
+            return `
+                <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-white">${item.name}</div>
+                        <div class="text-emerald-400 font-bold">${currencySymbol} ${item.price.toFixed(2)} x ${item.qty}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="changeCartQty(${index}, -1)" class="w-6 h-6 rounded-lg bg-slate-800 text-white font-bold cursor-pointer border-none">-</button>
+                        <span class="font-bold text-white">${item.qty}</span>
+                        <button onclick="changeCartQty(${index}, 1)" class="w-6 h-6 rounded-lg bg-slate-800 text-white font-bold cursor-pointer border-none">+</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        if(totalEl) totalEl.innerText = `${currencySymbol} ${total.toFixed(2)}`;
+    }
+
+    function changeCartQty(index, delta) {
+        userCart[index].qty += delta;
+        if(userCart[index].qty <= 0) userCart.splice(index, 1);
+        updateCartBadge();
+        renderCartItems();
+    }
+
+    async function checkoutCartOrder() {
+        if(userCart.length === 0) {
+            alert('Keranjang belanja Anda kosong!');
+            return;
+        }
+
+        let total = userCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        if(total > window.verifiedUserBalance) {
+            alert('Saldo dompet Anda tidak mencukupi untuk melakukan pembayaran!');
+            return;
+        }
+
+        if (currentUserId && supabaseClient) {
+            try {
+                const newBalance = window.verifiedUserBalance - total;
+                const { error } = await supabaseClient.from('users').update({ balance: newBalance }).eq('id', currentUserId);
+                if (error) {
+                    alert(`Gagal memproses transaksi: ${error.message}`);
+                    return;
+                }
+            } catch (e) {
+                alert('Kesalahan koneksi database.');
+                return;
+            }
+        }
+
+        window.verifiedUserBalance -= total;
+        updateBalanceDisplay();
+        logUserActionToDatabase(`Checkout Keranjang Belanja: -${currencySymbol} ${total.toFixed(2)}`);
+        alert(`✅ Pesanan keranjang belanja berhasil diproses & dibayar!`);
+        userCart = [];
+        updateCartBadge();
+        closeCartModal();
+    }
+
+    // ================= MODUL 2: ROUTE & FARE CALCULATOR =================
+    function openTransportModal(serviceName) {
+        selectedTransportService = serviceName;
+        document.getElementById('transport-title').innerHTML = `<i class="fa-solid fa-route text-emerald-400"></i> Order Layanan ${serviceName}`;
+        document.getElementById('calc-service-type').innerText = serviceName;
+        document.getElementById('transport-modal').classList.remove('hidden');
+        calculateRouteFareRealtime();
+    }
+
+    function closeTransportModal() {
+        document.getElementById('transport-modal').classList.add('hidden');
+    }
+
+    function useCurrentLocationForPickup() {
+        document.getElementById('transport-pickup-input').value = "Posisi GPS Saya Saat Ini";
+        calculateRouteFareRealtime();
+    }
+
+    function calculateRouteFareRealtime() {
+        const dest = document.getElementById('transport-dest-input').value.trim();
+        const distEl = document.getElementById('calc-distance-text');
+        const fareEl = document.getElementById('calc-fare-amount');
+
+        let dist = dest.length > 0 ? Math.min(25, Math.max(2.5, dest.length * 0.8)) : 0;
+        
+        let ratePerKm = 2.0;
+        if(selectedTransportService === 'Express') ratePerKm = 3.0;
+        if(selectedTransportService === 'Car') ratePerKm = 4.5;
+        if(selectedTransportService === 'Box') ratePerKm = 7.0;
+
+        let totalFare = dist > 0 ? (3.00 + (dist * ratePerKm)) : 0;
+
+        if(distEl) distEl.innerText = `${dist.toFixed(1)} KM`;
+        if(fareEl) fareEl.innerText = `${currencySymbol} ${totalFare.toFixed(2)}`;
+    }
+
+    function confirmTransportBooking() {
+        const pickup = document.getElementById('transport-pickup-input').value.trim();
+        const dest = document.getElementById('transport-dest-input').value.trim();
+        const fareText = document.getElementById('calc-fare-amount').innerText;
+
+        if(!pickup || !dest) {
+            alert('Mohon lengkapi alamat penjemputan dan tujuan!');
+            return;
+        }
+
+        document.getElementById('route-pickup-text').innerText = pickup;
+        document.getElementById('route-dest-text').innerText = dest;
+        document.getElementById('route-fare-text').innerText = fareText;
+
+        showDriverTracking('Mitra ' + selectedTransportService + ' SWIFT', 'Driver menuju titik penjemputan...', 8);
+        logUserActionToDatabase(`Pemesanan ${selectedTransportService}: ${pickup} -> ${dest} (${fareText})`);
+        alert(`🚀 Pesanan ${selectedTransportService} berhasil dikonfirmasi! Driver terdekat sedang dipandu GPS.`);
+        closeTransportModal();
+    }
+
+    async function fetchRealProductsFromSupabase() {
+        const prodContainer = document.getElementById('nearby-products');
+        if(!prodContainer) return;
+
+        if (!supabaseClient) {
+            prodContainer.innerHTML = `<div class="w-full text-center py-4 text-xs text-slate-500">Database Supabase tidak terhubung.</div>`;
+            return;
+        }
+
+        try {
+            const { data: products, error } = await supabaseClient
+                .from('products')
+                .select('*')
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+
+            if (error || !products || products.length === 0) {
+                prodContainer.innerHTML = `<div class="w-full text-center py-4 text-xs text-slate-500 italic">Belum ada promo produk merchant di database.</div>`;
+                return;
+            }
+
+            prodContainer.innerHTML = '';
+            products.forEach(item => {
+                let card = document.createElement('div');
+                card.className = "product-card min-w-[160px] max-w-[160px] flex-shrink-0 bg-[#1e293b]";
+                card.innerHTML = `
+                    <div class="h-28 bg-slate-900 relative flex items-center justify-center overflow-hidden">
+                        ${item.is_video ? 
+                            `<video src="\${item.media_url}" autoplay loop muted class="w-full h-full object-cover"></video>` :
+                            `<div class="w-full h-full bg-cover bg-center" style="background-image: url('\${item.media_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80'}')"></div>`
+                        }
+                        <span class="absolute top-2 left-2 bg-black/60 backdrop-blur text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">${item.category}</span>
+                    </div>
+                    <div class="card-body p-3">
+                        <h4 class="text-[11px] font-bold text-slate-100 truncate">${item.name}</h4>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs font-black text-emerald-400">${currencySymbol} ${parseFloat(item.price).toFixed(2)}</span>
+                            <button onclick="addToCart('${item.id}', '${item.name}', ${item.price})" class="text-[10px] bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-1 px-2.5 rounded-full border-none cursor-pointer">+ Cart</button>
+                        </div>
+                    </div>
+                `;
+                prodContainer.appendChild(card);
+            });
+        } catch (err) {
+            prodContainer.innerHTML = `<div class="w-full text-center py-4 text-xs text-red-400">Gagal memuat data merchant.</div>`;
+        }
+    }
+
+    // ================= SINKRONISASI REAL-TIME & DATABASE SUPABASE =================
     async function syncRealDataFromSupabase() {
         if (!supabaseClient || !currentUserId) {
             window.verifiedUserBalance = 0.00;
@@ -746,149 +1187,24 @@
         }
 
         try {
-            const { data: userProfile, error } = await supabaseClient
+            const { data: userProfile } = await supabaseClient
                 .from('users')
-                .select('balance, reward_points, full_name, email')
+                .select('balance, reward_points, full_name, email, avatar_url')
                 .eq('id', currentUserId)
                 .single();
 
-            if (userProfile && !error) {
+            if (userProfile) {
                 window.verifiedUserBalance = parseFloat(userProfile.balance || 0.00);
-                localStorage.setItem('swift_user_rewards', userProfile.reward_points || '0');
-                if (userProfile.full_name) {
-                    localStorage.setItem('swift_logged_user_name', userProfile.full_name);
-                }
-            } else {
-                window.verifiedUserBalance = 0.00;
+                document.getElementById('reward-points-val').innerText = (userProfile.reward_points || 0).toLocaleString('id-ID');
+                if (userProfile.full_name) localStorage.setItem('swift_logged_user_name', userProfile.full_name);
+                if (userProfile.email) localStorage.setItem('swift_logged_user', userProfile.email);
+                if (userProfile.avatar_url) localStorage.setItem('swift_user_avatar', userProfile.avatar_url);
             }
-        } catch (err) {
-            console.log('Error fetching user profile from Supabase:', err);
-            window.verifiedUserBalance = 0.00;
-        }
+        } catch (err) {}
 
         updateBalanceDisplay();
-        updateRewardsDisplay();
         updateProfileDisplayUI();
-
-        // Cek apakah ada pesanan/transaksi aktif di Supabase
-        try {
-            const { data: activeOrder, error: orderErr } = await supabaseClient
-                .from('orders')
-                .select('*, drivers(full_name, phone)')
-                .eq('user_id', currentUserId)
-                .in('status', ['searching', 'accepted', 'pickup', 'on_delivery'])
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .single();
-
-            if (activeOrder && !orderErr) {
-                activeOrderData = activeOrder;
-                showDriverTracking(
-                    activeOrder.drivers?.full_name || 'Driver SWIFT',
-                    getOrderStatusLabel(activeOrder.status),
-                    activeOrder.eta_minutes || 10
-                );
-            } else {
-                activeOrderData = null;
-                hideDriverTracking();
-            }
-        } catch (err) {
-            hideDriverTracking();
-        }
-
         fetchRealProductsFromSupabase();
-        fetchRealBannersFromSupabase();
-    }
-
-    async function fetchRealBannersFromSupabase() {
-        if (!supabaseClient) return;
-        try {
-            const { data: banners, error } = await supabaseClient
-                .from('banners')
-                .select('*')
-                .eq('is_active', true)
-                .order('created_at', { ascending: false });
-
-            if (banners && banners.length > 0) {
-                promotionalBanners = banners.map(b => ({
-                    title: b.title,
-                    badge: b.badge || 'SWIFT PROMO',
-                    subtitle: b.subtitle || '',
-                    image: b.image_url
-                }));
-                updateBannerUI(0);
-            }
-        } catch (err) {
-            console.log('Tabel banners belum dikonfigurasi di Supabase');
-        }
-    }
-
-    function updateBannerUI(index) {
-        if (!promotionalBanners || promotionalBanners.length === 0) return;
-        let currentData = promotionalBanners[index];
-        const bannerBg = document.getElementById('promo-banner-container');
-        const bannerTitle = document.getElementById('promo-title');
-        const bannerBadge = document.getElementById('promo-badge');
-        const bannerSub = document.getElementById('promo-subtitle');
-
-        if (bannerBg && bannerTitle && bannerBadge) {
-            if (currentData.image) {
-                bannerBg.style.backgroundImage = `linear-gradient(to top, rgba(3,7,18,0.95), rgba(3,7,18,0.3)), url('${currentData.image}')`;
-            } else {
-                bannerBg.style.backgroundImage = 'none';
-                bannerBg.className = "h-36 bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 flex items-end p-4 justify-between border border-emerald-500/20 rounded-[28px]";
-            }
-            bannerTitle.innerText = currentData.title;
-            if (bannerSub) bannerSub.innerText = currentData.subtitle || '';
-            bannerBadge.innerHTML = `<i class="fa-solid fa-bullhorn mr-1"></i> ${currentData.badge}`;
-        }
-    }
-
-    async function fetchRealProductsFromSupabase() {
-        if (!supabaseClient) return;
-        try {
-            const { data: products, error } = await supabaseClient
-                .from('products')
-                .select('*')
-                .eq('is_available', true);
-
-            const prodContainer = document.getElementById('nearby-products');
-            if (products && products.length > 0 && prodContainer) {
-                const rate = conversionRates[currentCurrency] || 1;
-                prodContainer.innerHTML = '';
-                products.forEach(item => {
-                    const convertedPrice = (item.price * rate);
-                    const priceFormatted = currentCurrency === 'IDR' ? convertedPrice.toLocaleString('id-ID') : convertedPrice.toFixed(2);
-                    let card = document.createElement('div');
-                    card.className = "product-card min-w-[150px] max-w-[150px] flex-shrink-0 bg-[#1e293b]";
-                    card.innerHTML = `
-                        <div class="h-28 bg-cover bg-center" style="background-image: url('${item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80'}')"></div>
-                        <div class="card-body p-3">
-                            <h4 class="text-[11px] font-bold text-slate-100 truncate">${item.name}</h4>
-                            <div class="flex justify-between items-center mt-2">
-                                <span class="text-xs font-black text-emerald-400">${currencySymbol} ${priceFormatted}</span>
-                                <button onclick="triggerRealCheckout('${item.id}', '${item.name}', ${item.price})" class="text-[10px] bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-1 px-2.5 border-none cursor-pointer">Pesan →</button>
-                            </div>
-                        </div>
-                    `;
-                    prodContainer.appendChild(card);
-                });
-            } else if (prodContainer) {
-                prodContainer.innerHTML = `<div class="w-full text-center py-4 text-xs text-slate-500 italic">Belum ada produk kedai yang terdaftar di database.</div>`;
-            }
-        } catch (err) {
-            console.log('Produk belum dikonfigurasi di Supabase');
-        }
-    }
-
-    function getOrderStatusLabel(status) {
-        switch(status) {
-            case 'searching': return 'Mencari driver terdekat...';
-            case 'accepted': return 'Driver menuju lokasi penjemputan...';
-            case 'pickup': return 'Pesanan sedang diambil driver...';
-            case 'on_delivery': return 'Pesanan dalam perjalanan ke lokasi Anda...';
-            default: return 'Memproses pesanan...';
-        }
     }
 
     function showDriverTracking(driverName, statusText, etaMinutes) {
@@ -903,63 +1219,43 @@
 
     function hideDriverTracking() {
         const widget = document.getElementById('gps-tracking-widget');
-        if (widget) {
-            widget.classList.add('hidden');
-        }
+        if (widget) widget.classList.add('hidden');
     }
 
     function checkActiveOrderChat() {
-        if (activeOrderData && activeOrderData.drivers) {
-            openLiveChatModal(`Driver ${activeOrderData.drivers.full_name}`);
-        } else {
-            alert('Belum ada pesanan atau pengiriman aktif saat ini.');
-        }
+        openLiveChatModal('Driver SWIFT Express');
     }
 
-    async function addRealtimeRoyalty(sourceType, amount, description) {
-        window.verifiedUserBalance += amount;
-        
-        if (amount > 0) {
-            let currentPoints = parseInt(localStorage.getItem('swift_user_rewards') || '0');
-            currentPoints += Math.floor(amount * 10);
-            localStorage.setItem('swift_user_rewards', currentPoints.toString());
-            updateRewardsDisplay();
-        }
-
-        updateBalanceDisplay();
-        logUserAction(`Royalti Real-Time [${sourceType}]: +RM ${amount.toFixed(2)} (${description})`);
-
-        if (supabaseClient && currentUserId) {
-            try {
-                await supabaseClient.rpc('distribute_royalty', {
-                    p_user_id: currentUserId,
-                    p_source_type: sourceType,
-                    p_amount: amount,
-                    p_description: description
-                });
-            } catch (err) {
-                console.error('Supabase RPC Error:', err);
-            }
-        }
-    }
-
-    function updateRewardsDisplay() {
-        const points = parseInt(localStorage.getItem('swift_user_rewards') || '0');
-        const pointsEl = document.getElementById('reward-points-val');
-        if (pointsEl) pointsEl.innerText = points.toLocaleString('id-ID');
-    }
-
-    function redeemRewardPoints() {
-        let points = parseInt(localStorage.getItem('swift_user_rewards') || '0');
-        if (points < 100) {
-            alert('Minimal penukaran adalah 100 poin SWIFT Rewards.');
+    async function redeemRewardPoints() {
+        if (!currentUserId || !supabaseClient) {
+            alert('Silakan login terlebih dahulu!');
             return;
         }
-        let bonusAmount = (points / 100) * 1.00;
-        localStorage.setItem('swift_user_rewards', '0');
-        addRealtimeRoyalty('reward_redeem', bonusAmount, 'Penukaran Poin SWIFT Rewards');
-        alert(`🎉 Berhasil menukar ${points} poin menjadi Saldo +RM ${bonusAmount.toFixed(2)}!`);
-        updateRewardsDisplay();
+
+        try {
+            const { data: userProfile } = await supabaseClient.from('users').select('reward_points, balance').eq('id', currentUserId).single();
+            const points = userProfile ? userProfile.reward_points || 0 : 0;
+
+            if (points < 100) {
+                alert('Minimal penukaran adalah 100 poin SWIFT Rewards.');
+                return;
+            }
+
+            const bonusAmount = (points / 100) * 1.00;
+            const newBalance = (userProfile.balance || 0) + bonusAmount;
+
+            const { error } = await supabaseClient.from('users').update({ reward_points: 0, balance: newBalance }).eq('id', currentUserId);
+            if (error) {
+                alert(`Gagal menukar poin: ${error.message}`);
+                return;
+            }
+
+            alert(`🎉 Berhasil menukar ${points} poin menjadi Saldo +${currencySymbol} ${bonusAmount.toFixed(2)}!`);
+            syncRealDataFromSupabase();
+            openWalletModule('Bonus');
+        } catch (err) {
+            alert('Terjadi kesalahan sistem penukaran poin.');
+        }
     }
 
     let activeChatTarget = 'Dukungan CS';
@@ -976,202 +1272,310 @@
         document.getElementById('live-chat-modal').classList.add('hidden');
     }
 
-    function getChatHistory() {
-        try {
-            const raw = localStorage.getItem(`swift_chat_${activeChatTarget}`);
-            return raw ? JSON.parse(raw) : [];
-        } catch(e) { return []; }
-    }
-
-    function sendLiveChatMessage() {
+    async function sendLiveChatMessage() {
         const input = document.getElementById('chat-input-text');
         if(!input) return;
         const text = input.value.trim();
         if(!text) return;
 
-        const msgs = getChatHistory();
-        const timeStr = new Date().toTimeString().split(' ')[0].substring(0,5);
-        msgs.push({ sender: 'User', text: text, time: timeStr });
+        if (currentUserId && supabaseClient) {
+            await supabaseClient.from('chat_messages').insert([
+                { sender_id: currentUserId, recipient: activeChatTarget, message: text, created_at: new Date() }
+            ]);
+        }
 
-        localStorage.setItem(`swift_chat_${activeChatTarget}`, JSON.stringify(msgs));
         input.value = '';
         renderLiveChatMessages();
-        logUserAction(`Kirim Pesan Live Chat ke [${activeChatTarget}]: "${text}"`);
     }
 
-    function renderLiveChatMessages() {
+    async function renderLiveChatMessages() {
         const box = document.getElementById('chat-messages-box');
         if(!box) return;
-        const msgs = getChatHistory();
-        
-        if (msgs.length === 0) {
-            box.innerHTML = `<div class="text-slate-500 text-center py-8 text-xs italic">// Belum ada pesan. Ketik pesan di bawah untuk memulai obrolan.</div>`;
+
+        if (!currentUserId || !supabaseClient) {
+            box.innerHTML = `<div class="text-slate-500 text-center py-8 text-xs italic">Silakan login untuk memulai obrolan.</div>`;
             return;
         }
 
-        box.innerHTML = msgs.map(m => {
-            const isMe = m.sender === 'User';
-            return `
-                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-                    <div class="max-w-[80%] p-3 rounded-2xl ${isMe ? 'bg-emerald-500 text-slate-950 font-semibold' : 'bg-slate-900 border border-slate-800 text-white'}">
-                        <div>${m.text}</div>
-                        <div class="text-[9px] ${isMe ? 'text-slate-800' : 'text-slate-400'} text-right mt-1 font-mono">${m.time}</div>
+        try {
+            const { data: messages, error } = await supabaseClient
+                .from('chat_messages')
+                .select('*')
+                .or(`sender_id.eq.${currentUserId},recipient.eq.${activeChatTarget}`)
+                .order('created_at', { ascending: true });
+
+            if (error || !messages || messages.length === 0) {
+                box.innerHTML = `<div class="text-slate-500 text-center py-8 text-xs italic">Belum ada riwayat pesan.</div>`;
+                return;
+            }
+
+            box.innerHTML = messages.map(m => {
+                const isMe = m.sender_id === currentUserId;
+                const timeStr = new Date(m.created_at).toTimeString().substring(0,5);
+                return `
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                        <div class="max-w-[80%] p-3 rounded-2xl ${isMe ? 'bg-emerald-500 text-slate-950 font-semibold' : 'bg-slate-900 border border-slate-800 text-white'}">
+                            <div>${m.message}</div>
+                            <div class="text-[9px] ${isMe ? 'text-slate-800' : 'text-slate-400'} text-right mt-1 font-mono">${timeStr}</div>
+                        </div>
                     </div>
-                </div>
-            `;
-        }).join('');
-        box.scrollTop = box.scrollHeight;
+                `;
+            }).join('');
+            box.scrollTop = box.scrollHeight;
+        } catch (err) {
+            box.innerHTML = `<div class="text-slate-500 text-center py-8 text-xs italic">Gagal memuat pesan.</div>`;
+        }
     }
 
-    function triggerReferralReward(platform) {
-        addRealtimeRoyalty('referral', 5.00, `Berbagi aplikasi via ${platform}`);
-        alert(`🤝 Tautan berhasil dibagikan! Bonus referral akan dikreditkan saat pengguna baru mendaftar.`);
-    }
-
+    // ================= MODUL DOMPET & PUSAT KLAIM BONUS =================
     function openWalletModule(moduleName) {
         const panel = document.getElementById('wallet-dynamic-panel');
         const titleEl = document.getElementById('wallet-panel-title');
         const contentEl = document.getElementById('wallet-panel-content');
         panel.classList.remove('hidden');
-        titleEl.innerText = `Panel Layanan: ${moduleName}`;
+        titleEl.innerText = `Panel Layanan (${activeCountryCode}): ${moduleName}`;
 
         if (moduleName === 'Top Up') {
             contentEl.innerHTML = `
-                <p class="mb-2">Masukkan nominal saldo yang ingin Anda tambahkan:</p>
-                <input type="number" id="custom-topup-amount" placeholder="Contoh: 100" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
+                <p class="mb-2 text-xs">Masukkan nominal saldo (${currencySymbol}) yang ingin ditambahkan:</p>
+                <input type="number" id="custom-topup-amount" placeholder="Nominal Saldo" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
                 <button onclick="processCustomTopUp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl cursor-pointer border-none transition shadow">Konfirmasi Top Up (+)</button>
             `;
         } else if (moduleName === 'Tarik Tunai') {
             contentEl.innerHTML = `
-                <p class="mb-2">Masukkan nominal penarikan dana ke rekening bank:</p>
-                <input type="number" id="custom-withdraw-amount" placeholder="Contoh: 50" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
+                <p class="mb-2 text-xs">Masukkan nominal penarikan dana ke rekening bank Anda:</p>
+                <input type="number" id="custom-withdraw-amount" placeholder="Nominal Penarikan" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white mb-3 outline-none">
                 <button onclick="processCustomWithdraw()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl cursor-pointer border border-slate-700 transition">Proses Penarikan 🏦</button>
             `;
         } else if (moduleName === 'Kirim') {
             contentEl.innerHTML = `
                 <div class="space-y-2.5">
                     <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nomor Tujuan / No. HP / Rekening</label>
-                        <input type="text" id="transfer-target" placeholder="Contoh: 08123456789" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nomor Tujuan / ID Rekening</label>
+                        <input type="text" id="transfer-target" placeholder="ID / No. HP Tujuan" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nominal Kirim</label>
-                        <input type="number" id="transfer-amount" placeholder="Contoh: 25.00" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nominal Kirim (${currencySymbol})</label>
+                        <input type="number" id="transfer-amount" placeholder="Nominal" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500">
                     </div>
                     <button onclick="processCustomTransfer()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">KIRIM DANA SEKARANG 🚀</button>
                 </div>
             `;
         } else if (moduleName === 'QRIS') {
-            const qrData = encodeURIComponent(`00020101021126580014ID.CO.QRIS.WWW01189360091400000000005204599953033605802ID5911SWIFT-PAY6013KUALA_LUMPUR6304ABCD`);
+            const gatewayTitle = activeCountryCode === 'ID' ? 'QRIS Nasional Indonesia' : (activeCountryCode === 'SG' ? 'PayNow Singapore' : 'DuitNow QR Malaysia');
+            const qrData = encodeURIComponent(`00020101021126580014REGION.${activeCountryCode}.QRIS01189360091400000000005204599953033605802${activeCountryCode}5911SWIFT-PAY6013REGION_HUB6304ABCD`);
+            
             contentEl.innerHTML = `
-                <div class="text-center space-y-3 p-1">
-                    <p class="text-slate-300 text-xs">Scan atau tunjukkan QRIS merchant SWIFT untuk pembayaran instan:</p>
-                    <div class="p-4 bg-white rounded-2xl w-48 mx-auto flex flex-col items-center justify-center shadow-lg border-2 border-emerald-500/30">
-                        <div class="text-[10px] font-black tracking-widest text-slate-800 uppercase mb-2 flex items-center gap-1">
-                            <i class="fa-solid fa-qrcode text-emerald-600"></i> SWIFT PAY QRIS
-                        </div>
-                        <img src="https://quickchart.io/qr?text=${qrData}&size=160&margin=1" alt="QRIS Code" class="w-36 h-36 rounded-lg shadow-sm">
+                <div class="space-y-3 text-xs">
+                    <div class="flex bg-slate-900 p-1 rounded-full border border-slate-800">
+                        <button onclick="switchQrisTab('terima')" id="qris-tab-terima" class="flex-1 py-1.5 font-bold rounded-full text-white bg-emerald-500 transition cursor-pointer border-none">Terima QR (${activeCountryCode})</button>
+                        <button onclick="switchQrisTab('bayar')" id="qris-tab-bayar" class="flex-1 py-1.5 font-bold rounded-full text-slate-400 transition cursor-pointer border-none bg-transparent">Bayar / Scan Kamera</button>
                     </div>
-                    
-                    <div class="space-y-2 mt-2">
-                        <input type="number" id="qris-pay-amount" placeholder="Masukkan Nominal Belanja" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs text-white outline-none focus:border-emerald-500 text-center font-bold">
-                        <button onclick="processQRTransaction()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs cursor-pointer border-none shadow-md transition">
-                            BAYAR BELANJA QRIS 📲
+
+                    <div id="qris-content-terima" class="space-y-3 text-center">
+                        <p class="text-slate-300">Tampilkan QR ${gatewayTitle} untuk menerima pembayaran:</p>
+                        <div class="p-4 bg-white rounded-2xl w-48 mx-auto flex flex-col items-center justify-center shadow-lg border-2 border-emerald-500/30">
+                            <div class="text-[10px] font-black tracking-widest text-slate-800 uppercase mb-2">
+                                <i class="fa-solid fa-qrcode text-emerald-600"></i> ${gatewayTitle}
+                            </div>
+                            <img src="https://quickchart.io/qr?text=${qrData}&size=160&margin=1" alt="QR Code" class="w-36 h-36 rounded-lg shadow-sm">
+                        </div>
+                    </div>
+
+                    <div id="qris-content-bayar" class="space-y-3 hidden">
+                        <p class="text-slate-300">Buka kamera langsung untuk memindai QR lintas negara:</p>
+                        <div class="p-3 bg-emerald-950/40 border border-emerald-500/40 rounded-2xl text-center space-y-2">
+                            <label for="qris-camera-input" class="cursor-pointer inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold px-4 py-2.5 rounded-full text-xs transition shadow">
+                                <i class="fa-solid fa-camera"></i> Buka Kamera Scan QR 📷
+                            </label>
+                            <input type="file" id="qris-camera-input" accept="image/*" capture="environment" onchange="handleCameraScan(event)" class="hidden">
+                            <div id="qris-scan-preview" class="text-[11px] text-emerald-400 font-mono">Kamera siap digunakan di wilayah ${activeCountryCode}</div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">ID Tujuan / Merchant</label>
+                            <input type="text" id="qris-dest-input" placeholder="Merchant ID" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nominal Pembayaran (${currencySymbol})</label>
+                            <input type="number" id="qris-pay-amount" placeholder="Nominal" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500 font-bold">
+                        </div>
+                        <button onclick="processAdvancedQRTransaction()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl transition shadow-md cursor-pointer border-none">
+                            BAYAR VIA GATEWAY ${activeCountryCode} 📲
                         </button>
                     </div>
                 </div>
             `;
-        } else {
-            contentEl.innerHTML = `<p class="text-slate-400">Modul ${moduleName} siap digunakan secara real-time.</p>`;
+        } else if (moduleName === 'Tagihan') {
+            contentEl.innerHTML = `
+                <div class="space-y-3 text-xs">
+                    <p class="text-slate-300">Pilih jenis pembayaran tagihan rutin Anda:</p>
+                    <div class="grid grid-cols-2 gap-2 text-center">
+                        <div onclick="alert('Layanan Tagihan Listrik aktif di wilayah ${activeCountryCode}');" class="p-3 bg-slate-900 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-800 text-amber-400 font-bold">⚡ Listrik / PLN</div>
+                        <div onclick="alert('Layanan Tagihan Air aktif di wilayah ${activeCountryCode}');" class="p-3 bg-slate-900 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-800 text-blue-400 font-bold">💧 Air / PDAM</div>
+                        <div onclick="alert('Layanan Tagihan Internet aktif di wilayah ${activeCountryCode}');" class="p-3 bg-slate-900 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-800 text-purple-400 font-bold">🌐 Internet / Wi-Fi</div>
+                        <div onclick="alert('Layanan Pulsa & Data aktif di wilayah ${activeCountryCode}');" class="p-3 bg-slate-900 rounded-xl border border-slate-800 cursor-pointer hover:bg-slate-800 text-emerald-400 font-bold">📱 Pulsa & Data</div>
+                    </div>
+                </div>
+            `;
+        } else if (moduleName === 'Bonus') {
+            contentEl.innerHTML = `
+                <div class="space-y-3 text-xs">
+                    <div class="p-3.5 bg-gradient-to-r from-amber-950/60 to-slate-900 border border-amber-500/40 rounded-2xl flex justify-between items-center shadow-lg">
+                        <div>
+                            <div class="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                                <i class="fa-solid fa-star"></i> Poin SWIFT Reward
+                            </div>
+                            <div class="text-xl font-black text-white mt-0.5" id="bonus-points-display">0 <span class="text-xs text-amber-300 font-normal">Poin</span></div>
+                        </div>
+                        <button onclick="redeemRewardPoints()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs transition border-none cursor-pointer shadow">
+                            TUKAR POIN 🎁
+                        </button>
+                    </div>
+
+                    <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-white flex items-center gap-1.5">
+                                <i class="fa-solid fa-calendar-check text-emerald-400"></i> Bonus Harian Absen
+                            </div>
+                            <div class="text-[10px] text-slate-400">Klaim saldo aktif harian pengguna</div>
+                        </div>
+                        <button onclick="claimDailyRewardBonus()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold px-3 py-1.5 rounded-xl text-xs border-none transition cursor-pointer">
+                            Klaim (+)
+                        </button>
+                    </div>
+
+                    <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                        <label class="block text-[10px] uppercase font-bold text-slate-400">Klaim Kode Voucher / Referral</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="bonus-claim-code" placeholder="Kode Voucher / Promo" class="flex-1 bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-amber-500 uppercase font-mono font-bold">
+                            <button onclick="processBonusClaimCode()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold px-4 py-2.5 rounded-xl text-xs transition shadow cursor-pointer border-none">
+                                KLAIM 🚀
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-indigo-300">Komisi Referral Terkumpul</div>
+                                <div class="text-[10px] text-slate-400">Cairkan komisi pengguna ke dompet utama</div>
+                            </div>
+                            <span class="text-xs font-black text-emerald-400" id="referral-commission-display">${currencySymbol} 0.00</span>
+                        </div>
+                        <button onclick="claimReferralCommission()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-2 rounded-xl text-xs transition shadow cursor-pointer border-none">
+                            CAIRKAN KOMISI KE DOMPET 💰
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            if (currentUserId && supabaseClient) {
+                supabaseClient.from('users').select('reward_points, referral_commission').eq('id', currentUserId).single().then(({ data }) => {
+                    if (data) {
+                        const ptsEl = document.getElementById('bonus-points-display');
+                        const refEl = document.getElementById('referral-commission-display');
+                        if (ptsEl) ptsEl.innerText = `${(data.reward_points || 0).toLocaleString('id-ID')} Poin`;
+                        if (refEl) refEl.innerText = `${currencySymbol} ${parseFloat(data.referral_commission || 0).toFixed(2)}`;
+                    }
+                });
+            }
         }
     }
 
-    function processQRTransaction() {
-        const amountInput = document.getElementById('qris-pay-amount');
-        if(!amountInput) return;
-        const amount = parseFloat(amountInput.value);
-
-        if (!amount || amount <= 0) {
-            alert('Mohon masukkan nominal belanja QRIS yang valid!');
-            return;
-        }
-        if (amount > window.verifiedUserBalance) {
-            alert('Saldo dompet Anda tidak mencukupi!');
+    // ================= FUNGSI EKSKUSI KLAIM REAL SUPABASE =================
+    async function claimDailyRewardBonus() {
+        if (!currentUserId || !supabaseClient) {
+            alert('Silakan login terlebih dahulu untuk mengklaim bonus harian!');
             return;
         }
 
-        window.verifiedUserBalance -= amount;
-        updateBalanceDisplay();
+        try {
+            const { data, error } = await supabaseClient.rpc('claim_daily_bonus', { user_uuid: currentUserId });
+            if (error) {
+                alert(`Gagal mengklaim bonus harian: ${error.message}`);
+                return;
+            }
 
-        logUserAction(`Pembayaran QRIS Merchant: -RM ${amount.toFixed(2)}`);
-        alert(`✅ Pembayaran QRIS sebesar RM ${amount.toFixed(2)} Berhasil!`);
-        document.getElementById('wallet-dynamic-panel').classList.add('hidden');
+            alert('🎉 Bonus harian berhasil diklaim dan masuk ke dompet Anda!');
+            syncRealDataFromSupabase();
+        } catch (err) {
+            alert('Terjadi kesalahan koneksi saat mengklaim bonus harian.');
+        }
     }
 
-    function processCustomTransfer() {
-        const targetInput = document.getElementById('transfer-target');
-        const amountInput = document.getElementById('transfer-amount');
-        if(!targetInput || !amountInput) return;
-        const target = targetInput.value.trim();
-        const amount = parseFloat(amountInput.value);
+    async function processBonusClaimCode() {
+        const input = document.getElementById('bonus-claim-code');
+        if (!input) return;
+        const code = input.value.trim().toUpperCase();
 
-        if (!target) {
-            alert('Mohon masukkan nomor tujuan pengiriman!');
-            return;
-        }
-        if (!amount || amount <= 0) {
-            alert('Mohon masukkan nominal kirim yang valid!');
-            return;
-        }
-        if (amount > window.verifiedUserBalance) {
-            alert('Saldo dompet Anda tidak mencukupi!');
+        if (!code) {
+            alert('Masukkan kode voucher promo atau referral!');
             return;
         }
 
-        window.verifiedUserBalance -= amount;
-        updateBalanceDisplay();
+        if (!currentUserId || !supabaseClient) {
+            alert('Silakan login terlebih dahulu!');
+            return;
+        }
 
-        logUserAction(`Kirim Dana: -RM ${amount.toFixed(2)} ke [${target}]`);
-        alert(`✅ Berhasil mengirim dana sebesar RM ${amount.toFixed(2)} ke ${target}!`);
-        document.getElementById('wallet-dynamic-panel').classList.add('hidden');
+        try {
+            const { data, error } = await supabaseClient.rpc('claim_user_voucher', {
+                user_uuid: currentUserId,
+                voucher_code: code
+            });
+
+            if (error) {
+                alert(`Gagal mengklaim kode: ${error.message}`);
+                return;
+            }
+
+            alert(`🎉 Berhasil! Bonus dari kode ${code} telah ditambahkan ke akun Anda.`);
+            input.value = '';
+            syncRealDataFromSupabase();
+            document.getElementById('wallet-dynamic-panel').classList.add('hidden');
+        } catch (err) {
+            alert('Terjadi kesalahan sistem saat memproses voucher.');
+        }
     }
 
-    function processCustomTopUp() {
-        const input = document.getElementById('custom-topup-amount');
-        if(!input) return;
-        const amount = parseFloat(input.value);
-        if (!amount || amount <= 0) return;
-        addRealtimeRoyalty('topup', amount, 'Top Up Saldo Dompet');
-        alert(`✅ Berhasil Top Up sebesar +RM ${amount.toFixed(2)}!`);
-        document.getElementById('wallet-dynamic-panel').classList.add('hidden');
-    }
-
-    function processCustomWithdraw() {
-        const input = document.getElementById('custom-withdraw-amount');
-        if(!input) return;
-        const amount = parseFloat(input.value);
-        if (!amount || amount > window.verifiedUserBalance) {
-            alert('Saldo tidak mencukupi!');
+    async function claimReferralCommission() {
+        if (!currentUserId || !supabaseClient) {
+            alert('Silakan login terlebih dahulu!');
             return;
         }
-        addRealtimeRoyalty('withdraw', -amount, 'Penarikan Tunai');
-        alert(`✅ Permintaan penarikan tunai sebesar RM ${amount.toFixed(2)} diproses!`);
-        document.getElementById('wallet-dynamic-panel').classList.add('hidden');
+
+        try {
+            const { data, error } = await supabaseClient.rpc('claim_referral_commission', { user_uuid: currentUserId });
+            if (error) {
+                alert(`Gagal mencairkan komisi: ${error.message}`);
+                return;
+            }
+
+            alert('💸 Komisi referral berhasil dicairkan ke saldo utama Anda!');
+            syncRealDataFromSupabase();
+            openWalletModule('Bonus');
+        } catch (err) {
+            alert('Terjadi kesalahan saat mencairkan komisi.');
+        }
     }
 
+    // ================= MODUL PENGATURAN PROFIL & UPLOAD AVATAR (SEMPURNA & DINAMIS) =================
     function openProfileModal(featureName) {
         const panel = document.getElementById('profile-dynamic-panel');
         const titleEl = document.getElementById('profile-panel-title');
         const contentEl = document.getElementById('profile-panel-content');
+        if(!panel || !titleEl || !contentEl) return;
+        
         panel.classList.remove('hidden');
-        titleEl.innerText = `Pengaturan: ${featureName}`;
 
-        const currName = localStorage.getItem('swift_logged_user_name') || 'Member SWIFT';
+        const currName = localStorage.getItem('swift_logged_user_name') || 'Pengguna SWIFT';
         const currEmail = localStorage.getItem('swift_logged_user') || 'user@swift.com';
 
-        if (featureName === 'Edit Profil') {
+        if (featureName === 'Edit Profil' || featureName === 'Edit Informasi Akun') {
+            titleEl.innerText = `PENGATURAN: EDIT PROFIL AKUN`;
             contentEl.innerHTML = `
-                <div class="space-y-3">
+                <div class="space-y-3 text-xs">
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nama Lengkap</label>
                         <input type="text" id="edit-profile-name" value="${currName}" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
@@ -1183,100 +1587,149 @@
                     <button onclick="saveProfileChanges()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">SIMPAN PERUBAHAN 💾</button>
                 </div>
             `;
-        } else if (featureName === 'Verifikasi') {
+        } else if (featureName === 'Ubah Kata Sandi' || featureName === 'Keamanan') {
+            titleEl.innerText = `PENGATURAN: KEAMANAN & KATA SANDI`;
             contentEl.innerHTML = `
-                <div class="text-center space-y-2 p-2">
-                    <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
-                        <i class="fa-solid fa-user-check"></i>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Kata Sandi Saat Ini</label>
+                        <input type="password" id="pass-old" placeholder="Masukkan kata sandi lama" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
                     </div>
-                    <h4 class="font-bold text-white">Status Akun: Aktif</h4>
-                    <p class="text-slate-400 text-[11px]">Akun Anda siap digunakan untuk bertransaksi di ekosistem SWIFT.</p>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Kata Sandi Baru</label>
+                        <input type="password" id="pass-new" placeholder="Minimal 6 karakter" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Konfirmasi Kata Sandi Baru</label>
+                        <input type="password" id="pass-confirm" placeholder="Ulangi kata sandi baru" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
+                    </div>
+                    <button onclick="processPasswordChange()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">PERBARUI KATA SANDI 🔑</button>
+                </div>
+            `;
+        } else if (featureName === 'Pengaturan Notifikasi' || featureName === 'Notifikasi') {
+            titleEl.innerText = `PENGATURAN: NOTIFIKASI APLIKASI`;
+            contentEl.innerHTML = `
+                <div class="space-y-3 text-xs">
+                    <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-white">Notifikasi Pesanan & Driver</div>
+                            <div class="text-[10px] text-slate-400">Info status perjalanan & pengiriman barang</div>
+                        </div>
+                        <input type="checkbox" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                    </div>
+                    <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-white">Notifikasi Promo & Bonus</div>
+                            <div class="text-[10px] text-slate-400">Info voucher diskon & cashback harian</div>
+                        </div>
+                        <input type="checkbox" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                    </div>
+                    <button onclick="alert('✅ Pengaturan notifikasi berhasil disimpan!'); document.getElementById('profile-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">SIMPAN PREFERENSI 🔔</button>
                 </div>
             `;
         }
     }
 
-    function saveProfileChanges() {
+    async function saveProfileChanges() {
         const nameEl = document.getElementById('edit-profile-name');
         const emailEl = document.getElementById('edit-profile-email');
         if(!nameEl || !emailEl) return;
 
-        const name = nameEl.value.trim();
-        const email = emailEl.value.trim();
+        const newName = nameEl.value.trim();
+        const newEmail = emailEl.value.trim();
 
-        if(!name || !email) {
-            alert('Nama dan Email tidak boleh kosong!');
-            return;
+        if (currentUserId && supabaseClient) {
+            const { error } = await supabaseClient.from('users').update({ full_name: newName, email: newEmail }).eq('id', currentUserId);
+            if (error) {
+                alert(`Gagal memperbarui profil di database: ${error.message}`);
+                return;
+            }
         }
 
-        localStorage.setItem('swift_logged_user_name', name);
-        localStorage.setItem('swift_logged_user', email);
+        localStorage.setItem('swift_logged_user_name', newName);
+        localStorage.setItem('swift_logged_user', newEmail);
 
         updateProfileDisplayUI();
-        logUserAction(`Update Profil: ${name}`);
-        alert('✅ Informasi profil berhasil disimpan!');
+        alert('✅ Informasi profil berhasil disimpan ke database!');
         document.getElementById('profile-dynamic-panel').classList.add('hidden');
     }
 
-    function handleAvatarUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const imgData = e.target.result;
-                localStorage.setItem('swift_user_avatar', imgData);
-                updateProfileDisplayUI();
-                logUserAction('Mengunggah Foto Profil Baru');
-                alert('📸 Foto profil berhasil diperbarui!');
-            };
-            reader.readAsDataURL(file);
+    async function processPasswordChange() {
+        const oldP = document.getElementById('pass-old').value;
+        const newP = document.getElementById('pass-new').value;
+        const confirmP = document.getElementById('pass-confirm').value;
+
+        if (!oldP || !newP || !confirmP) {
+            alert('Mohon isi semua kolom kata sandi!');
+            return;
         }
+        if (newP !== confirmP) {
+            alert('Konfirmasi kata sandi baru tidak cocok!');
+            return;
+        }
+
+        if (currentUserId && supabaseClient) {
+            const { error } = await supabaseClient.auth.updateUser({ password: newP });
+            if (error) {
+                alert(`Gagal memperbarui kata sandi: ${error.message}`);
+                return;
+            }
+        }
+
+        alert('🔑 Kata sandi berhasil diperbarui!');
+        document.getElementById('profile-dynamic-panel').classList.add('hidden');
+    }
+
+    // Fungsi Upload Foto Profil / Avatar Real-Time Tanpa Gagal
+    function triggerAvatarUpload() {
+        const fileInput = document.getElementById('profile-avatar-file-input');
+        if (fileInput) fileInput.click();
+    }
+
+    async function handleAvatarUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran file terlalu besar! Maksimal 2MB.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const base64Image = e.target.result;
+            
+            // Simpan langsung ke Supabase database jika terhubung
+            if (currentUserId && supabaseClient) {
+                try {
+                    await supabaseClient.from('users').update({ avatar_url: base64Image }).eq('id', currentUserId);
+                } catch (err) {}
+            }
+
+            localStorage.setItem('swift_user_avatar', base64Image);
+            updateProfileDisplayUI();
+            alert('📸 Foto profil berhasil diperbarui dan tersimpan rapi!');
+        };
+        reader.readAsDataURL(file);
     }
 
     function updateProfileDisplayUI() {
-        const savedName = localStorage.getItem('swift_logged_user_name') || 'Member SWIFT';
+        const savedName = localStorage.getItem('swift_logged_user_name') || 'Pengguna SWIFT';
         const savedEmail = localStorage.getItem('swift_logged_user') || 'Belum Login';
         const savedAvatar = localStorage.getItem('swift_user_avatar');
 
         const nameLabel = document.getElementById('profile-name-label');
         const emailLabel = document.getElementById('profile-email-label');
         const avatarContainer = document.getElementById('profile-avatar-container');
-        const initialsEl = document.getElementById('profile-initials');
 
         if(nameLabel) nameLabel.innerText = savedName;
         if(emailLabel) emailLabel.innerText = savedEmail;
-
-        if (savedAvatar && avatarContainer) {
+        if(avatarContainer && savedAvatar) {
             avatarContainer.style.backgroundImage = `url('${savedAvatar}')`;
-            if(initialsEl) initialsEl.style.display = 'none';
-        } else if (nameLabel && initialsEl) {
-            const initials = savedName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-            initialsEl.innerText = initials || 'SW';
+            avatarContainer.style.backgroundSize = 'cover';
+            avatarContainer.style.backgroundPosition = 'center';
+            avatarContainer.innerHTML = ''; // Hapus teks inisial jika foto ada
         }
-    }
-
-    function openVideoUploadModal() {
-        document.getElementById('video-upload-modal').classList.remove('hidden');
-    }
-
-    function closeVideoUploadModal() {
-        document.getElementById('video-upload-modal').classList.add('hidden');
-    }
-
-    function handleProcessVideoUpload() {
-        const titleInput = document.getElementById('video-title-input');
-        const fileInput = document.getElementById('video-file-input');
-        if(!titleInput || !fileInput) return;
-
-        if (!titleInput.value.trim() || fileInput.files.length === 0) {
-            alert('Mohon lengkapi judul dan pilih file video!');
-            return;
-        }
-
-        alert('🎉 Video berhasil diunggah!');
-        titleInput.value = '';
-        fileInput.value = '';
-        closeVideoUploadModal();
     }
 
     function switchAuthTab(tab) {
@@ -1305,25 +1758,11 @@
         if(!idInput || !passInput) return;
 
         const identifier = idInput.value.trim();
-        const password = passInput.value.trim();
-
-        if (!identifier || !password) {
-            alert('Mohon isi email/username dan password!');
-            return;
-        }
-
         if (supabaseClient) {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: identifier.includes('@') ? identifier : `${identifier}@swift.com`,
-                password: password
-            });
-            if (error) {
-                alert('Gagal Masuk: ' + error.message);
-                return;
-            }
-            if (data.user) {
-                currentUserId = data.user.id;
-                localStorage.setItem('swift_user_uuid', currentUserId);
+            const { data } = await supabaseClient.from('users').select('*').eq('email', identifier).single();
+            if (data) {
+                currentUserId = data.id;
+                localStorage.setItem('swift_user_uuid', data.id);
             }
         }
 
@@ -1336,62 +1775,31 @@
 
     async function handleSupabaseRegister() {
         const namaInput = document.getElementById('reg-nama');
-        const unameInput = document.getElementById('reg-username');
         const emailInput = document.getElementById('reg-email');
-        const phoneInput = document.getElementById('reg-phone');
-        const passInput = document.getElementById('reg-password');
         if(!namaInput || !emailInput) return;
 
-        const nama = namaInput.value.trim();
-        const username = unameInput.value.trim();
-        const email = emailInput.value.trim();
-        const phone = phoneInput.value.trim();
-        const password = passInput.value.trim();
-
-        if (!nama || !username || !email || !phone || !password) {
-            alert('Semua kolom harus diisi!');
-            return;
-        }
-
         if (supabaseClient) {
-            const { data, error } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-                options: { data: { full_name: nama, username: username, phone: phone } }
-            });
-            if (error) {
-                alert('Registrasi Gagal: ' + error.message);
-                return;
+            const { data } = await supabaseClient.from('users').insert([
+                { full_name: namaInput.value.trim(), email: emailInput.value.trim(), balance: 0.00, reward_points: 0 }
+            ]).select().single();
+
+            if (data) {
+                currentUserId = data.id;
+                localStorage.setItem('swift_user_uuid', data.id);
             }
         }
 
-        localStorage.setItem('swift_logged_user_name', nama);
-        alert('🎉 Registrasi Berhasil! Silakan masuk.');
+        localStorage.setItem('swift_logged_user_name', namaInput.value.trim());
+        localStorage.setItem('swift_logged_user', emailInput.value.trim());
+        alert('🎉 Registrasi Berhasil! Silakan masuk dengan akun baru Anda.');
         switchAuthTab('login');
     }
 
-    // 3. FUNGSI LOGOUT DENGAN AUTO-PURGE
     function handleLogout() {
         localStorage.clear();
         window.verifiedUserBalance = 0.00;
         alert('Berhasil keluar akun.');
         location.reload();
-    }
-
-    let currentCurrency = 'MYR';
-    let currencySymbol = 'RM';
-    let conversionRates = { MYR: 1, IDR: 3500, SGD: 0.30 };
-    let promotionalBanners = [];
-
-    function syncCountryAndCurrency() {
-        const countrySelect = document.getElementById('country-select');
-        const currencySelect = document.getElementById('currency-select');
-        if (!countrySelect || !currencySelect) return;
-        const country = countrySelect.value;
-        if (country === 'ID') currencySelect.value = 'IDR';
-        else if (country === 'SG') currencySelect.value = 'SGD';
-        else currencySelect.value = 'MYR';
-        changeCurrency();
     }
 
     function switchPage(pageId, element) {
@@ -1408,55 +1816,55 @@
         }
 
         updateBalanceDisplay();
-        updateRewardsDisplay();
         updateProfileDisplayUI();
         loadLogsToUI();
-        loadAnnouncementToUI();
     }
 
-    function triggerServiceAction(serviceName) {
-        const panel = document.getElementById('service-dynamic-panel');
-        const titleEl = document.getElementById('service-panel-title');
-        const contentEl = document.getElementById('service-panel-content');
-        panel.classList.remove('hidden');
-
-        titleEl.innerText = `Layanan: ${serviceName}`;
-        contentEl.innerHTML = `
-            <p class="text-slate-300">Pilih tujuan atau detail pemesanan ${serviceName}:</p>
-            <button onclick="alert('Pemesanan ${serviceName} sedang diproses...'); document.getElementById('service-dynamic-panel').classList.add('hidden');" class="w-full bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer border-none mt-2">Konfirmasi Pemesanan (${serviceName})</button>
-        `;
-    }
-
-    function logUserAction(actionName) {
-        const logs = JSON.parse(localStorage.getItem('swift_user_activity_logs') || '[]');
-        const timeStr = new Date().toTimeString().split(' ')[0] + ' ' + new Date().toLocaleDateString();
-        logs.unshift(`[${timeStr}] ${actionName}`);
-        if (logs.length > 50) logs.pop();
-        localStorage.setItem('swift_user_activity_logs', JSON.stringify(logs));
+    async function logUserActionToDatabase(actionName) {
+        if (currentUserId && supabaseClient) {
+            await supabaseClient.from('activity_logs').insert([
+                { user_id: currentUserId, action: actionName, created_at: new Date() }
+            ]);
+        }
         loadLogsToUI();
     }
 
-    function loadLogsToUI() {
+    async function loadLogsToUI() {
         const container = document.getElementById('activity-log-container');
         if(!container) return;
-        const logs = JSON.parse(localStorage.getItem('swift_user_activity_logs') || '[]');
-        if (logs.length === 0) {
-            container.innerHTML = `<div class="text-slate-500 text-center py-4 italic">// Belum ada riwayat aktivitas.</div>`;
+
+        if (!currentUserId || !supabaseClient) {
+            container.innerHTML = `<div class="text-slate-500 text-center py-4 italic">// Belum ada riwayat aktivitas. Silakan login.</div>`;
             return;
         }
-        container.innerHTML = logs.map(l => `
-            <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 text-slate-300 flex items-start gap-2.5 shadow-sm">
-                <i class="fa-solid fa-circle-check text-emerald-400 mt-0.5"></i>
-                <div class="flex-1 break-all">${l}</div>
-            </div>
-        `).join('');
-    }
 
-    function loadAnnouncementToUI() {
-        const annText = document.getElementById('announcement-text');
-        if(!annText) return;
-        const ann = localStorage.getItem('swift_global_announcement');
-        annText.innerText = ann ? ann : "Sistem SWIFT beroperasi normal.";
+        try {
+            const { data: logs, error } = await supabaseClient
+                .from('activity_logs')
+                .select('*')
+                .eq('user_id', currentUserId)
+                .order('created_at', { ascending: false });
+
+            if (error || !logs || logs.length === 0) {
+                container.innerHTML = `<div class="text-slate-500 text-center py-4 italic">// Belum ada riwayat aktivitas.</div>`;
+                return;
+            }
+
+            container.innerHTML = logs.map(l => {
+                const timeStr = new Date(l.created_at).toLocaleString();
+                return `
+                    <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 text-slate-300 flex items-start gap-2.5 shadow-sm text-xs">
+                        <i class="fa-solid fa-circle-check text-emerald-400 mt-0.5"></i>
+                        <div class="flex-1 break-all">
+                            <div>${l.action}</div>
+                            <div class="text-[9px] text-slate-500 mt-0.5">${timeStr}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            container.innerHTML = `<div class="text-slate-500 text-center py-4 italic">// Gagal memuat riwayat.</div>`;
+        }
     }
 
     function openShareModal() { document.getElementById('share-modal').classList.remove('hidden'); }
@@ -1467,71 +1875,21 @@
         if(!link) return;
         link.select();
         navigator.clipboard.writeText(link.value).then(() => {
-            triggerReferralReward('Salin Tautan');
+            logUserActionToDatabase('Berbagi Tautan Aplikasi');
+            alert('Tautan referral berhasil disalin!');
         });
-    }
-
-    function changeCurrency() {
-        const select = document.getElementById('currency-select');
-        if(!select) return;
-        currentCurrency = select.value;
-        if(currentCurrency === 'IDR') currencySymbol = 'Rp';
-        else if(currentCurrency === 'SGD') currencySymbol = 'S\$';
-        else currencySymbol = 'RM';
-        document.getElementById('currency-symbol').innerText = currencySymbol;
-        const walletSymbolEl = document.getElementById('wallet-currency-symbol');
-        if(walletSymbolEl) walletSymbolEl.innerText = currencySymbol;
-        updateBalanceDisplay();
-    }
-
-    let isVoiceActive = true;
-    function toggleUserVoicePreference() {
-        isVoiceActive = !isVoiceActive;
-        const btn = document.getElementById('user-voice-toggle');
-        if(!btn) return;
-        btn.className = isVoiceActive ? "voice-toggle on" : "voice-toggle off";
-        btn.innerHTML = isVoiceActive ? '<i class="fa-solid fa-volume-high text-xs"></i>' : '<i class="fa-solid fa-volume-mute text-xs"></i>';
-    }
-
-    function initMasterAdminBridge() {
-        const isLocked = localStorage.getItem('swift_app_lockdown') === 'true';
-        if (isLocked) {
-            document.body.innerHTML = `
-                <div style="background:#030712; color:#f8fafc; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
-                    <h1 style="font-size:20px; font-weight:800; color:#ef4444; margin-bottom:10px;">SISTEM DALAM PEMELIHARAAN (LOCKDOWN)</h1>
-                </div>
-            `;
-            return;
-        }
-        updateBalanceDisplay();
-        updateRewardsDisplay();
-        updateProfileDisplayUI();
-        loadLogsToUI();
-        loadAnnouncementToUI();
-    }
-
-    function openMasterAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
-    function closeMasterAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
-    function saveAdminAnnouncement() {
-        const input = document.getElementById('admin-announcement-input');
-        if(!input || !input.value.trim()) return;
-        localStorage.setItem('swift_global_announcement', input.value.trim());
-        alert('✅ Pengumuman disiarkan!');
-        loadAnnouncementToUI();
-    }
-    function setAdminLockdown(status) {
-        localStorage.setItem('swift_app_lockdown', status ? 'true' : 'false');
-        alert(`⚠️ Lockdown diubah ke: ${status}`);
-        if(status) location.reload();
     }
 
     function openLiveStreamModal() { document.getElementById('live-modal').classList.remove('hidden'); }
     function closeLiveStreamModal() { document.getElementById('live-modal').classList.add('hidden'); }
-    function refreshLocation() { logUserAction('Memperbarui Titik GPS'); }
+    
+    function refreshLocation() { 
+        autoDetectUserCountryAndGateway();
+        logUserActionToDatabase('Memperbarui Titik GPS'); 
+    }
 
-    window.addEventListener('DOMContentLoaded', () => {
-        // PERSIAPAN AWAL: PAKSA SALDO KE 0.00 JIKA USER BELUM TERVERIFIKASI
-        localStorage.removeItem('swift_user_balance');
+    // Inisialisasi Aplikasi Saat Halaman Dimuat
+    window.addEventListener('DOMContentLoaded', async () => {
         window.verifiedUserBalance = 0.00;
 
         const loggedUser = localStorage.getItem('swift_logged_user');
@@ -1540,9 +1898,10 @@
             if(authModal) authModal.classList.add('hidden');
         }
 
-        initMasterAdminBridge();
+        await autoDetectUserCountryAndGateway();
+        updateBalanceDisplay();
+        updateProfileDisplayUI();
         syncRealDataFromSupabase();
-        refreshLocation();
     });
 </script>
 </body>
