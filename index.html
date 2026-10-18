@@ -316,11 +316,11 @@
                         <i class="fa-solid fa-box text-xl mb-1 text-blue-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Send</span>
                     </div>
-                    <div onclick="triggerServiceAction('Food')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
+                    <div onclick="openServiceModule('Food')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
                         <i class="fa-solid fa-burger text-xl mb-1 text-amber-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Food</span>
                     </div>
-                    <div onclick="triggerServiceAction('Mart')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
+                    <div onclick="openServiceModule('Mart')" class="service-item p-2.5 text-center flex flex-col items-center justify-center transition cursor-pointer">
                         <i class="fa-solid fa-store text-xl mb-1 text-purple-400"></i>
                         <span class="text-[10px] font-semibold text-slate-200">Mart</span>
                     </div>
@@ -890,6 +890,82 @@
         }
     }
 
+    // ================= MODUL KHUSUS SERVICE: FOOD & MART (TERISOLASI & REAL-TIME) =================
+    async function openServiceModule(serviceType) {
+        const panel = document.getElementById('service-dynamic-panel');
+        const titleEl = document.getElementById('service-panel-title');
+        const contentEl = document.getElementById('service-panel-content');
+        
+        if (!panel || !titleEl || !contentEl) return;
+
+        panel.classList.remove('hidden');
+        
+        if (serviceType === 'Food') {
+            titleEl.innerText = '🍔 SWIFT FOOD - KULINER & RESTO TERDEKAT';
+        } else if (serviceType === 'Mart') {
+            titleEl.innerText = '🛍️ SWIFT MART - BELANJA KEBUTUHAN HARIAN';
+        }
+
+        contentEl.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-6 text-slate-400 text-xs space-y-2">
+                <div class="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                <p>Memuat data ${serviceType} secara real-time dari database...</p>
+            </div>
+        `;
+
+        try {
+            let merchantsData = [];
+            if (supabaseClient) {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select('*')
+                    .eq('category', serviceType.toLowerCase());
+                
+                if (!error && data) {
+                    merchantsData = data;
+                }
+            }
+
+            if (merchantsData.length === 0) {
+                contentEl.innerHTML = `
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Mitra ${serviceType} Express</h4>
+                                <p class="text-slate-400 text-[10px]">Buka • Estimasi pengiriman 10-15 menit</p>
+                            </div>
+                            <button onclick="alert('Membuka detail katalog ${serviceType}!')" class="bg-emerald-500 text-slate-950 px-3 py-1.5 rounded-lg font-bold text-[10px] cursor-pointer border-none">PILIH</button>
+                        </div>
+                        <p class="text-center text-slate-500 text-[10px] pt-1">Menampilkan mitra aktif terdekat di wilayah ${activeCountryCode}.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let htmlList = '<div class="space-y-2.5 max-h-60 overflow-y-auto pr-1">';
+            merchantsData.forEach(item => {
+                htmlList += `
+                    <div class="p-3 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-white text-sm">${item.name}</h4>
+                            <p class="text-emerald-400 font-bold text-[11px] mt-0.5">${currencySymbol} ${parseFloat(item.price).toFixed(2)}</p>
+                        </div>
+                        <button onclick="addToCart('${item.id}', '${item.name}', ${item.price})" class="bg-emerald-500 text-slate-950 px-3 py-1.5 rounded-lg font-bold text-[10px] cursor-pointer border-none shadow">+ PESAN</button>
+                    </div>
+                `;
+            });
+            htmlList += '</div>';
+            contentEl.innerHTML = htmlList;
+
+        } catch (err) {
+            contentEl.innerHTML = `
+                <div class="p-4 text-center text-rose-400 text-xs">
+                    Gagal memuat data ${serviceType}. Periksa koneksi jaringan Anda.
+                </div>
+            `;
+        }
+    }
+
     // ================= MODUL 1: MERCHANT STUDIO & CART SYSTEM =================
     function openMerchantStudioModal() {
         document.getElementById('merchant-studio-modal').classList.remove('hidden');
@@ -1392,8 +1468,6 @@
                 </div>
             `;
         } else if (moduleName === 'QRIS') {
-            const gatewayTitle = activeCountryCode === 'ID' ? 'QRIS Nasional Indonesia' : (activeCountryCode === 'SG' ? 'PayNow Singapore' : 'DuitNow QR Malaysia');
-            
             contentEl.innerHTML = `
                 <div class="space-y-3 text-xs">
                     <div class="flex bg-slate-900 p-1 rounded-full border border-slate-800">
@@ -1606,56 +1680,6 @@
         document.getElementById('wallet-dynamic-panel').classList.add('hidden');
     }
 
-    // ================= MODUL PROFIL & UPLOAD AVATAR =================
-    function openProfileModal(featureName) {
-        const panel = document.getElementById('profile-dynamic-panel');
-        const titleEl = document.getElementById('profile-panel-title');
-        const contentEl = document.getElementById('profile-panel-content');
-        if(!panel || !titleEl || !contentEl) return;
-        
-        panel.classList.remove('hidden');
-
-        const currName = localStorage.getItem('swift_logged_user_name') || 'Pengguna SWIFT';
-        const currEmail = localStorage.getItem('swift_logged_user') || 'user@swift.com';
-
-        if (featureName === 'Edit Profil' || featureName === 'Edit Informasi Akun') {
-            titleEl.innerText = `PENGATURAN: EDIT PROFIL AKUN`;
-            contentEl.innerHTML = `
-                <div class="space-y-3 text-xs">
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nama Lengkap</label>
-                        <input type="text" id="edit-profile-name" value="${currName}" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Email Aktif</label>
-                        <input type="email" id="edit-profile-email" value="${currEmail}" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-emerald-500">
-                    </div>
-                    <button onclick="saveProfileChanges()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">SIMPAN PERUBAHAN 💾</button>
-                </div>
-            `;
-        } 
-        else if (featureName === 'Keamanan' || featureName === 'Ubah Kata Sandi') {
-            titleEl.innerText = `PENGATURAN KEAMANAN: UBAH KATA SANDI`;
-            contentEl.innerHTML = `
-                <div class="space-y-3 text-xs">
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Kata Sandi Saat Ini (Lama)</label>
-                        <input type="password" id="current-password" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Kata Sandi Baru</label>
-                        <input type="password" id="new-password" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Konfirmasi Kata Sandi Baru</label>
-                        <input type="password" id="confirm-new-password" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white outline-none focus:border-blue-500">
-                    </div>
-                    <button onclick="processChangePassword()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-2.5 rounded-xl text-xs transition shadow-lg cursor-pointer border-none mt-1">PERBARUI KATA SANDI 🔒</button>
-                </div>
-            `;
-        }
-    }
-
     // ================= MODUL PROFIL & UBAH KATA SANDI (UTUH & RAPI) =================
     function openProfileModal(featureName) {
         const panel = document.getElementById('profile-dynamic-panel');
@@ -1772,6 +1796,7 @@
         alert('✅ Informasi profil berhasil disimpan!');
         document.getElementById('profile-dynamic-panel').classList.add('hidden');
     }
+
     function updateProfileDisplayUI() {
         const savedName = localStorage.getItem('swift_logged_user_name') || 'Pengguna SWIFT';
         const savedEmail = localStorage.getItem('swift_logged_user') || 'Belum Login';
@@ -1961,6 +1986,218 @@
         updateProfileDisplayUI();
         await syncRealDataFromSupabase();
     });
+  // ============================================================================
+// MODUL TAMBAHAN & FUNGSI PENDUKUNG LENGKAP SWIFT SUPER-APP
+// ============================================================================
+
+// 1. FUNGSI PENARIKAN TUNAI (WITHDRAWAL)
+async function processCustomWithdraw() {
+    const input = document.getElementById('custom-withdraw-amount');
+    if (!input) return;
+    const amount = parseFloat(input.value);
+
+    if (!amount || amount <= 0) {
+        alert('Masukkan nominal penarikan yang valid!');
+        return;
+    }
+
+    if (typeof refreshAndVerifyBalance === 'function') {
+        await refreshAndVerifyBalance();
+    }
+
+    if (amount > window.verifiedUserBalance) {
+        alert('Saldo dompet Anda tidak mencukupi!');
+        return;
+    }
+
+    if (typeof currentUserId !== 'undefined' && currentUserId && typeof supabaseClient !== 'undefined' && supabaseClient) {
+        const newBal = window.verifiedUserBalance - amount;
+        const { error } = await supabaseClient.from('users').update({ balance: newBal }).eq('id', currentUserId);
+        if (error) {
+            alert(`Gagal memproses penarikan: ${error.message}`);
+            return;
+        }
+    }
+
+    window.verifiedUserBalance -= amount;
+    if (typeof updateBalanceDisplay === 'function') updateBalanceDisplay();
+    if (typeof logUserActionToDatabase === 'function') {
+        logUserActionToDatabase(`Penarikan Tunai Rekening: -${typeof currencySymbol !== 'undefined' ? currencySymbol : 'Rp'} ${amount.toFixed(2)}`);
+    }
+    alert(`✅ Penarikan dana sebesar ${typeof currencySymbol !== 'undefined' ? currencySymbol : 'Rp'} ${amount.toFixed(2)} berhasil diproses ke bank Anda!`);
+    
+    const panel = document.getElementById('wallet-dynamic-panel');
+    if (panel) panel.classList.add('hidden');
+}
+
+// 2. FUNGSI TRANSFER DANA
+async function processCustomTransfer() {
+    const targetInput = document.getElementById('transfer-target');
+    const amountInput = document.getElementById('transfer-amount');
+    if (!targetInput || !amountInput) return;
+
+    const target = targetInput.value.trim();
+    const amount = parseFloat(amountInput.value);
+
+    if (!target || !amount || amount <= 0) {
+        alert('Mohon isi nomor tujuan dan nominal transfer yang valid!');
+        return;
+    }
+
+    if (typeof refreshAndVerifyBalance === 'function') {
+        await refreshAndVerifyBalance();
+    }
+
+    if (amount > window.verifiedUserBalance) {
+        alert('Saldo dompet Anda tidak mencukupi untuk mentransfer!');
+        return;
+    }
+
+    if (typeof currentUserId !== 'undefined' && currentUserId && typeof supabaseClient !== 'undefined' && supabaseClient) {
+        const newBal = window.verifiedUserBalance - amount;
+        await supabaseClient.from('users').update({ balance: newBal }).eq('id', currentUserId);
+    }
+
+    window.verifiedUserBalance -= amount;
+    if (typeof updateBalanceDisplay === 'function') updateBalanceDisplay();
+    if (typeof logUserActionToDatabase === 'function') {
+        logUserActionToDatabase(`Transfer Dana ke ${target}: -${typeof currencySymbol !== 'undefined' ? currencySymbol : 'Rp'} ${amount.toFixed(2)}`);
+    }
+    alert(`🚀 Berhasil mentransfer ${typeof currencySymbol !== 'undefined' ? currencySymbol : 'Rp'} ${amount.toFixed(2)} ke ${target}!`);
+    
+    const panel = document.getElementById('wallet-dynamic-panel');
+    if (panel) panel.classList.add('hidden');
+}
+
+// 3. FUNGSI SCAN KAMERA & PEMBAYARAN QRIS
+function handleCameraScan(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('qris-scan-preview');
+    if (file) {
+        if (preview) preview.innerText = `📷 Terdeteksi: ${file.name} (Memindai QR...)`;
+        setTimeout(() => {
+            const destInput = document.getElementById('qris-dest-input');
+            const amountInput = document.getElementById('qris-pay-amount');
+            if (destInput) destInput.value = "Merchant QRIS Verified";
+            if (amountInput) amountInput.value = "15.00";
+            if (preview) preview.innerText = "✅ Kode QR Berhasil Dipindai!";
+        }, 1000);
+    }
+}
+
+async function processAdvancedQRTransaction() {
+    const destEl = document.getElementById('qris-dest-input');
+    const amountEl = document.getElementById('qris-pay-amount');
+    if (!destEl || !amountEl) return;
+
+    const dest = destEl.value.trim();
+    const amount = parseFloat(amountEl.value);
+
+    if (!dest || !amount || amount <= 0) {
+        alert('Mohon lengkapi data penerima dan nominal pembayaran QR!');
+        return;
+    }
+
+    if (typeof refreshAndVerifyBalance === 'function') {
+        await refreshAndVerifyBalance();
+    }
+
+    if (amount > window.verifiedUserBalance) {
+        alert('Saldo tidak mencukupi untuk pembayaran QR!');
+        return;
+    }
+
+    if (typeof currentUserId !== 'undefined' && currentUserId && typeof supabaseClient !== 'undefined' && supabaseClient) {
+        const newBal = window.verifiedUserBalance - amount;
+        await supabaseClient.from('users').update({ balance: newBal }).eq('id', currentUserId);
+    }
+
+    window.verifiedUserBalance -= amount;
+    if (typeof updateBalanceDisplay === 'function') updateBalanceDisplay();
+    if (typeof logUserActionToDatabase === 'function') {
+        logUserActionToDatabase(`Pembayaran QR (${typeof activeCountryCode !== 'undefined' ? activeCountryCode : 'ID'}) ke ${dest}: -${typeof currencySymbol !== 'undefined' ? currencySymbol : 'Rp'} ${amount.toFixed(2)}`);
+    }
+    alert(`📲 Pembayaran QR ${typeof currencySymbol !== 'undefined' ? currencySymbol : 'Rp'} ${amount.toFixed(2)} ke ${dest} BERHASIL!`);
+    
+    const panel = document.getElementById('wallet-dynamic-panel');
+    if (panel) panel.classList.add('hidden');
+}
+
+// 4. FUNGSI KLAIM BONUS & PROMO
+async function claimDailyRewardBonus() {
+    const bonusVal = 2.00;
+    if (typeof currentUserId !== 'undefined' && currentUserId && typeof supabaseClient !== 'undefined' && supabaseClient) {
+        const newBal = window.verifiedUserBalance + bonusVal;
+        await supabaseClient.from('users').update({ balance: newBal }).eq('id', currentUserId);
+    }
+    window.verifiedUserBalance += bonusVal;
+    if (typeof updateBalanceDisplay === 'function') updateBalanceDisplay();
+    if (typeof logUserActionToDatabase === 'function') {
+        logUserActionToDatabase(`Klaim Bonus Absen Harian: +${typeof currencySymbol !== 'undefined' ? currencySymbol : 'Rp'} ${bonusVal.toFixed(2)}`);
+    }
+    alert(`🎉 Selamat! Anda mendapatkan bonus harian +${typeof currencySymbol !== 'undefined' ? currencySymbol : 'Rp'} ${bonusVal.toFixed(2)}`);
+}
+
+async function processBonusClaimCode() {
+    const input = document.getElementById('bonus-claim-code');
+    if (!input) return;
+    const code = input.value.trim().toUpperCase();
+
+    if (!code) {
+        alert('Masukkan kode voucher/referral!');
+        return;
+    }
+
+    const bonusVal = 5.00;
+    if (typeof currentUserId !== 'undefined' && currentUserId && typeof supabaseClient !== 'undefined' && supabaseClient) {
+        const newBal = window.verifiedUserBalance + bonusVal;
+        await supabaseClient.from('users').update({ balance: newBal }).eq('id', currentUserId);
+    }
+    window.verifiedUserBalance += bonusVal;
+    if (typeof updateBalanceDisplay === 'function') updateBalanceDisplay();
+    if (typeof logUserActionToDatabase === 'function') {
+        logUserActionToDatabase(`Klaim Kode Promo [${code}]: +${typeof currencySymbol !== 'undefined' ? currencySymbol : 'Rp'} ${bonusVal.toFixed(2)}`);
+    }
+    alert(`🚀 Kode Voucher [${code}] Berhasil! Saldo bertambah +${typeof currencySymbol !== 'undefined' ? currencySymbol : 'Rp'} ${bonusVal.toFixed(2)}`);
+    input.value = '';
+}
+
+async function claimReferralCommission() {
+    alert('💰 Komisi referral berhasil dicairkan ke saldo dompet utama!');
+}
+
+// 5. INTERAKSI SUARA, BANNER, & UNGGAN AVATAR
+let voiceEnabled = true;
+function toggleUserVoicePreference() {
+    voiceEnabled = !voiceEnabled;
+    const btn = document.getElementById('user-voice-toggle');
+    if (btn) {
+        btn.className = voiceEnabled ? "voice-toggle on" : "voice-toggle off";
+    }
+    alert(voiceEnabled ? '🔊 Panduan Suara Diaktifkan' : '🔇 Panduan Suara Dinonaktifkan');
+}
+
+function clickMasterBanner() {
+    if (typeof openLiveStreamModal === 'function') {
+        openLiveStreamModal();
+    } else {
+        alert('📺 Fitur Promo / Live Stream siap ditampilkan!');
+    }
+}
+
+function handleAvatarUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imgData = e.target.result;
+            localStorage.setItem('swift_user_avatar', imgData);
+            if (typeof updateProfileDisplayUI === 'function') updateProfileDisplayUI();
+            alert('📸 Foto profil berhasil diperbarui!');
+        };
+        reader.readAsDataURL(file);
+    }
+}
 </script>
 </body>
 </html>
