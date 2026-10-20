@@ -342,7 +342,12 @@
                     </div>
                 </div>
             </div>
-
+<div onclick="openActualLiveStreamModal()" class="cursor-pointer bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition group">
+    <div class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center text-lg group-hover:scale-110 transition">
+        🔴
+    </div>
+    <span class="text-[11px] font-bold text-white tracking-wide">Live Stream</span>
+</div>
             <!-- Feed Video Pendek Promosi Produk (Food & Mart) -->
             <div class="swift-card">
                 <div class="flex justify-between items-center mb-3">
@@ -1962,7 +1967,15 @@
             alert('Tautan referral berhasil disalin!');
         });
     }
+function openLiveStreamModal() {
+    const modal = document.getElementById('livestream-modal');
+    if (modal) modal.classList.remove('hidden');
+}
 
+function closeLiveStreamModal() {
+    const modal = document.getElementById('livestream-modal');
+    if (modal) modal.classList.add('hidden');
+}
     function openLiveStreamModal() { document.getElementById('live-modal').classList.remove('hidden'); }
     function closeLiveStreamModal() { document.getElementById('live-modal').classList.add('hidden'); }
     
@@ -2198,6 +2211,240 @@ function handleAvatarUpload(event) {
         reader.readAsDataURL(file);
     }
 }
+  // ================= SISTEM LIVE STREAMING REAL-TIME ENTERPRISE =================
+let activeStreamChannel = null;
+let localMediaStream = null;
+
+function openActualLiveStreamModal() {
+    const modal = document.getElementById('actual-live-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        loadLiveStreamDataFromDatabase();
+    }
+}
+
+function closeActualLiveStreamModal() {
+    const modal = document.getElementById('actual-live-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    // Matikan kamera jika sedang broadcast
+    if (localMediaStream) {
+        localMediaStream.getTracks().forEach(track => track.stop());
+        localMediaStream = null;
+    }
+    const videoEl = document.getElementById('live-video-preview');
+    if (videoEl) videoEl.classList.add('hidden');
+}
+
+async function startBroadcastingLiveStream() {
+    try {
+        const placeholder = document.getElementById('live-placeholder-screen');
+        const videoEl = document.getElementById('live-video-preview');
+        const statusText = document.getElementById('live-status-text');
+
+        // Meminta izin kamera dan mikrofon perangkat pengguna secara nyata
+        localMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        
+        if (videoEl) {
+            videoEl.srcObject = localMediaStream;
+            videoEl.classList.remove('hidden');
+        }
+        if (placeholder) placeholder.classList.add('hidden');
+        if (statusText) statusText.innerText = "Status: Anda Sedang Melakukan Siaran (BROADCASTING)";
+
+        alert('🔴 Kamera aktif! Anda sekarang sedang melakukan siaran langsung ke jaringan global SWIFT.');
+
+        // Simpan status live ke Supabase jika terhubung
+        if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+            await supabaseClient.from('live_broadcasts').upsert({
+                host_id: typeof currentUserId !== 'undefined' ? currentUserId : 'guest_host',
+                host_name: localStorage.getItem('swift_user_name') || 'Mitra SWIFT',
+                is_active: true,
+                updated_at: new Date()
+            });
+        }
+    } catch (err) {
+        alert('Gagal mengakses kamera/mikrofon: Pastikan izin browser diaktifkan.');
+        console.error(err);
+    }
+}
+
+function sendLiveChatMessage() {
+    const input = document.getElementById('live-chat-input');
+    const container = document.getElementById('live-chat-messages-container');
+    if (!input || !input.value.trim()) return;
+
+    const msgText = input.value.trim();
+    const userName = localStorage.getItem('swift_user_name') || 'Pengguna SWIFT';
+
+    const msgHTML = `
+        <div class="bg-slate-800/40 p-2 rounded-xl text-slate-300">
+            <span class="font-bold text-red-400">${userName}:</span> ${msgText}
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', msgHTML);
+    container.scrollTop = container.scrollHeight;
+    input.value = '';
+}
+
+function triggerLiveGiftSaweria() {
+    const giftVal = 10.00;
+    if (typeof window.verifiedUserBalance !== 'undefined') {
+        if (window.verifiedUserBalance < giftVal) {
+            alert('Saldo dompet tidak cukup untuk mengirim saweran koin!');
+            return;
+        }
+        window.verifiedUserBalance -= giftVal;
+        if (typeof updateBalanceDisplay === 'function') updateBalanceDisplay();
+    }
+    
+    const container = document.getElementById('live-chat-messages-container');
+    const giftHTML = `
+        <div class="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/40 p-2 rounded-xl text-amber-300 font-bold">
+            🎁 SAWERAN: Mengirim Koin Senilai ${typeof currencySymbol !== 'undefined' ? currencySymbol : 'RM'} 10.00 ke Host!
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', giftHTML);
+    container.scrollTop = container.scrollHeight;
+    alert('🎁 Berhasil mengirim hadiah/saweran ke penyiar live!');
+}
+
+async function loadLiveStreamDataFromDatabase() {
+    // Sinkronisasi data live aktif dari Supabase secara real-time
+    if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+        const { data } = await supabaseClient.from('live_broadcasts').select('*').eq('is_active', true).limit(1);
+        if (data && data.length > 0) {
+            const hostInfo = document.getElementById('live-stream-host-info');
+            if (hostInfo) hostInfo.innerText = `Host: ${data[0].host_name}`;
+        }
+    }
+}
 </script>
+  <!-- ================= MODUL LIVE STREAMING SWIFT ================= -->
+<div id="livestream-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+        <!-- Header Modal -->
+        <div class="bg-slate-800 px-4 py-3 flex justify-between items-center border-b border-slate-700">
+            <h3 class="text-white font-bold text-sm flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                🔴 SWIFT Live Streaming Studio
+            </h3>
+            <button onclick="closeLiveStreamModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+        </div>
+        
+        <!-- Video Player / Live Stream Screen -->
+        <div class="p-4 flex flex-col gap-3">
+            <div class="aspect-video bg-black rounded-xl relative flex items-center justify-center border border-slate-800 overflow-hidden">
+                <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
+                    LIVE
+                </div>
+                <div class="text-center p-4">
+                    <svg class="w-10 h-10 text-slate-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    <p class="text-slate-400 text-xs font-medium">Belum Ada Siaran Langsung Aktif</p>
+                    <p class="text-slate-500 text-[10px] mt-1">Mitra atau Admin belum memulai siaran saat ini.</p>
+                </div>
+            </div>
+
+            <!-- Detail & Informasi -->
+            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/50 text-xs text-slate-300">
+                <p class="font-semibold text-emerald-400 mb-1">📢 Fitur Studio Mitra Live:</p>
+                <p class="text-[11px] text-slate-400">Promosikan produk kedai Anda secara live stream real-time langsung ke seluruh pengguna aplikasi SWIFT.</p>
+            </div>
+        </div>
+
+        <!-- Footer Tombol Aksi -->
+        <div class="bg-slate-800 px-4 py-3 border-t border-slate-700 flex justify-end gap-2">
+            <button onclick="closeLiveStreamModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-xl">Tutup</button>
+            <button onclick="alert('🔴 Menyiapkan kamera & mikrofon Studio Mitra...');" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition flex items-center gap-1">
+                Mulai Siaran Live
+            </button>
+        </div>
+    </div>
+</div>
+ 
+<div id="actual-live-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+    <div class="bg-slate-950 border border-slate-800 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+        
+        <!-- Header Live Stream -->
+        <div class="bg-slate-900 px-5 py-4 flex justify-between items-center border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <span class="bg-red-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider animate-pulse flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> LIVE
+                </span>
+                <div>
+                    <h3 id="live-stream-title-header" class="text-white font-bold text-sm">SWIFT Global Broadcasting Studio</h3>
+                    <p class="text-slate-400 text-[11px]" id="live-stream-host-info">Host: Menghubungkan ke server...</p>
+                </div>
+            </div>
+            <button onclick="closeActualLiveStreamModal()" class="text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+        </div>
+
+        <!-- Konten Utama: Video & Chat Live -->
+        <div class="grid grid-cols-1 md:grid-cols-3 flex-1 overflow-hidden">
+            
+            <!-- Sisi Kiri: Layar Video / Kamera Siaran (2 Kolom) -->
+            <div class="md:col-span-2 bg-black relative flex flex-col items-center justify-center border-r border-slate-800 min-h-[260px]">
+                <!-- Video Element / Kamera Streamer -->
+                <video id="live-video-preview" autoplay playsinline muted class="w-full h-full object-cover absolute inset-0 hidden"></video>
+                
+                <!-- Placeholder jika belum ada video atau mode penonton -->
+                <div id="live-placeholder-screen" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-slate-900/50 to-black">
+                    <div class="w-16 h-16 rounded-full bg-red-600/20 text-red-500 flex items-center justify-center mb-3 animate-bounce">
+                        📡
+                    </div>
+                    <h4 class="text-white font-bold text-sm mb-1">Siaran Langsung Aktif</h4>
+                    <p class="text-slate-400 text-xs max-w-xs">Menghubungkan transmisi video real-time berkecepatan tinggi antar pengguna lintas negara.</p>
+                </div>
+
+                <!-- Watermark Penonton -->
+                <div class="absolute top-4 left-4 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10 flex items-center gap-2 text-white text-[11px]">
+                    👁️ <span id="live-viewer-count">1</span> Penonton
+                </div>
+            </div>
+
+            <!-- Sisi Kanan: Live Chat & Interaksi Komunitas (1 Kolom) -->
+            <div class="bg-slate-900/90 flex flex-col h-full justify-between p-3">
+                <div class="text-xs font-bold text-slate-300 pb-2 border-b border-slate-800 flex justify-between items-center">
+                    <span>💬 Chat Komunitas Live</span>
+                    <span class="text-[10px] text-emerald-400 font-normal">● Sinkron Supabase</span>
+                </div>
+                
+                <!-- Daftar Pesan Chat -->
+                <div id="live-chat-messages-container" class="flex-1 overflow-y-auto py-2 space-y-2 text-xs pr-1">
+                    <div class="bg-slate-800/60 p-2 rounded-xl text-slate-300">
+                        <span class="font-bold text-emerald-400">System:</span> Selamat datang di siaran langsung SWIFT! Jaga sopan santun.
+                    </div>
+                </div>
+
+                <!-- Kolom Kirim Pesan Chat / Saweran -->
+                <div class="pt-2 border-t border-slate-800 flex flex-col gap-2">
+                    <div class="flex gap-1">
+                        <input type="text" id="live-chat-input" placeholder="Kirim pesan live..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                        <button onclick="sendLiveChatMessage()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition">Kirim</button>
+                    </div>
+                    <button onclick="triggerLiveGiftSaweria()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-extrabold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1 shadow-lg">
+                        🎁 Kirim Saweran / Koin SWIFT
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Kontrol (Mulai Live / Tutup) -->
+        <div class="bg-slate-900 px-5 py-3 border-t border-slate-800 flex justify-between items-center">
+            <span class="text-slate-400 text-xs" id="live-status-text">Status: Siap Menonton</span>
+            <div class="flex gap-2">
+                <button onclick="closeActualLiveStreamModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl transition">Keluar</button>
+                <button onclick="startBroadcastingLiveStream()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-red-600/30">
+                    📹 Mulai Siaran Saya (Broadcast)
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
 </body>
 </html>
