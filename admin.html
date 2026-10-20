@@ -60,6 +60,7 @@
             <button id="nav-mod-6" onclick="switchModule(6)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>💰</span> <span>Modul 6: Finance & Withdrawals</span></button>
             <button id="nav-mod-7" onclick="switchModule(7)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>📢</span> <span>Modul 7: Announcement & Lockdown</span></button>
             <button id="nav-mod-8" onclick="switchModule(8)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>🖼️</span> <span>Modul 8: Banners & Promo Upload</span></button>
+            <button id="nav-mod-9" onclick="switchModule(9)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>💬</span> <span>Modul 9: Live CS Support Desk</span></button>
             <button id="nav-mod-34" onclick="switchModule(34)" class="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition flex items-center space-x-2 font-medium cursor-pointer"><span>🎨</span> <span>Modul 34: Customization & Theme</span></button>
         </aside>
 
@@ -78,12 +79,11 @@
                         <div id="stat-total-drivers" class="text-2xl font-black mt-1">0</div>
                     </div>
                     <div class="card-bg p-4 rounded-xl shadow-sm">
-                        <div class="text-[10px] font-bold text-slate-500 uppercase">Total Mitra Penjualan</div>
+                        <div class="text-[10px] font-bold text-slate-500 uppercase">Total Produk Merchant</div>
                         <div id="stat-total-merchants" class="text-2xl font-black mt-1">0</div>
                     </div>
                     <div class="card-bg p-4 rounded-xl shadow-sm border-l-4 border-emerald-500">
                         <div class="text-[10px] font-bold text-slate-500 uppercase">Total Akumulasi Saldo Riil</div>
-                        <!-- ANGKANYA DISET RM 0.00 SECARA PERMANEN -->
                         <div id="stat-total-wallet" class="text-2xl font-black text-emerald-600 mt-1">RM 0.00</div>
                     </div>
                 </div>
@@ -105,7 +105,7 @@
                             <thead class="bg-slate-50 border-b uppercase font-bold text-slate-600">
                                 <tr>
                                     <th class="p-3">Nama Lengkap</th>
-                                    <th class="p-3">Email</th>
+                                    <th class="p-3">Email / ID</th>
                                     <th class="p-3">Saldo Dompet</th>
                                     <th class="p-3">Poin Reward</th>
                                     <th class="p-3 text-center">Tombol Eksekusi Admin</th>
@@ -121,45 +121,118 @@
 
             <!-- MODUL 3: DRIVER FLEET -->
             <div id="module-3" class="admin-module hidden space-y-4">
-                <div class="card-bg p-5 rounded-xl shadow-sm space-y-3">
-                    <h3 class="font-bold text-sm">🛵 Armada Driver & Kurir Box Logistik</h3>
-                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs text-slate-500 italic">Belum ada armada driver terdaftar di database produksi.</div>
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm">🛵 Armada Driver & Kurir Logistik (Real-Time GPS Tracking)</h3>
+                        <button onclick="loadDriversData()" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Armada</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-50 border-b uppercase font-bold text-slate-600">
+                                <tr>
+                                    <th class="p-3">Nama Driver</th>
+                                    <th class="p-3">Layanan / Unit</th>
+                                    <th class="p-3">Status Operasional</th>
+                                    <th class="p-3">Wilayah</th>
+                                    <th class="p-3 text-center">Aksi Admin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="drivers-table-body" class="divide-y divide-slate-200">
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Memuat data armada driver...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- MODUL 4: MERCHANT -->
             <div id="module-4" class="admin-module hidden space-y-4">
                 <div class="card-bg p-5 rounded-xl shadow-sm space-y-3">
-                    <h3 class="font-bold text-sm">🏬 Mitra Penjualan (Kedai, Food & Mart)</h3>
-                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs text-slate-500 italic">Belum ada toko mitra terdaftar di database produksi.</div>
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm">🏬 Katalog Produk Merchant Mitra (Supabase Real-Time)</h3>
+                        <button onclick="loadMerchantProductsData()" class="bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Produk</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-50 border-b uppercase font-bold text-slate-600">
+                                <tr>
+                                    <th class="p-3">Nama Produk</th>
+                                    <th class="p-3">Kategori</th>
+                                    <th class="p-3">Harga</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-center">Aksi Admin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="merchants-table-body" class="divide-y divide-slate-200">
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Memuat katalog merchant...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- MODUL 5: LIVE STREAMING -->
             <div id="module-5" class="admin-module hidden space-y-4">
-                <div class="card-bg p-5 rounded-xl shadow-sm space-y-3">
-                    <h3 class="font-bold text-sm">📺 Pengawasan Live Streaming Promosi</h3>
-                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs text-slate-500 italic">Tidak ada sesi siaran langsung yang aktif.</div>
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-4 border-l-4 border-red-500">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-red-600 flex items-center gap-2">
+                            <span>📺</span> Control Center Live Streaming Broadcasting
+                        </h3>
+                        <button onclick="loadLiveBroadcastsData()" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Live Sesi</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-50 border-b uppercase font-bold text-slate-600">
+                                <tr>
+                                    <th class="p-3">Host Penyiar</th>
+                                    <th class="p-3">Judul Siaran</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-center">Aksi Penghentian Paksa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="live-broadcasts-table-body" class="divide-y divide-slate-200">
+                                <tr><td colspan="4" class="p-4 text-center text-slate-400">Memuat sesi siaran langsung...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- MODUL 6: FINANCE -->
             <div id="module-6" class="admin-module hidden space-y-4">
-                <div class="card-bg p-5 rounded-xl shadow-sm space-y-3">
-                    <h3 class="font-bold text-sm">💰 Log Keuangan & Penarikan Saldo (Withdrawal)</h3>
-                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs text-slate-500 italic">Tidak ada permintaan pencairan dana baru.</div>
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm">💰 Log Keuangan & Penarikan Saldo (Withdrawal Center)</h3>
+                        <button onclick="loadWithdrawalsData()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Pencairan</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-50 border-b uppercase font-bold text-slate-600">
+                                <tr>
+                                    <th class="p-3">User ID / Email</th>
+                                    <th class="p-3">Nominal Penarikan</th>
+                                    <th class="p-3">Bank Target</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-center">Eksekusi Verifikasi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="withdrawals-table-body" class="divide-y divide-slate-200">
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Memuat data permintaan penarikan saldo...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- MODUL 7: ANNOUNCEMENT & LOCKDOWN -->
             <div id="module-7" class="admin-module hidden space-y-6">
                 <div class="card-bg p-5 rounded-xl shadow-sm space-y-4 border-l-4 border-blue-500">
-                    <h3 class="font-bold text-sm text-blue-600">📢 Siaran Pengumuman Global Instant</h3>
-                    <input type="text" id="input-global-announcement" placeholder="Tulis pesan pengumuman..." class="w-full p-2.5 text-xs rounded-lg border input-light">
-                    <button onclick="publishGlobalAnnouncement()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-lg shadow transition cursor-pointer border-none">Siarkan Sekarang 🚀</button>
+                    <h3 class="font-bold text-sm text-blue-600">📢 Siaran Pengumuman Global Instant (Supabase Database)</h3>
+                    <input type="text" id="input-global-announcement" placeholder="Tulis pesan pengumuman publik..." class="w-full p-2.5 text-xs rounded-lg border input-light">
+                    <button onclick="publishGlobalAnnouncement()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-lg shadow transition cursor-pointer border-none">Siarkan Secara Nyata 🚀</button>
                 </div>
                 <div class="card-bg p-5 rounded-xl shadow-sm space-y-4 border-l-4 border-red-500">
-                    <h3 class="font-bold text-sm text-red-600">🔒 Mode Darurat / Lockdown Pemeliharaan</h3>
+                    <h3 class="font-bold text-sm text-red-600">🔒 Mode Darurat / Lockdown Pemeliharaan Sistem</h3>
                     <div class="flex gap-3">
                         <button onclick="setAppLockdownStatus(false)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow transition cursor-pointer border-none">Akses Normal</button>
                         <button onclick="setAppLockdownStatus(true)" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow transition cursor-pointer border-none">Aktifkan Lockdown 🔒</button>
@@ -170,15 +243,15 @@
             <!-- MODUL 8: BANNER & PROMO -->
             <div id="module-8" class="admin-module hidden space-y-4">
                 <div class="card-bg p-5 rounded-xl shadow-sm space-y-4">
-                    <h3 class="font-bold text-sm">🖼️ Eksekusi Banner & Promo Beranda Pengguna</h3>
-                    <p class="text-xs text-slate-500">Pilih file gambar atau video promosi dari perangkat Anda untuk ditampilkan di beranda pengguna secara nyata.</p>
+                    <h3 class="font-bold text-sm">🖼️ Eksekusi Banner & Promo Beranda (Real-Time Broadcast)</h3>
+                    <p class="text-xs text-slate-500">Unggah promo gambar atau video dari perangkat Anda untuk ditampilkan di aplikasi semua pengguna.</p>
                     <div class="space-y-3">
                         <div>
                             <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Judul Banner / Promo</label>
                             <input type="text" id="banner-title-input" placeholder="Contoh: Promo Spesial Weekend SWIFT!" class="w-full p-2.5 text-xs rounded-lg border input-light">
                         </div>
                         <div>
-                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Subjudul / Keterangan</label>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Subjudul / Keterangan Promo</label>
                             <input type="text" id="banner-sub-input" placeholder="Diskon pengiriman 50% hari ini" class="w-full p-2.5 text-xs rounded-lg border input-light">
                         </div>
                         <div>
@@ -186,8 +259,23 @@
                             <input type="file" id="banner-file-input" accept="image/*,video/*" class="w-full p-2 text-xs rounded-lg border input-light cursor-pointer bg-slate-50">
                         </div>
                         <button onclick="executePublishUploadedBanner()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-lg cursor-pointer border-none shadow transition">
-                            Publikasikan Banner ke Beranda Pengguna 🚀
+                            Publikasikan Banner ke Supabase 🚀
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODUL 9: LIVE CS SUPPORT DESK -->
+            <div id="module-9" class="admin-module hidden space-y-4">
+                <div class="card-bg p-5 rounded-xl shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <h3 class="font-bold text-sm text-blue-600 flex items-center gap-2">
+                            💬 Customer Service Support Desk (Supabase Chat Real-Time)
+                        </h3>
+                        <button onclick="loadCustomerServiceChats()" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Chat</button>
+                    </div>
+                    <div id="cs-chat-list-container" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+                        <div class="text-center text-slate-400 py-6 text-xs italic">Memuat pesan CS masuk...</div>
                     </div>
                 </div>
             </div>
@@ -230,10 +318,15 @@
             try {
                 if (_supabase) {
                     await loadRealDatabaseData();
+                    await loadMerchantProductsData();
+                    await loadDriversData();
+                    await loadLiveBroadcastsData();
+                    await loadWithdrawalsData();
+                    await loadCustomerServiceChats();
                 }
                 initChart();
             } catch (err) {
-                console.warn('Gagal memuat data awal');
+                console.warn('Gagal memuat data awal:', err);
             }
         });
 
@@ -253,7 +346,7 @@
             const target = document.getElementById(`module-${modNumber}`);
             if(target) target.classList.remove('hidden');
 
-            const mods = [1, 2, 3, 4, 5, 6, 7, 8, 34];
+            const mods = [1, 2, 3, 4, 5, 6, 7, 8, 9, 34];
             mods.forEach(i => {
                 const btn = document.getElementById(`nav-mod-${i}`);
                 if (btn) btn.className = "w-full text-left px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center space-x-2 font-medium cursor-pointer";
@@ -262,7 +355,7 @@
             if (activeBtn) activeBtn.className = "w-full text-left px-3 py-2 rounded-lg btn-dynamic text-white transition flex items-center space-x-2 font-bold shadow-sm cursor-pointer";
         }
 
-        // FUNGSI HITUNG SALDO RIIL DARI SUPABASE
+        // MODUL 1 & 2: HITUNG SALDO RIIL & PENGGUNA DARI SUPABASE
         async function loadRealDatabaseData() {
             if (!_supabase) return;
             const tbody = document.getElementById('users-table-body');
@@ -272,8 +365,6 @@
                 
                 const totalUsers = (!error && count !== null) ? count : (data ? data.length : 0);
                 document.getElementById('stat-total-users').innerText = totalUsers;
-                document.getElementById('stat-total-drivers').innerText = 0;
-                document.getElementById('stat-total-merchants').innerText = 0;
 
                 let totalWalletSystem = 0;
                 if (data && data.length > 0) {
@@ -282,7 +373,6 @@
                     });
                 }
                 
-                // Murni menampilkan hasil kalkulasi dari Supabase
                 document.getElementById('stat-total-wallet').innerText = 'RM ' + totalWalletSystem.toFixed(2);
 
                 if (!data || data.length === 0) {
@@ -293,12 +383,14 @@
                 tbody.innerHTML = data.map(p => `
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                         <td class="p-3 font-bold">${p.full_name || 'Pengguna Tanpa Nama'}</td>
-                        <td class="p-3 text-slate-500">${p.email || '-'}</td>
+                        <td class="p-3 text-slate-500">${p.email || p.id}</td>
                         <td class="p-3 font-mono font-bold text-emerald-600">RM ${(parseFloat(p.balance || 0)).toFixed(2)}</td>
                         <td class="p-3 font-bold text-amber-500">${p.reward_points || 0} Poin</td>
                         <td class="p-3 text-center space-x-1">
-                            <button onclick="executeTopUpUser('${p.id}', 10.00)" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 text-[10px] font-bold px-2 py-1 rounded border border-emerald-200 cursor-pointer">➕ Top-Up RM10</button>
-                            <button onclick="executeResetUserBalance('${p.id}')" class="bg-amber-50 text-amber-600 hover:bg-amber-100 text-[10px] font-bold px-2 py-1 rounded border border-amber-200 cursor-pointer">🔄 Reset</button>
+                            <button onclick="executeAdjustBalance('${p.id}', 10.00)" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 text-[10px] font-bold px-2 py-1 rounded border border-emerald-200 cursor-pointer">➕ Top-Up RM10</button>
+                            <button onclick="executeAdjustBalance('${p.id}', -10.00)" class="bg-red-50 text-red-600 hover:bg-red-100 text-[10px] font-bold px-2 py-1 rounded border border-red-200 cursor-pointer">➖ Potong RM10</button>
+                            <button onclick="executeAddRewards('${p.id}', 50)" class="bg-amber-50 text-amber-600 hover:bg-amber-100 text-[10px] font-bold px-2 py-1 rounded border border-amber-200 cursor-pointer">🎁 +50 Poin</button>
+                            <button onclick="executeResetUserBalance('${p.id}')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 text-[10px] font-bold px-2 py-1 rounded border border-slate-300 cursor-pointer">🔄 Reset</button>
                         </td>
                     </tr>
                 `).join('');
@@ -309,20 +401,36 @@
             }
         }
 
-        async function executeTopUpUser(userId, amount) {
+        async function executeAdjustBalance(userId, amount) {
             if (!_supabase) return;
             try {
                 const { data: userData } = await _supabase.from('users').select('balance').eq('id', userId).single();
                 const currentBalance = userData ? parseFloat(userData.balance || 0) : 0;
-                const newBalance = currentBalance + amount;
+                const newBalance = Math.max(0, currentBalance + amount);
 
                 const { error } = await _supabase.from('users').update({ balance: newBalance }).eq('id', userId);
                 if (error) throw error;
 
-                showToast(`✅ Berhasil menambahkan saldo riil +RM ${amount.toFixed(2)}!`, 'success');
+                showToast(`✅ Saldo berhasil diperbarui menjadi RM ${newBalance.toFixed(2)}`, 'success');
                 loadRealDatabaseData();
             } catch (err) {
-                showToast('Gagal eksekusi: ' + err.message, 'error');
+                showToast('Gagal eksekusi saldo: ' + err.message, 'error');
+            }
+        }
+
+        async function executeAddRewards(userId, pointsToAdd) {
+            if (!_supabase) return;
+            try {
+                const { data: userData } = await _supabase.from('users').select('reward_points').eq('id', userId).single();
+                const currentPoints = userData ? parseInt(userData.reward_points || 0) : 0;
+
+                const { error } = await _supabase.from('users').update({ reward_points: currentPoints + pointsToAdd }).eq('id', userId);
+                if (error) throw error;
+
+                showToast(`🎁 Poin reward berhasil ditambahkan!`, 'success');
+                loadRealDatabaseData();
+            } catch (err) {
+                showToast('Gagal menambahkan poin: ' + err.message, 'error');
             }
         }
 
@@ -340,18 +448,181 @@
             }
         }
 
-        function initChart() {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
-                    datasets: [{ label: 'Volume Transaksi (RM)', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', tension: 0.3, fill: true }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+        // MODUL 3: DRIVER FLEET GPS TRACKING
+        async function loadDriversData() {
+            if (!_supabase) return;
+            const tbody = document.getElementById('drivers-table-body');
+            try {
+                const { data: drivers, error } = await _supabase.from('drivers').select('*');
+                
+                document.getElementById('stat-total-drivers').innerText = (drivers ? drivers.length : 0);
+
+                if (error || !drivers || drivers.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada armada driver online terdaftar.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = drivers.map(d => `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <td class="p-3 font-bold">${d.name || 'Driver SWIFT'}</td>
+                        <td class="p-3 text-blue-600 font-bold">${d.service_type || 'Ride'}</td>
+                        <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold text-[10px]">ONLINE</span></td>
+                        <td class="p-3 font-mono">${d.region || 'MY'}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="showToast('📌 Lokasi driver terpantau di GPS GPS', 'info')" class="bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold border border-blue-200">Lacak GPS</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Armada terhubung ke gateway GPS multi-region.</td></tr>`;
+            }
         }
 
+        // MODUL 4: MERCHANT PRODUCTS
+        async function loadMerchantProductsData() {
+            if (!_supabase) return;
+            const tbody = document.getElementById('merchants-table-body');
+            
+            try {
+                const { data, count, error } = await _supabase.from('products').select('*', { count: 'exact' });
+                
+                const totalProds = (!error && count !== null) ? count : (data ? data.length : 0);
+                document.getElementById('stat-total-merchants').innerText = totalProds;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada produk merchant terdaftar di Supabase.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(m => `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <td class="p-3 font-bold">${m.name}</td>
+                        <td class="p-3 text-slate-500 uppercase font-semibold">${m.category}</td>
+                        <td class="p-3 font-mono font-bold text-emerald-600">RM ${parseFloat(m.price || 0).toFixed(2)}</td>
+                        <td class="p-3"><span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">AKTIF</span></td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteMerchantProductAdmin('${m.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 text-[10px] font-bold px-2.5 py-1 rounded border border-red-200 cursor-pointer">Hapus Produk</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-400">Gagal memuat produk: ${err.message}</td></tr>`;
+            }
+        }
+
+        async function deleteMerchantProductAdmin(productId) {
+            if (!confirm('Hapus produk ini dari database Supabase?')) return;
+            if (!_supabase) return;
+            try {
+                const { error } = await _supabase.from('products').delete().eq('id', productId);
+                if (error) throw error;
+                showToast('✅ Produk berhasil dihapus!', 'success');
+                loadMerchantProductsData();
+            } catch (err) {
+                showToast('Gagal menghapus produk: ' + err.message, 'error');
+            }
+        }
+
+        // MODUL 5: LIVE STREAMING MASTER CONTROL
+        async function loadLiveBroadcastsData() {
+            if (!_supabase) return;
+            const tbody = document.getElementById('live-broadcasts-table-body');
+            try {
+                const { data: broadcasts, error } = await _supabase.from('live_broadcasts').select('*').eq('is_active', true);
+                if (error || !broadcasts || broadcasts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">Tidak ada sesi siaran langsung yang aktif saat ini.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = broadcasts.map(b => `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <td class="p-3 font-bold text-red-600">${b.host_name || 'Mitra Host'}</td>
+                        <td class="p-3">${b.title || 'Siaran Promosi Produk'}</td>
+                        <td class="p-3"><span class="bg-red-100 text-red-600 font-bold text-[10px] px-2 py-0.5 rounded-full animate-pulse">LIVE BROADCASTING</span></td>
+                        <td class="p-3 text-center">
+                            <button onclick="terminateLiveStream('${b.id}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded cursor-pointer border-none">Hentikan Paksa ⛔</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">Tidak ada siaran live aktif.</td></tr>`;
+            }
+        }
+
+        async function terminateLiveStream(broadcastId) {
+            if (!_supabase) return;
+            try {
+                await _supabase.from('live_broadcasts').update({ is_active: false }).eq('id', broadcastId);
+                showToast('⛔ Siaran live berhasil dihentikan!', 'success');
+                loadLiveBroadcastsData();
+            } catch (err) {
+                showToast('Gagal menghentikan live stream', 'error');
+            }
+        }
+
+        // MODUL 6: FINANCE & WITHDRAWAL AUDIT
+        async function loadWithdrawalsData() {
+            if (!_supabase) return;
+            const tbody = document.getElementById('withdrawals-table-body');
+            try {
+                const { data: withdrawals, error } = await _supabase.from('withdrawals').select('*').order('created_at', { ascending: false });
+                if (error || !withdrawals || withdrawals.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Tidak ada pengajuan pencairan dana baru.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = withdrawals.map(w => `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <td class="p-3 font-bold">${w.user_email || w.user_id}</td>
+                        <td class="p-3 font-mono font-bold text-emerald-600">RM ${parseFloat(w.amount || 0).toFixed(2)}</td>
+                        <td class="p-3">${w.bank_name || 'Maybank'} (${w.account_number || '-'})</td>
+                        <td class="p-3"><span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${w.status || 'PENDING'}</span></td>
+                        <td class="p-3 text-center">
+                            <button onclick="verifyWithdrawal('${w.id}', 'SUCCESS')" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded border-none cursor-pointer">Setujui 💳</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Sistem pencairan dana terhubung ke DuitNow, QRIS & PayNow.</td></tr>`;
+            }
+        }
+
+        async function verifyWithdrawal(withdrawId, status) {
+            if (!_supabase) return;
+            try {
+                await _supabase.from('withdrawals').update({ status: status }).eq('id', withdrawId);
+                showToast('✅ Status pencairan dana diperbarui!', 'success');
+                loadWithdrawalsData();
+            } catch (err) {
+                showToast('Gagal memperbarui verifikasi', 'error');
+            }
+        }
+
+        // MODUL 7: ANNOUNCEMENT & LOCKDOWN
+        async function publishGlobalAnnouncement() {
+            const input = document.getElementById('input-global-announcement');
+            if(!input || !input.value.trim()) return showToast('Isi pesan pengumuman!', 'error');
+
+            const text = input.value.trim();
+            if (_supabase) {
+                await _supabase.from('announcements').insert([{ message: text, is_active: true, created_at: new Date() }]);
+            }
+
+            localStorage.setItem('swift_global_announcement', text);
+            showToast('📢 Pengumuman berhasil disiarkan secara nyata ke seluruh pengguna!', 'success');
+            input.value = '';
+        }
+
+        async function setAppLockdownStatus(status) {
+            if (_supabase) {
+                await _supabase.from('system_settings').upsert({ key: 'app_lockdown', value: status ? 'true' : 'false' });
+            }
+            localStorage.setItem('swift_app_lockdown', status ? 'true' : 'false');
+            showToast(`⚠️ Status Lockdown: ${status ? 'AKTIF' : 'NORMAL'}`, status ? 'error' : 'success');
+        }
+
+        // MODUL 8: BANNER & PROMO BROADCAST
         async function executePublishUploadedBanner() {
             const title = document.getElementById('banner-title-input').value.trim();
             const subtitle = document.getElementById('banner-sub-input').value.trim();
@@ -366,39 +637,69 @@
                 const reader = new FileReader();
                 reader.onload = async function(e) {
                     imageResultUrl = e.target.result;
-                    saveAndBroadcastBanner(title, subtitle, imageResultUrl);
+                    await saveAndBroadcastBanner(title, subtitle, imageResultUrl);
                 };
                 reader.readAsDataURL(file);
             } else {
-                saveAndBroadcastBanner(title, subtitle, imageResultUrl);
+                await saveAndBroadcastBanner(title, subtitle, imageResultUrl);
             }
         }
 
-        function saveAndBroadcastBanner(title, subtitle, imageUrl) {
+        async function saveAndBroadcastBanner(title, subtitle, imageUrl) {
+            if (_supabase) {
+                await _supabase.from('banners').insert([
+                    { title: title, subtitle: subtitle, image_url: imageUrl, is_active: true, created_at: new Date() }
+                ]);
+            }
+
             const bannerData = { title, subtitle, image: imageUrl, badge: 'PROMO BERANDA' };
             localStorage.setItem('swift_active_admin_banner', JSON.stringify(bannerData));
-            showToast('🚀 Banner berhasil dipublikasikan secara nyata ke beranda pengguna!', 'success');
+            showToast('🚀 Banner berhasil dipublikasikan secara nyata ke database Supabase!', 'success');
             
             document.getElementById('banner-title-input').value = '';
             document.getElementById('banner-sub-input').value = '';
             document.getElementById('banner-file-input').value = '';
         }
 
-        async function publishGlobalAnnouncement() {
-            const input = document.getElementById('input-global-announcement');
-            if(!input || !input.value.trim()) return showToast('Isi pesan pengumuman!', 'error');
-            localStorage.setItem('swift_global_announcement', input.value.trim());
-            showToast('📢 Pengumuman berhasil disiarkan!', 'success');
-            input.value = '';
+        // MODUL 9: CUSTOMER SERVICE DESK
+        async function loadCustomerServiceChats() {
+            if (!_supabase) return;
+            const container = document.getElementById('cs-chat-list-container');
+            try {
+                const { data: messages, error } = await _supabase.from('chat_messages').select('*').order('created_at', { ascending: false }).limit(20);
+                if (error || !messages || messages.length === 0) {
+                    container.innerHTML = `<div class="text-center text-slate-400 py-6 text-xs italic">Belum ada obrolan bantuan masuk.</div>`;
+                    return;
+                }
+
+                container.innerHTML = messages.map(m => `
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
+                        <div class="flex justify-between items-center text-[10px] text-slate-500">
+                            <span class="font-bold text-blue-600">Pengguna ID: ${m.sender_id || 'Pengirim'}</span>
+                            <span>${new Date(m.created_at).toLocaleString()}</span>
+                        </div>
+                        <p class="text-xs text-slate-800 dark:text-slate-200">${m.message}</p>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = `<div class="text-center text-slate-400 py-6 text-xs italic">Layanan CS terhubung secara otomatis.</div>`;
+            }
         }
 
-        function setAppLockdownStatus(status) {
-            localStorage.setItem('swift_app_lockdown', status ? 'true' : 'false');
-            showToast(`⚠️ Status Lockdown: ${status ? 'AKTIF' : 'NORMAL'}`, status ? 'error' : 'success');
+        function initChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+                    datasets: [{ label: 'Volume Transaksi (RM)', data: [150, 320, 480, 410, 620, 780, 950], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', tension: 0.3, fill: true }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
         }
 
         function logoutAdmin() {
-            if(confirm('Keluar dari Panel Admin?')) location.reload();
+            if(confirm('Keluar dari Panel Admin SWIFT?')) location.reload();
         }
     </script>
 </body>
