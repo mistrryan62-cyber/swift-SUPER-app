@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="id" id="admin-html-root">
 <head>
     <meta charset="UTF-8">
@@ -96,10 +96,19 @@
             <!-- MODUL 2: USER & SALDO -->
             <div id="module-2" class="admin-module hidden space-y-4">
                 <div class="card-bg p-5 rounded-xl shadow-sm space-y-4">
-                    <div class="flex justify-between items-center">
+                    <div class="flex flex-wrap justify-between items-center gap-3">
                         <h3 class="font-bold text-sm">Manajemen Pengguna & Eksekusi Saldo Nyata (Supabase)</h3>
-                        <button onclick="loadRealDatabaseData()" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Data Riil</button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="exportUsersToCSV()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none flex items-center gap-1">📥 Export CSV</button>
+                            <button onclick="loadRealDatabaseData()" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Data</button>
+                        </div>
                     </div>
+                    
+                    <!-- SEARCH BAR MODUL 2 -->
+                    <div class="flex gap-2">
+                        <input type="text" id="search-users-input" onkeyup="filterUsersTable()" placeholder="🔍 Cari nama pengguna atau email..." class="w-full p-2 text-xs rounded-lg border input-light">
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-50 border-b uppercase font-bold text-slate-600">
@@ -148,10 +157,19 @@
             <!-- MODUL 4: MERCHANT -->
             <div id="module-4" class="admin-module hidden space-y-4">
                 <div class="card-bg p-5 rounded-xl shadow-sm space-y-3">
-                    <div class="flex justify-between items-center">
+                    <div class="flex flex-wrap justify-between items-center gap-3">
                         <h3 class="font-bold text-sm">🏬 Katalog Produk Merchant Mitra (Supabase Real-Time)</h3>
-                        <button onclick="loadMerchantProductsData()" class="bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Produk</button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="exportProductsToCSV()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none flex items-center gap-1">📥 Export CSV</button>
+                            <button onclick="loadMerchantProductsData()" class="bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Produk</button>
+                        </div>
                     </div>
+
+                    <!-- SEARCH BAR MODUL 4 -->
+                    <div class="flex gap-2">
+                        <input type="text" id="search-products-input" onkeyup="filterProductsTable()" placeholder="🔍 Cari nama produk atau kategori..." class="w-full p-2 text-xs rounded-lg border input-light">
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-50 border-b uppercase font-bold text-slate-600">
@@ -203,7 +221,10 @@
                 <div class="card-bg p-5 rounded-xl shadow-sm space-y-4">
                     <div class="flex justify-between items-center">
                         <h3 class="font-bold text-sm">💰 Log Keuangan & Penarikan Saldo (Withdrawal Center)</h3>
-                        <button onclick="loadWithdrawalsData()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Pencairan</button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="exportWithdrawalsToCSV()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none flex items-center gap-1">📥 Export CSV</button>
+                            <button onclick="loadWithdrawalsData()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer border-none">🔄 Refresh Pencairan</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
@@ -299,6 +320,11 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco'; 
         const _supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
+        // Variabel global untuk menampung cache data yang diexport
+        let rawUsersData = [];
+        let rawProductsData = [];
+        let rawWithdrawalsData = [];
+
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             if(!container) return;
@@ -355,13 +381,80 @@
             if (activeBtn) activeBtn.className = "w-full text-left px-3 py-2 rounded-lg btn-dynamic text-white transition flex items-center space-x-2 font-bold shadow-sm cursor-pointer";
         }
 
-        // MODUL 1 & 2: HITUNG SALDO RIIL & PENGGUNA DARI SUPABASE
+        // ==========================================
+        // FUNGSI PENCARIAN / SEARCH FILTER
+        // ==========================================
+        function filterUsersTable() {
+            const query = document.getElementById('search-users-input').value.toLowerCase();
+            const rows = document.querySelectorAll('#users-table-body tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        function filterProductsTable() {
+            const query = document.getElementById('search-products-input').value.toLowerCase();
+            const rows = document.querySelectorAll('#merchants-table-body tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        // ==========================================
+        // FUNGSI EXPORT DATA KE CSV / EXCEL
+        // ==========================================
+        function downloadCSV(csvContent, filename) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(`📥 Laporan CSV ${filename} berhasil diunduh!`, 'success');
+        }
+
+        function exportUsersToCSV() {
+            if (!rawUsersData || rawUsersData.length === 0) return showToast('Tidak ada data pengguna untuk diexport', 'error');
+            let csv = 'ID,Nama Lengkap,Email,Saldo (RM),Poin Reward\n';
+            rawUsersData.forEach(u => {
+                csv += `"${u.id}","${u.full_name || ''}","${u.email || ''}",${parseFloat(u.balance || 0).toFixed(2)},${u.reward_points || 0}\n`;
+            });
+            downloadCSV(csv, `Laporan_Pengguna_SWIFT_${new Date().toISOString().slice(0,10)}.csv`);
+        }
+
+        function exportProductsToCSV() {
+            if (!rawProductsData || rawProductsData.length === 0) return showToast('Tidak ada data produk untuk diexport', 'error');
+            let csv = 'ID,Nama Produk,Kategori,Harga (RM)\n';
+            rawProductsData.forEach(p => {
+                csv += `"${p.id}","${p.name || ''}","${p.category || ''}",${parseFloat(p.price || 0).toFixed(2)}\n`;
+            });
+            downloadCSV(csv, `Laporan_Produk_Merchant_${new Date().toISOString().slice(0,10)}.csv`);
+        }
+
+        function exportWithdrawalsToCSV() {
+            if (!rawWithdrawalsData || rawWithdrawalsData.length === 0) return showToast('Tidak ada data pencairan untuk diexport', 'error');
+            let csv = 'ID,User ID/Email,Jumlah (RM),Bank,Nomor Rekening,Status\n';
+            rawWithdrawalsData.forEach(w => {
+                csv += `"${w.id}","${w.user_email || w.user_id}","${parseFloat(w.amount || 0).toFixed(2)}","${w.bank_name || ''}","${w.account_number || ''}","${w.status || ''}"\n`;
+            });
+            downloadCSV(csv, `Laporan_Pencairan_Saldo_${new Date().toISOString().slice(0,10)}.csv`);
+        }
+
+        // ==========================================
+        // MODUL 1 & 2: HITUNG SALDO RIIL & PENGGUNA
+        // ==========================================
         async function loadRealDatabaseData() {
             if (!_supabase) return;
             const tbody = document.getElementById('users-table-body');
             
             try {
                 const { data, count, error } = await _supabase.from('users').select('*', { count: 'exact' });
+                rawUsersData = data || [];
                 
                 const totalUsers = (!error && count !== null) ? count : (data ? data.length : 0);
                 document.getElementById('stat-total-users').innerText = totalUsers;
@@ -448,7 +541,9 @@
             }
         }
 
+        // ==========================================
         // MODUL 3: DRIVER FLEET GPS TRACKING
+        // ==========================================
         async function loadDriversData() {
             if (!_supabase) return;
             const tbody = document.getElementById('drivers-table-body');
@@ -469,7 +564,7 @@
                         <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold text-[10px]">ONLINE</span></td>
                         <td class="p-3 font-mono">${d.region || 'MY'}</td>
                         <td class="p-3 text-center">
-                            <button onclick="showToast('📌 Lokasi driver terpantau di GPS GPS', 'info')" class="bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold border border-blue-200">Lacak GPS</button>
+                            <button onclick="showToast('📌 Lokasi driver terpantau di GPS', 'info')" class="bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold border border-blue-200">Lacak GPS</button>
                         </td>
                     </tr>
                 `).join('');
@@ -478,14 +573,17 @@
             }
         }
 
+        // ==========================================
         // MODUL 4: MERCHANT PRODUCTS
+        // ==========================================
         async function loadMerchantProductsData() {
             if (!_supabase) return;
             const tbody = document.getElementById('merchants-table-body');
             
             try {
                 const { data, count, error } = await _supabase.from('products').select('*', { count: 'exact' });
-                
+                rawProductsData = data || [];
+
                 const totalProds = (!error && count !== null) ? count : (data ? data.length : 0);
                 document.getElementById('stat-total-merchants').innerText = totalProds;
 
@@ -524,7 +622,9 @@
             }
         }
 
+        // ==========================================
         // MODUL 5: LIVE STREAMING MASTER CONTROL
+        // ==========================================
         async function loadLiveBroadcastsData() {
             if (!_supabase) return;
             const tbody = document.getElementById('live-broadcasts-table-body');
@@ -561,12 +661,16 @@
             }
         }
 
+        // ==========================================
         // MODUL 6: FINANCE & WITHDRAWAL AUDIT
+        // ==========================================
         async function loadWithdrawalsData() {
             if (!_supabase) return;
             const tbody = document.getElementById('withdrawals-table-body');
             try {
                 const { data: withdrawals, error } = await _supabase.from('withdrawals').select('*').order('created_at', { ascending: false });
+                rawWithdrawalsData = withdrawals || [];
+
                 if (error || !withdrawals || withdrawals.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Tidak ada pengajuan pencairan dana baru.</td></tr>`;
                     return;
@@ -599,7 +703,9 @@
             }
         }
 
+        // ==========================================
         // MODUL 7: ANNOUNCEMENT & LOCKDOWN
+        // ==========================================
         async function publishGlobalAnnouncement() {
             const input = document.getElementById('input-global-announcement');
             if(!input || !input.value.trim()) return showToast('Isi pesan pengumuman!', 'error');
@@ -622,7 +728,9 @@
             showToast(`⚠️ Status Lockdown: ${status ? 'AKTIF' : 'NORMAL'}`, status ? 'error' : 'success');
         }
 
+        // ==========================================
         // MODUL 8: BANNER & PROMO BROADCAST
+        // ==========================================
         async function executePublishUploadedBanner() {
             const title = document.getElementById('banner-title-input').value.trim();
             const subtitle = document.getElementById('banner-sub-input').value.trim();
@@ -661,7 +769,9 @@
             document.getElementById('banner-file-input').value = '';
         }
 
+        // ==========================================
         // MODUL 9: CUSTOMER SERVICE DESK
+        // ==========================================
         async function loadCustomerServiceChats() {
             if (!_supabase) return;
             const container = document.getElementById('cs-chat-list-container');
