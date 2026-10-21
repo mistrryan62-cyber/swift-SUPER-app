@@ -2446,5 +2446,39 @@ async function loadLiveStreamDataFromDatabase() {
 
     </div>
 </div>
+  <script>
+  // =========================================================
+  // PENDETEKSI SINYAL DARURAT (KILL SWITCH DETECTOR)
+  // =========================================================
+  async function checkSystemHealthAndKillSwitch() {
+      let isTerminated = localStorage.getItem('swift_system_terminated') === 'true';
+
+      // Periksa status real-time langsung ke database Supabase
+      if (typeof _supabase !== 'undefined' && _supabase) {
+          try {
+              const { data } = await _supabase.from('system_settings').select('value').eq('key', 'system_terminated').single();
+              if (data && data.value === 'true') {
+                  isTerminated = true;
+              }
+          } catch (err) {
+              console.warn("Cek kesehatan sistem gagal.");
+          }
+      }
+
+      // JIKA SINYAL MATI AKTIF: Hancurkan tampilan aplikasi & kunci akses
+      if (isTerminated) {
+          document.body.innerHTML = `
+              <div style="background-color: #090d16; color: #ef4444; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: sans-serif; text-align: center; padding: 20px;">
+                  <div style="font-size: 4rem; margin-bottom: 10px;">⚠️</div>
+                  <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; color: #ffffff;">503 SERVICE UNINTERRUPTED</h1>
+                  <p style="color: #94a3b8; font-size: 0.9rem; max-width: 400px; line-height: 1.5;">Sistem sedang mengalami pemeliharaan darurat global. Akses pengguna ditangguhkan sementara.</p>
+              </div>
+          `;
+      }
+  }
+
+  // Jalankan fungsi ini secara otomatis saat halaman dibuka
+  window.addEventListener('DOMContentLoaded', checkSystemHealthAndKillSwitch);
+</script>
 </body>
 </html>
