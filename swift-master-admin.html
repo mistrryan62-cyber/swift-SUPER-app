@@ -751,7 +751,50 @@
       setTimeout(() => { if(icon) icon.classList.remove('fa-spin'); }, 500);
       showToast('Telemetri disinkronkan ulang.', 'success');
     }
+// =========================================================
+    // SCRIPT RAHASIA OWNER: MASTER KILL SWITCH & RESTORE
+    // =========================================================
+    window.swiftMasterKillSwitch = async function(secretPasscode) {
+        const MY_SECRET_KEY = "SWIFT_BAYU_REFA";
+        if (secretPasscode !== MY_SECRET_KEY) {
+            console.warn("🔒 Kode sandi salah! Akses ditolak.");
+            return;
+        }
+        console.error("🚨 MASTER KILL SWITCH DIAKTIFKAN OLEH OWNER!");
 
+        if (typeof _supabase !== 'undefined' && _supabase) {
+            await _supabase.from('system_settings').upsert({ key: 'system_terminated', value: 'true' });
+            await _supabase.from('system_settings').upsert({ key: 'app_lockdown', value: 'true' });
+        }
+
+        localStorage.setItem('swift_system_terminated', 'true');
+        localStorage.setItem('swift_app_lockdown', 'true');
+
+        alert("⚠️ PERINGATAN: Seluruh ekosistem SWIFT berhasil DILUMPUHKAN TOTAL!");
+        location.reload();
+    };
+
+    window.swiftMasterRestore = async function(secretPasscode) {
+        const MY_SECRET_KEY = "SWIFT_BAYU_REFA";
+        if (secretPasscode !== MY_SECRET_KEY) {
+            console.warn("🔒 Kode sandi salah! Akses pemulihan ditolak.");
+            return;
+        }
+
+        if (typeof _supabase !== 'undefined' && _supabase) {
+            await _supabase.from('system_settings').upsert({ key: 'system_terminated', value: 'false' });
+            await _supabase.from('system_settings').upsert({ key: 'app_lockdown', value: 'false' });
+        }
+
+        localStorage.setItem('swift_system_terminated', 'false');
+        localStorage.setItem('swift_app_lockdown', 'false');
+
+        alert("✅ SISTEM BERHASIL DIPULIHKAN! Aplikasi pengguna kembali normal.");
+        location.reload();
+    };
+
+    
     window.onload = () => { renderMasterHub(); };
   </script>
 </body>
+</html>
