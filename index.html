@@ -2454,14 +2454,10 @@ async function loadLiveStreamDataFromDatabase() {
       let isTerminated = localStorage.getItem('swift_system_terminated') === 'true';
 
       // Periksa status real-time langsung ke database Supabase
-      if (typeof _supabase !== 'undefined' && _supabase) {
-          try {
-              const { data } = await _supabase.from('system_settings').select('value').eq('key', 'system_terminated').single();
-              if (data && data.value === 'true') {
-                  isTerminated = true;
-              }
-          } catch (err) {
-              console.warn("Cek kesehatan sistem gagal.");
+if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+    try {
+        const { data } = await supabaseClient.from('system_settings').select('value').eq('key', 'system_terminated').single();
+      
           }
       }
 
