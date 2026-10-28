@@ -2553,19 +2553,17 @@ async function checkSystemHealthAndKillSwitch() {
 }
 
 
-  <!-- MODAL KYC (VERIFIKASI IDENTITAS) -->
-<div id="kyc-modal" class="fixed inset-0 z-50 bg-black/95 hidden flex items-center justify-center p-4">
-    <div class="w-full max-w-[480px] bg-[#0f172a] border border-slate-800 rounded-3xl p-5 shadow-2xl flex flex-col space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-id-card text-emerald-400"></i> Verifikasi Identitas Pengguna (KYC)
-            </h3>
-            <button onclick="document.getElementById('kyc-modal').classList.add('hidden')" class="text-slate-400 hover:text-white text-lg cursor-pointer bg-transparent border-none">&times;</button>
-        </div>
-        <div class="space-y-3 text-xs">
-            <p class="text-slate-300">Unggah foto kartu identitas resmi (KTP / Paspor) untuk membuka batas limit transaksi penuh.</p>
-            <div>
-              <div>
+// KONFIGURASI SUPABASE APLIKASI SWIFT
+const SUPABASE_URL = "https://ydulzwenmideyjrntwie.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdWx6d2VubWlkZXlqcm50d2llIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMDg3NjksImV4cCI6MjEwMzY4NDc2OX0.l_C6SfeqPFjmrNQxJZai_ZS9ZbTLNzEnFJT3l8h8K0w";
+
+// Kunci pembayaran Publishable
+const PUBLISHABLE_KEY = "sb_publishable_pKu-iWAbOKFsRcSoWKHDMQ_iGviaQco";
+
+// Buat koneksi klien Supabase
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+
   window.addEventListener('DOMContentLoaded', checkSystemHealthAndKillSwitch);
 </script> 
 </body>
