@@ -57,3 +57,80 @@ async function handleLogout() {
         window.location.href = 'index.html';
     }
 }
+
+/**
+ * Memproses Pembayaran Otomatis (Money-in) via Xendit Edge Function
+ */
+async function bayarPesanan(totalHarga, emailPelanggan, idPesanan) {
+    const client = getSupabase();
+    if (!client) {
+        alert("Klien Supabase belum siap.");
+        return;
+    }
+
+    try {
+        // Memanggil Supabase Edge Function 'create-invoice'
+        const { data, error } = await client.functions.invoke('create-invoice', {
+            body: {
+                external_id: `SWIFT-ORDER-${idPesanan}-${Date.now()}`,
+                amount: totalHarga,
+                    payer_email: emailPelanggan,
+                description: `Pembayaran Pesanan SWiFT.App #${idPesanan}`
+            }
+        });
+
+        if (error) throw error;
+
+        // Jika berhasil, arahkan pengguna ke halaman pembayaran resmi Xendit
+        if (data && data.invoice_url) {
+            console.log("Link Pembayaran Xendit:", data.invoice_url);
+            window.location.href = data.invoice_url;
+        } else {
+            alert("Gagal menghasilkan tagihan pembayaran dari Xendit.");
+        }
+    } catch (err) {
+        console.error("Kesalahan proses pembayaran:", err);
+        alert("Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.");
+    }
+}
+
+/**
+ * Inisialisasi Proses Checkout dan Pembayaran Terintegrasi
+ * Menghubungkan sesi pengguna aktif secara otomatis dengan Xendit
+ */
+async function handleCheckoutProcess(totalBelanja, idUnikPesanan) {
+    const session = await checkAuthSession();
+    
+    // Validasi apakah pengguna sudah login
+    if (!session || !session.user) {
+        alert("Silakan masuk (login) terlebih dahulu untuk melanjutkan pembayaran.");
+        window.location.href = 'index.html'; // Arahkan ke halaman login jika belum masuk
+        return;
+    }
+
+    const emailPengguna = session.user.email;
+    const idPesanan = idUnikPesanan || `SWIFT-${Math.floor(Math.random() * 1000000)}`;
+
+    console.log(`Memproses pembayaran untuk: ${emailPengguna} dengan nominal: ${formatIDR(totalBelanja)}`);
+
+    // Panggil fungsi utama bayarPesanan
+    await bayarPesanan(totalBelanja, emailPengguna, idPesanan);
+}
+
+// Sinkronisasi Tombol Bayar di Frontend (HTML/JS)
+document.addEventListener('DOMContentLoaded', () => {
+    const tombolBayar = document.getElementById('btn-bayar-swift');
+    
+    if (tombolBayar) {
+        tombolBayar.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            // Contoh data dinamis dari keranjang belanja aplikasi SWiFT
+            const totalTagihan = 75000; // Contoh: Rp 75.000
+            const kodeTransaksi = "TRX-PROD-" + Date.now();
+            
+            // Jalankan proses terintegrasi
+            await handleCheckoutProcess(totalTagihan, kodeTransaksi);
+        });
+    }
+});
