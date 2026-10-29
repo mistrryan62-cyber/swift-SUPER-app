@@ -74,7 +74,7 @@ async function bayarPesanan(totalHarga, emailPelanggan, idPesanan) {
             body: {
                 external_id: `SWIFT-ORDER-${idPesanan}-${Date.now()}`,
                 amount: totalHarga,
-                    payer_email: emailPelanggan,
+                payer_email: emailPelanggan,
                 description: `Pembayaran Pesanan SWiFT.App #${idPesanan}`
             }
         });
@@ -117,7 +117,7 @@ async function handleCheckoutProcess(totalBelanja, idUnikPesanan) {
     await bayarPesanan(totalBelanja, emailPengguna, idPesanan);
 }
 
-// Sinkronisasi Tombol Bayar di Frontend (HTML/JS)
+// Sinkronisasi Tombol Bayar di Frontend (HTML/JS) secara Real-Time dari Keranjang
 document.addEventListener('DOMContentLoaded', () => {
     const tombolBayar = document.getElementById('btn-bayar-swift');
     
@@ -125,11 +125,24 @@ document.addEventListener('DOMContentLoaded', () => {
         tombolBayar.addEventListener('click', async (e) => {
             e.preventDefault();
             
-            // Contoh data dinamis dari keranjang belanja aplikasi SWiFT
-            const totalTagihan = 75000; // Contoh: Rp 75.000
-            const kodeTransaksi = "TRX-PROD-" + Date.now();
+            // Ambil total tagihan secara real-time dari elemen HTML keranjang belanja
+            const totalElement = document.getElementById('cart-total-amount');
+            let totalTagihan = 0;
             
-            // Jalankan proses terintegrasi
+            if (totalElement) {
+                // Membersihkan teks mata uang agar menjadi angka murni
+                const bersihTeks = totalElement.innerText.replace(/[^0-9.-]+/g, "");
+                totalTagihan = parseFloat(bersihTeks) || 0;
+            }
+            
+            if (totalTagihan <= 0) {
+                alert("Keranjang belanja Anda masih kosong atau total belum dihitung.");
+                return;
+            }
+            
+            const kodeTransaksi = "TRX-SWIFT-" + Date.now();
+            
+            // Jalankan proses terintegrasi secara real-time
             await handleCheckoutProcess(totalTagihan, kodeTransaksi);
         });
     }
